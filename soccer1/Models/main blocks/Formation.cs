@@ -1,0 +1,54 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Data.Entity;
+using soccer1.Models.main_blocks;
+using System.ComponentModel.DataAnnotations;
+
+namespace soccer1.Models.main_blocks
+{
+    public static class GameConstants
+    {
+        public const int canvaseSizeX = 1920;
+        public const int canvaseSizeY = 1080;
+        public const int formationMaxX = 100;
+        public const int formationMinX = 0;
+        public const int formationMaxY = 50;
+        public const int formationMinY = -50;
+        public const int PlayerInFild = 5;
+        public const int MaxPlayerInMatch = 10;
+        public const float SpeedOfDragFreeadPrefab = 3.0f;
+        public const float ObjectInPanelTreshhold = 10.0f;
+    }
+    public class Formation
+    {
+        
+      
+    [Key]
+        public string IdName { get; set; }
+
+        public int index { get; set; }
+        public string showName { get; set; }
+        public PawnStartPosition[] positions { get; set; }
+        public Property price { get; set; }
+        public string discription { get; set; }
+    }
+   
+    public struct PawnStartPosition
+    {
+        [Range(GameConstants.formationMinX, GameConstants.formationMaxX)]
+        public int x;
+        [Range(GameConstants.formationMinY, GameConstants.formationMaxY)]
+        public int y;
+    }
+
+    public class FormationInfoDBContext : DbContext
+    {
+        public DbSet<Formation> Formationss { get; set; }
+    }
+
+
+
+
+}
