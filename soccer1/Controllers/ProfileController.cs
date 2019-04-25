@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Mvc;
 using soccer1.Models;
 using soccer1.Models.main_blocks;
+using soccer1.Models.utilites;
 using System.Web.Script.Serialization;
 
 namespace soccer1.Controllers
@@ -23,7 +24,7 @@ namespace soccer1.Controllers
                 string Team1 = collection["Team"];
                 TeamForSerialize teamfs = new JavaScriptSerializer().Deserialize<TeamForSerialize>(Team1);
 
-                //TeamForConnectedPlayers playerteam = Convertors.TeamForSerializeToTeam(teamfs);
+                TeamForConnectedPlayers playerteam = Convertors.TeamForSerializeToTeam(teamfs);
 
 
 
