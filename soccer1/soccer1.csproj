@@ -202,6 +202,7 @@
     <Compile Include="Controllers\LoadingController.cs" />
     <Compile Include="Controllers\MatchController.cs" />
     <Compile Include="Controllers\LeagueController.cs" />
+    <Compile Include="Controllers\ProfileController.cs" />
     <Compile Include="Controllers\SellAndBuyController.cs" />
     <Compile Include="Controllers\ViewAppController.cs" />
     <Compile Include="Global.asax.cs">
@@ -311,6 +312,7 @@
     <Folder Include="Views\Loading\" />
     <Folder Include="Views\Match\" />
     <Folder Include="Views\Menu\" />
+    <Folder Include="Views\Profile\" />
     <Folder Include="Views\SellAndBuy\" />
     <Folder Include="Views\ViewApp\" />
   </ItemGroup>
