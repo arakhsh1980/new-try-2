@@ -9,6 +9,7 @@ using System.Web.Mvc;
 using soccer1;
 
 
+
 namespace soccer1.Models
 {
     public static class ConnectedPlayersList
@@ -409,6 +410,56 @@ namespace soccer1.Models
             {
                 check = IsConnected(i);
             }
+
+        }
+        public static void changeProfileData(TeamForConnectedPlayers playerteam, int ConnectionId)
+        {
+            ////////////////change Pawn info
+            //convert array to list
+            List<int> pawnOutOfTeamlist = new List<int>(connectedPlayers[ConnectionId].pawnOutOfTeam);
+            List<int> pawnsInBenchlist = new List<int>(connectedPlayers[ConnectionId].team.PlayeingPawns);
+            List<int> PlayeingPawnslist = new List<int>(connectedPlayers[ConnectionId].team.pawnsInBench);
+            List<int> pawnsInBenchlist2 = new List<int>(playerteam.pawnsInBench);
+            List<int> PlayeingPawnslist2 = new List<int>(playerteam.PlayeingPawns);
+            //make allpawnList of player
+            pawnOutOfTeamlist.AddRange(pawnsInBenchlist);
+            pawnOutOfTeamlist.AddRange(PlayeingPawnslist);
+            //delete new team of AllPawnList to show pawnOutOfTeam
+            foreach (int i in pawnsInBenchlist2)
+            {
+                pawnOutOfTeamlist.RemoveAt(i);
+            }
+            foreach (int i in PlayeingPawnslist2)
+            {
+                pawnOutOfTeamlist.RemoveAt(i);
+            }
+            
+            connectedPlayers[ConnectionId].pawnOutOfTeam = pawnOutOfTeamlist.ToArray();
+            connectedPlayers[ConnectionId].team.PlayeingPawns = PlayeingPawnslist2.ToArray();
+            connectedPlayers[ConnectionId].team.pawnsInBench = pawnsInBenchlist2.ToArray();
+            ////////////////change elixir info
+            List<int> ElixirOutOfTeamlist = new List<int>(connectedPlayers[ConnectionId].elixirOutOfTeam);
+            List<int> ElixirInBenchlist = new List<int>(connectedPlayers[ConnectionId].team.ElixirInBench);
+            List<int> elixirInBenchlist2 = new List<int>(playerteam.ElixirInBench);
+            ElixirOutOfTeamlist.AddRange(ElixirInBenchlist);
+            //delete new team of AllPawnList to show pawnOutOfTeam
+            foreach (int i in elixirInBenchlist2)
+            {
+                ElixirOutOfTeamlist.RemoveAt(i);
+            }
+            connectedPlayers[ConnectionId].elixirOutOfTeam = ElixirOutOfTeamlist.ToArray();
+            connectedPlayers[ConnectionId].team.ElixirInBench = elixirInBenchlist2.ToArray();
+            ////////////////change formation info
+            List<int> UsableFormationTeamlist = new List<int>(connectedPlayers[ConnectionId].team.UsableFormations);
+            int CurentFormationTeamlist = connectedPlayers[ConnectionId].team.CurrentFormation;
+            int CurentFormationTeamlistNew = playerteam.CurrentFormation;
+            UsableFormationTeamlist.Add(CurentFormationTeamlist);
+            UsableFormationTeamlist.RemoveAt(CurentFormationTeamlistNew);
+            connectedPlayers[ConnectionId].team.UsableFormations = UsableFormationTeamlist.ToArray();
+            connectedPlayers[ConnectionId].team.CurrentFormation = CurentFormationTeamlistNew;
+            ////////////////save changes of Pawn&Formation&elixir in database
+            DatabaseManager.SaveChangesOnPlayer(connectedPlayers[ConnectionId]);
+
 
         }
     }

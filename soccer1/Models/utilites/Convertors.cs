@@ -7,6 +7,7 @@ using System.Web.Mvc;
 using soccer1.Models.main_blocks;
 using System.Web.Script.Serialization;
 
+
 using soccer1.Models;
 
 namespace soccer1.Models.utilites
@@ -60,6 +61,21 @@ namespace soccer1.Models.utilites
             for (int i = 0; i < team.UsableFormations.Length; i++) { slteam.UsableFormations[i] = AssetManager.ReturnFormationName(team.UsableFormations[i]); }
         
             return slteam;
+        }
+
+        public static TeamForConnectedPlayers TeamForSerializeToTeam(TeamForSerialize pl)
+        {
+            //convert of Teamforserialize Class to Team Class 
+            //convert string to int
+            TeamForConnectedPlayers plsrs = new TeamForConnectedPlayers();
+            for (int i = 0; i < pl.PlayeingPawns.Length; i++) { plsrs.PlayeingPawns[i] = Int32.Parse(pl.PlayeingPawns[i]);}
+            for (int i = 0; i < pl.pawnsInBench.Length; i++) { plsrs.pawnsInBench[i] = Int32.Parse(pl.pawnsInBench[i]); }
+            for (int i = 0; i < pl.UsableFormations.Length; i++) { plsrs.UsableFormations[i] = Int32.Parse(pl.UsableFormations[i]); }
+            for (int i = 0; i < pl.ElixirInBench.Length; i++) { plsrs.pawnsInBench[i] = Int32.Parse(pl.ElixirInBench[i]); }
+
+            plsrs.CurrentFormation = Int32.Parse(pl.CurrentFormation);
+
+            return plsrs;
         }
 
         public static string IntArrayToSrting(int[] ar)
