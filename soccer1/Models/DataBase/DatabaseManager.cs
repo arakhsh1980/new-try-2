@@ -70,21 +70,35 @@ namespace soccer1.Models
         }
 
         public static void SaveChangesOnPlayer(PlayerForConnectedPlayer pl)
-        {            
-            PlayerForDatabase  playerInfo = db.playerInfoes2.Find(pl.id);
-            //Player playerInfo = db.playerInfoes2.Find(pl.id);
-            if (playerInfo == null) {
+        {   
+            SaveChangesOnPlayerInDataBase(Convertors.PlayerToPlayerForDatabase(pl));
+        }
+
+        public static void SaveChangesOnPlayerInDataBase(PlayerForDatabase pl)
+        {
+            PlayerForDatabase playerInfo = db.playerInfoes2.Find(pl.id);
+            if (playerInfo == null)
+            {
                 Errors.AddBigError("player dident find for saveing");
             }
             else
             {
-                playerInfo= Convertors.PlayerToPlayerForDatabase(pl);
+                playerInfo.CurrentFormation = pl.CurrentFormation;
+                playerInfo.ElixirInBench = pl.ElixirInBench;
+                playerInfo.Fan = pl.Fan;
+                playerInfo.level = pl.level;
+                playerInfo.Money = pl.Money;
+                playerInfo.Name = pl.Name;
+                playerInfo.otherElixirs = pl.otherElixirs;
+                playerInfo.pawnsInBench = pl.pawnsInBench;
+                playerInfo.PlayeingPawns = pl.PlayeingPawns;
+                playerInfo.PowerLevel = pl.PowerLevel;
+                playerInfo.SoccerSpetial = pl.SoccerSpetial;
+                playerInfo.UsableFormations = pl.UsableFormations;
                 db.Entry(playerInfo).State = EntityState.Modified;
                 db.SaveChanges();
-            }   
+            }
         }
-
-
 
         public static void AddPawnToDataBase(Pawn p)
         {

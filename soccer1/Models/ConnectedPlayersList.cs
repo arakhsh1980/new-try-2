@@ -427,11 +427,11 @@ namespace soccer1.Models
             //delete new team of AllPawnList to show pawnOutOfTeam
             foreach (int i in pawnsInBenchlist2)
             {
-                pawnOutOfTeamlist.RemoveAt(i);
+                pawnOutOfTeamlist.Remove(i);
             }
             foreach (int i in PlayeingPawnslist2)
             {
-                pawnOutOfTeamlist.RemoveAt(i);
+                pawnOutOfTeamlist.Remove(i);
             }
             
             connectedPlayers[ConnectionId].pawnOutOfTeam = pawnOutOfTeamlist.ToArray();
@@ -445,7 +445,7 @@ namespace soccer1.Models
             //delete new team of AllPawnList to show pawnOutOfTeam
             foreach (int i in elixirInBenchlist2)
             {
-                ElixirOutOfTeamlist.RemoveAt(i);
+                ElixirOutOfTeamlist.Remove(i);
             }
             connectedPlayers[ConnectionId].elixirOutOfTeam = ElixirOutOfTeamlist.ToArray();
             connectedPlayers[ConnectionId].team.ElixirInBench = elixirInBenchlist2.ToArray();
@@ -454,7 +454,7 @@ namespace soccer1.Models
             int CurentFormationTeamlist = connectedPlayers[ConnectionId].team.CurrentFormation;
             int CurentFormationTeamlistNew = playerteam.CurrentFormation;
             UsableFormationTeamlist.Add(CurentFormationTeamlist);
-            UsableFormationTeamlist.RemoveAt(CurentFormationTeamlistNew);
+            UsableFormationTeamlist.Remove(CurentFormationTeamlistNew);
             connectedPlayers[ConnectionId].team.UsableFormations = UsableFormationTeamlist.ToArray();
             connectedPlayers[ConnectionId].team.CurrentFormation = CurentFormationTeamlistNew;
             ////////////////save changes of Pawn&Formation&elixir in database

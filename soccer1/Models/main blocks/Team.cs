@@ -23,7 +23,7 @@ namespace soccer1.Models.main_blocks
         }
 
 
-        public int CurrentFormation;
+        public int CurrentFormation { get; set; }
 
 
 
