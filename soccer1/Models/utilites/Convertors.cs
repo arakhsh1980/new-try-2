@@ -98,6 +98,24 @@ namespace soccer1.Models.utilites
             return kk;
         }
 
+
+        public static TeamForConnectedPlayers TeamForSerializeToTeam(TeamForSerialize pl)
+        {
+            //convert of Teamforserialize Class to Team Class 
+            //convert string to int
+            TeamForConnectedPlayers plsrs = new TeamForConnectedPlayers();
+            for (int i = 0; i < pl.PlayeingPawns.Length; i++) { plsrs.PlayeingPawns = SrtingTointArray(pl.PlayeingPawns[i]); }
+            for (int i = 0; i < pl.pawnsInBench.Length; i++) { plsrs.pawnsInBench = SrtingTointArray(pl.pawnsInBench[i]); }
+            for (int i = 0; i < pl.UsableFormations.Length; i++) { plsrs.UsableFormations = SrtingTointArray(pl.UsableFormations[i]); }
+            for (int i = 0; i < pl.ElixirInBench.Length; i++) { plsrs.pawnsInBench = SrtingTointArray(pl.ElixirInBench[i]); }
+
+            plsrs.CurrentFormation = Int32.Parse(pl.CurrentFormation);
+
+            return plsrs;
+        }
+
+
+
         public static PlayerForSerial PlayerToPlayrSerial(PlayerForConnectedPlayer pl)
         {
             PlayerForSerial plsr = new PlayerForSerial();

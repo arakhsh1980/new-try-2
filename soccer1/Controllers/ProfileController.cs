@@ -3,15 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using System.Runtime.Serialization;
-using System.Xml.Serialization;
 using soccer1.Models;
-using System.IO;
-using System.Text;
-using System.Runtime.Serialization.Json;
-using System.Web.Script.Serialization;
-using soccer1.Models.utilites;
 using soccer1.Models.main_blocks;
+using soccer1.Models.utilites;
+using System.Web.Script.Serialization;
 
 namespace soccer1.Controllers
 {
@@ -28,11 +23,13 @@ namespace soccer1.Controllers
             {
                 string Team1 = collection["Team"];
                 TeamForSerialize teamfs = new JavaScriptSerializer().Deserialize<TeamForSerialize>(Team1);
+
                 TeamForConnectedPlayers playerteam = Convertors.TeamForSerializeToTeam(teamfs);
-                ConnectedPlayersList.changeProfileData(playerteam, ConnectionId);
-                //PlayerForConnectedPlayer playera = DatabaseManager.LoadPlayerData(PlayerId);
-                //DatabaseManager.SaveChangesOnPlayer(playera);
-                
+
+
+
+
+
                 return true.ToString();
             }
             else
