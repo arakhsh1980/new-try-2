@@ -74,7 +74,7 @@ namespace soccer1.Models.utilites
             for (int i = 0; i < pl.UsableFormations.Length; i++) { plsrs.UsableFormations[i] = AssetManager.ReturnIndexOfPawn(pl.UsableFormations[i]); }
             for (int i = 0; i < pl.ElixirInBench.Length; i++) { plsrs.pawnsInBench[i] = AssetManager.ReturnIndexOfPawn(pl.ElixirInBench[i]); }
 
-            plsrs.CurrentFormation = Int32.Parse(pl.CurrentFormation);
+            plsrs.CurrentFormation = AssetManager.ReturnIndexOfPawn(pl.CurrentFormation); 
 
             return plsrs;
         }

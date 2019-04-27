@@ -24,7 +24,7 @@ namespace soccer1.Models
         public static int ReturnIndexOfPawn(string IdNamePawn)
         {
             int IndexOfPawn=-1;
-            for (int i = 1; i < Pawnlist.Length; i++)
+            for (int i = 0; i < Pawnlist.Length; i++)
             {
                 if (Pawnlist[i].IdName == IdNamePawn)
                 {
@@ -41,7 +41,7 @@ namespace soccer1.Models
         {
             Pawn p = new Pawn();
             p.IdName = "null";            
-            for (int i = 1; i < Pawnlist.Length; i++)
+            for (int i = 0; i < Pawnlist.Length; i++)
             {
                 if (Pawnlist[i].IdName == IdNamePawn){  p = Pawnlist[i]; }
             }             
@@ -52,7 +52,7 @@ namespace soccer1.Models
         {
             Elixir p = new Elixir();
             p.IdName = "null";            
-            for (int i = 1; i < Elixirlist.Length; i++)
+            for (int i = 0; i < Elixirlist.Length; i++)
             {
                 if (Elixirlist[i].IdName == IdNamePawn) {  p = Elixirlist[i]; }
             }
@@ -63,7 +63,7 @@ namespace soccer1.Models
         {
             Formation p = new Formation();
             p.IdName = "null";            
-            for (int i = 1; i < Formationlist.Length; i++)
+            for (int i = 0; i < Formationlist.Length; i++)
             {
                 if (Formationlist[i].IdName == IdNamePawn){  p = Formationlist[i]; }
             }
