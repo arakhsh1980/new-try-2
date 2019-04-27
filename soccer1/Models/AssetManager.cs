@@ -21,6 +21,22 @@ namespace soccer1.Models
         private static int ElixirConter = 0;
         private static int FormationConter = 0;
         //give pawnname add return pawnindex
+        public static int ReturnIndexOfPawn(string IdNamePawn)
+        {
+            int IndexOfPawn=-1;
+            for (int i = 1; i < Pawnlist.Length; i++)
+            {
+                if (Pawnlist[i].IdName == IdNamePawn)
+                {
+                    IndexOfPawn = i;
+                }
+            }
+            if (IndexOfPawn < 0)
+            {
+                Log.AddLog("Error : Can Not Find This Pawn");
+            }
+            return IndexOfPawn;
+        }
         public static Pawn RetrunPawnByIdName(string IdNamePawn)
         {
             Pawn p = new Pawn();

@@ -68,10 +68,11 @@ namespace soccer1.Models.utilites
             //convert of Teamforserialize Class to Team Class 
             //convert string to int
             TeamForConnectedPlayers plsrs = new TeamForConnectedPlayers();
-            for (int i = 0; i < pl.PlayeingPawns.Length; i++) { plsrs.PlayeingPawns[i] = Int32.Parse(pl.PlayeingPawns[i]); }
-            for (int i = 0; i < pl.pawnsInBench.Length; i++) { plsrs.pawnsInBench[i] = Int32.Parse(pl.pawnsInBench[i]); }
-            for (int i = 0; i < pl.UsableFormations.Length; i++) { plsrs.UsableFormations[i] = Int32.Parse(pl.UsableFormations[i]); }
-            for (int i = 0; i < pl.ElixirInBench.Length; i++) { plsrs.pawnsInBench[i] = Int32.Parse(pl.ElixirInBench[i]); }
+           
+            for (int i = 0; i < pl.PlayeingPawns.Length; i++) { plsrs.PlayeingPawns[i] = AssetManager.ReturnIndexOfPawn(pl.PlayeingPawns[i]); }
+            for (int i = 0; i < pl.pawnsInBench.Length; i++) { plsrs.pawnsInBench[i] = AssetManager.ReturnIndexOfPawn(pl.pawnsInBench[i]); }
+            for (int i = 0; i < pl.UsableFormations.Length; i++) { plsrs.UsableFormations[i] = AssetManager.ReturnIndexOfPawn(pl.UsableFormations[i]); }
+            for (int i = 0; i < pl.ElixirInBench.Length; i++) { plsrs.pawnsInBench[i] = AssetManager.ReturnIndexOfPawn(pl.ElixirInBench[i]); }
 
             plsrs.CurrentFormation = Int32.Parse(pl.CurrentFormation);
 
