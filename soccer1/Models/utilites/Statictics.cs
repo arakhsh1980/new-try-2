@@ -9,6 +9,8 @@ namespace soccer1.Models
 
     public enum PreMatchSituation { NonExistance, WithOnePlayer, WithTwoPlayer };
 
+    public enum AssetType { Pawn, Elixir, Formation, none };
+
     public enum ServrMasage { NothingNew, WatForOthr, GoToMatchi, ActTisShot, Winnerisii, Disconcted, PlayerGoal, PlrTimeOut, shotIsDown }
 
     public static class Statistics

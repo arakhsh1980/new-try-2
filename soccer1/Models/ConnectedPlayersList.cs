@@ -34,10 +34,10 @@ namespace soccer1.Models
         public static Property ReturnPropertyOfPlayer(int coonId)
         {
             Property pop = new Property();
-            pop.coin = connectedPlayers[coonId].property.coin;
-            pop.fan = connectedPlayers[coonId].property.fan;
-            pop.level = connectedPlayers[coonId].property.level;
-            pop.SoccerSpetial = connectedPlayers[coonId].property.SoccerSpetial;
+            pop.coin = connectedPlayers[coonId].PlayerProperty.coin;
+            pop.fan = connectedPlayers[coonId].PlayerProperty.fan;
+            pop.level = connectedPlayers[coonId].PlayerProperty.level;
+            pop.SoccerSpetial = connectedPlayers[coonId].PlayerProperty.SoccerSpetial;
             return pop;
         }
 
@@ -83,12 +83,19 @@ namespace soccer1.Models
         #endregion
 
 
+        
+
         public static void AddPawnToPlayer(int ConnectionId, int pawnIndex)
         {
             connectedPlayers[ConnectionId].pawnOutOfTeam[connectedPlayers[ConnectionId].pawnOutOfTeamCounter] = pawnIndex;
             connectedPlayers[ConnectionId].pawnOutOfTeamCounter++;            
         }
 
+        public static bool BuyAssetForPlayer(int ConnectionId, AssetType type, string AssetName)
+        {
+            Property price= AssetManager.ReturnAssetPrice(type, AssetName);
+            return connectedPlayers[ConnectionId].BuyAsset(type, AssetName, price);           
+        }
 
         public static void AddElixirToPlayer(int ConnectionId, int ElixirIndex)
         {
@@ -104,8 +111,8 @@ namespace soccer1.Models
 
         public static void SubtractProperty(int ConnectionId, Property prop)
         {
-            connectedPlayers[ConnectionId].property.coin = - prop.coin;
-            connectedPlayers[ConnectionId].property.SoccerSpetial = - prop.SoccerSpetial ;
+            connectedPlayers[ConnectionId].PlayerProperty.coin = - prop.coin;
+            connectedPlayers[ConnectionId].PlayerProperty.SoccerSpetial = - prop.SoccerSpetial ;
         }
 
 
@@ -365,8 +372,8 @@ namespace soccer1.Models
 
         public static void ChangePlayerProperty(Property newProperty , int PlayerId)
         {
-            connectedPlayers[PlayerId].property = newProperty;
-            connectedPlayers[PlayerId].property = newProperty;
+            connectedPlayers[PlayerId].PlayerProperty = newProperty;
+            connectedPlayers[PlayerId].PlayerProperty = newProperty;
         }
 
         

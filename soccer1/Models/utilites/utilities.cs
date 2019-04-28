@@ -27,16 +27,49 @@ namespace soccer1.Models.utilites
             for(int i=0; i< pl.elixirOutOfTeam.Length; i++) { pl.elixirOutOfTeam[i] = -1; }
             pl.pawnOutOfTeam = new int[Statistics.MaxPawnOutOfTeam];
             for (int i = 0; i < pl.pawnOutOfTeam.Length; i++) { pl.pawnOutOfTeam[i] = -1; }
-            pl.team = AssetManager.returnDefultTeam();
-            pl.property = new Property();
-            pl.property.fan = 0;
-            pl.property.coin = Statistics.StartingCoin;
-            pl.property.level = 1;
-            pl.property.SoccerSpetial = Statistics.StartingSS;
+            pl.team = utilities.returnDefultTeam();
+            pl.PlayerProperty = new Property();
+            pl.PlayerProperty.fan = 0;
+            pl.PlayerProperty.coin = Statistics.StartingCoin;
+            pl.PlayerProperty.level = 1;
+            pl.PlayerProperty.SoccerSpetial = Statistics.StartingSS;
             return pl;
         }
 
-       
+
+
+        public static TeamForConnectedPlayers returnDefultTeam()
+        {
+            TeamForConnectedPlayers team = new TeamForConnectedPlayers();
+            int defultPawnIndex = AssetManager.ReturnAssetIndex(AssetType.Pawn , "Defult");            
+            int defultElixirIndex = AssetManager.ReturnAssetIndex(AssetType.Elixir, "Defult");            
+            int defultFormationIndex = AssetManager.ReturnAssetIndex(AssetType.Formation, "Defult");            
+            team.CurrentFormation = defultFormationIndex;
+            for (int i = 0; i < team.PlayeingPawns.Length; i++) { team.PlayeingPawns[i] = defultPawnIndex; }
+            for (int i = 0; i < team.pawnsInBench.Length; i++) { team.pawnsInBench[i] = defultPawnIndex; }
+            for (int i = 0; i < team.UsableFormations.Length; i++) { team.UsableFormations[i] = -1; }
+            for (int i = 0; i < team.ElixirInBench.Length; i++) { team.ElixirInBench[i] = defultElixirIndex; }
+            return team;
+        }
+
+        public static AssetType ReturnAssetTypeByName(string typeName)
+        {
+            AssetType type = AssetType.none;
+            switch (typeName)
+            {
+                case "Pawn":
+                    type = AssetType.Pawn;
+                    break;
+                case "Elixir":
+                    type = AssetType.Elixir;
+                    break;
+                case "Formation":
+                    type = AssetType.Formation;
+                    break;
+            }
+            if (type == AssetType.none) { Errors.AddSmallError("AssetType not found"); }
+            return type;
+        }
 
 
 

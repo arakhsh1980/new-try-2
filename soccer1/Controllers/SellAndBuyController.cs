@@ -14,7 +14,30 @@ namespace soccer1.Controllers
     public class SellAndBuyController : Controller
     {
         // GET: SellAndBuy
-        
+
+        [HttpPost]
+        public string BuyAsset(FormCollection collection)
+        {
+            int ConnectionId = Int32.Parse(Request.Form["ConnectionId"]);
+            string PlayerId = Request.Form["PlayerId"];
+            string IdName = Request.Form["IdName"];
+            string AssetTypestring = Request.Form["AssetType"];
+            bool reusult = false;
+            AssetType assetType = utilities.ReturnAssetTypeByName(AssetTypestring);
+            if (ConnectedPlayersList.IsConnectedById(ConnectionId, PlayerId))
+            {
+                reusult = ConnectedPlayersList.BuyAssetForPlayer(ConnectionId, assetType, IdName);
+                return reusult.ToString();
+            }
+            else
+            {
+                Log.AddLog("Error : Can Not Add Pawn");
+                return false.ToString();
+            }
+        }
+
+
+
         [HttpPost]
         public string BuyPawn(FormCollection collection)
         {

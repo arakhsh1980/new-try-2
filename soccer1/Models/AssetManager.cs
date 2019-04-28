@@ -21,22 +21,31 @@ namespace soccer1.Models
         private static int ElixirConter = 0;
         private static int FormationConter = 0;
         //give pawnname add return pawnindex
-        public static int ReturnIndexOfPawn(string IdNamePawn)
+
+        public static int ReturnAssetIndex(AssetType type, string IdNamePawn)
         {
-            int IndexOfPawn=-1;
-            for (int i = 0; i < Pawnlist.Length; i++)
+            int IndexOfAsset=-1;
+            switch (type)
             {
-                if (Pawnlist[i].IdName == IdNamePawn)
-                {
-                    IndexOfPawn = i;
-                }
+                case AssetType.Pawn:
+                    for (int i = 0; i < Pawnlist.Length; i++) if (Pawnlist[i].IdName == IdNamePawn) { IndexOfAsset = i; }
+                   
+                    break;
+                case AssetType.Elixir:
+                    for (int i = 0; i < Elixirlist.Length; i++) if (Elixirlist[i].IdName == IdNamePawn) { IndexOfAsset = i; }
+                    break;
+                case AssetType.Formation:
+                    for (int i = 0; i < Formationlist.Length; i++) if (Formationlist[i].IdName == IdNamePawn) { IndexOfAsset = i; }
+                    break;
             }
-            if (IndexOfPawn < 0)
+            
+            if (IndexOfAsset < 0)
             {
                 Log.AddLog("Error : Can Not Find This Pawn");
             }
-            return IndexOfPawn;
+            return IndexOfAsset;
         }
+        
         public static Pawn RetrunPawnByIdName(string IdNamePawn)
         {
             Pawn p = new Pawn();
@@ -70,6 +79,156 @@ namespace soccer1.Models
             return p;
         }
 
+        public static string ReturnAssetName(AssetType type, int index)
+        {
+            if(arraylengh<= index || index < 0)
+            {
+                Errors.AddBigError(" index out of reng");
+                return "Error";
+            }
+            int maxAssined=0;
+            string idName= "Error";
+            switch (type)
+            {
+                case AssetType.Pawn:
+                    maxAssined = pawnsConter;
+                    idName= Pawnlist[index].IdName;
+                    break;
+                case AssetType.Elixir:
+                    maxAssined = ElixirConter;
+                    idName = Elixirlist[index].IdName;
+                    break;
+                case AssetType.Formation:
+                    maxAssined = FormationConter;
+                    idName = Formationlist[index].IdName;
+                    break;
+            }
+            if (maxAssined < index )
+            {
+                Errors.AddBigError(" index out of reng");
+                return "Error";
+            }
+            return idName;
+        }
+
+        public static Property ReturnAssetPrice(AssetType type, int index)
+        {
+            Property pop = new Property();
+            pop.coin = int.MaxValue;
+            pop.fan = int.MaxValue;
+            Property thisprop = new Property();
+            if (arraylengh <= index || index < 0)
+            {
+                Errors.AddBigError(" index out of reng");
+                return pop;
+            }
+
+            int maxAssined = 0;           
+            switch (type)
+            {
+                case AssetType.Pawn:
+                    maxAssined = pawnsConter;
+                    thisprop = Pawnlist[index].price;
+                    break;
+                case AssetType.Elixir:
+                    maxAssined = ElixirConter;
+                    thisprop = Elixirlist[index].price;
+                    break;
+                case AssetType.Formation:
+                    maxAssined = FormationConter;
+                    thisprop = Formationlist[index].price;
+                    break;
+            }
+            if (maxAssined < index)
+            {
+                Errors.AddBigError(" index out of reng");
+                return pop;
+            }
+            pop.coin = thisprop.coin;
+            pop.fan = thisprop.fan;
+            pop.level = thisprop.level;
+            pop.SoccerSpetial = thisprop.SoccerSpetial;
+            return pop;
+        }
+
+        public static Property ReturnAssetPrice(AssetType type, string  IdName)
+        {
+            return ReturnAssetPrice(type, ReturnAssetIndex(type, IdName));
+        }
+
+        public static void AddPawnToAssets(Pawn p)
+        {
+            if(Pawnlist.Length <= pawnsConter) { Errors.AddBigError("Pawnlist.Length <= pawnsConter"); return; }
+            int indexinarray = -1;
+            for (int i=0; i<= pawnsConter; i++) if (Pawnlist[i].IdName == p.IdName) { indexinarray = i; }
+            if(indexinarray == -1)
+            {
+                p.index = pawnsConter;
+                Pawnlist[pawnsConter] = p;
+                pawnsConter++;
+                //DatabaseManager.AddPawnToDataBase(p);
+            }
+            else
+            {
+                p.index = indexinarray;
+                Pawnlist[indexinarray] = p;                
+                //DatabaseManager.AddPawnToDataBase(p);
+            }
+        }
+        
+        public static void AddFormationToAssets(Formation ff)
+        {
+            if (Formationlist.Length <= FormationConter) { Errors.AddBigError("Formationlist.Length <= FormationConter"); return; }
+            int indexinarray = -1;
+            for (int i = 0; i <= FormationConter; i++) if (Formationlist[i].IdName == ff.IdName) { indexinarray = i; }
+            if (indexinarray == -1)
+            {
+                ff.index = FormationConter;
+                Formationlist[FormationConter] = ff;
+                FormationConter++;
+                //DatabaseManager.AddFormationToDataBase(ff);
+            }
+            else
+            {
+                ff.index = indexinarray;
+                Formationlist[indexinarray] = ff;
+                //DatabaseManager.AddFormationToDataBase(ff);
+            }
+        }
+        
+        public static void AddElixirToAssets(Elixir el)
+        {
+            if (Elixirlist.Length <= ElixirConter) { Errors.AddBigError("Elixirlist.Length <= ElixirConter"); return; }
+            int indexinarray = -1;
+            for (int i = 0; i <= ElixirConter; i++) if (Elixirlist[i].IdName == el.IdName) { indexinarray = i; }
+            if (indexinarray == -1)
+            {
+                el.index = ElixirConter;
+                Elixirlist[ElixirConter] = el;
+                ElixirConter++;
+                //DatabaseManager.AddElixirToDataBase(el);
+            }
+            else
+            {
+                el.index = indexinarray;
+                Elixirlist[indexinarray] = el;
+                //DatabaseManager.AddElixirToDataBase(el);
+            }
+        }
+        
+        public static void FillArrays()
+        {
+            for(int i=0; i< arraylengh; i++)
+            {
+                Pawnlist[i] = new Pawn();
+                Elixirlist[i] = new Elixir();
+                Formationlist[i] = new Formation();
+            }
+        }
+
+
+
+        /*
         public static string ReturnPawnName(int pawnId)
         {
             if(pawnId<0 || pawnsConter < pawnId) {
@@ -107,132 +266,48 @@ namespace soccer1.Models
                 return Formationlist[formId].IdName;
             }
         }
+        */
+
+
 
         //public static add
 
         //give index of pawn and return price of that pawn
-        public static Property ReturnPawnPrice(int index)
-        {
-            Property pop = new Property();
-            pop.coin = Pawnlist[index].price.coin;
-            pop.fan = Pawnlist[index].price.fan;
-            pop.level = Pawnlist[index].price.level;
-            pop.SoccerSpetial = Pawnlist[index].price.SoccerSpetial;
-            return pop;
-        }
 
-        public static Property ReturnElixirPrice(int index)
-        {
-            Property pop = new Property();
-            pop.coin = Elixirlist[index].price.coin;
-            pop.fan = Elixirlist[index].price.fan;
-            pop.level = Elixirlist[index].price.level;
-            pop.SoccerSpetial = Elixirlist[index].price.SoccerSpetial;
-            return pop;
-        }
-
-        public static Property ReturnFormationPrice(int index)
-        {
-            Property pop = new Property();
-            pop.coin = Formationlist[index].price.coin;
-            pop.fan = Formationlist[index].price.fan;
-            pop.level = Formationlist[index].price.level;
-            pop.SoccerSpetial = Formationlist[index].price.SoccerSpetial;
-            return pop;
-        }
-
-        public static  TeamForConnectedPlayers returnDefultTeam()
-        {
-            TeamForConnectedPlayers team = new TeamForConnectedPlayers();
-            int defultPawnIndex = 1;
-            for(int i=0; i< Pawnlist.Length; i++) if (Pawnlist[i].IdName == "Defult") { defultPawnIndex = i; }
-            int defultElixirIndex = 1;
-            for (int i = 0; i < Elixirlist.Length; i++) if (Elixirlist[i].IdName == "Defult") { defultElixirIndex = i; }
-            int defultFormationIndex = 1;
-            for (int i = 0; i < Formationlist.Length; i++) if (Formationlist[i].IdName == "Defult") { defultFormationIndex = i; }
-            team.CurrentFormation = defultFormationIndex;
-            for (int i = 0; i < team.PlayeingPawns.Length; i++) { team.PlayeingPawns[i] = defultPawnIndex; }
-            for (int i = 0; i < team.pawnsInBench.Length; i++) { team.pawnsInBench[i] = defultPawnIndex; }
-            for (int i = 0; i < team.UsableFormations.Length; i++) { team.UsableFormations[i] = -1; }
-            for (int i = 0; i < team.ElixirInBench.Length; i++) { team.ElixirInBench[i] = defultElixirIndex; }
-            return team;
-        }
-
-        public static void AddPawnToAssets(Pawn p)
-        {
-            if(Pawnlist.Length <= pawnsConter) { Errors.AddBigError("Pawnlist.Length <= pawnsConter"); return; }
-            int indexinarray = -1;
-            for (int i=0; i<= pawnsConter; i++) if (Pawnlist[i].IdName == p.IdName) { indexinarray = i; }
-            if(indexinarray == -1)
+        /*
+            public static Property ReturnPawnPrice(int index)
             {
-                p.index = pawnsConter;
-                Pawnlist[pawnsConter] = p;
-                pawnsConter++;
-                //DatabaseManager.AddPawnToDataBase(p);
+                Property pop = new Property();
+                pop.coin = Pawnlist[index].price.coin;
+                pop.fan = Pawnlist[index].price.fan;
+                pop.level = Pawnlist[index].price.level;
+                pop.SoccerSpetial = Pawnlist[index].price.SoccerSpetial;
+                return pop;
             }
-            else
+
+            public static Property ReturnElixirPrice(int index)
             {
-                p.index = indexinarray;
-                Pawnlist[indexinarray] = p;                
-                //DatabaseManager.AddPawnToDataBase(p);
+                Property pop = new Property();
+                pop.coin = Elixirlist[index].price.coin;
+                pop.fan = Elixirlist[index].price.fan;
+                pop.level = Elixirlist[index].price.level;
+                pop.SoccerSpetial = Elixirlist[index].price.SoccerSpetial;
+                return pop;
             }
-        }
 
-
-
-
-        public static void AddFormationToAssets(Formation ff)
-        {
-            if (Formationlist.Length <= FormationConter) { Errors.AddBigError("Formationlist.Length <= FormationConter"); return; }
-            int indexinarray = -1;
-            for (int i = 0; i <= FormationConter; i++) if (Formationlist[i].IdName == ff.IdName) { indexinarray = i; }
-            if (indexinarray == -1)
+            public static Property ReturnFormationPrice(int index)
             {
-                ff.index = FormationConter;
-                Formationlist[FormationConter] = ff;
-                FormationConter++;
-                //DatabaseManager.AddFormationToDataBase(ff);
+                Property pop = new Property();
+                pop.coin = Formationlist[index].price.coin;
+                pop.fan = Formationlist[index].price.fan;
+                pop.level = Formationlist[index].price.level;
+                pop.SoccerSpetial = Formationlist[index].price.SoccerSpetial;
+                return pop;
             }
-            else
-            {
-                ff.index = indexinarray;
-                Formationlist[indexinarray] = ff;
-                //DatabaseManager.AddFormationToDataBase(ff);
-            }
-        }
+            */
 
 
-        public static void AddElixirToAssets(Elixir el)
-        {
-            if (Elixirlist.Length <= ElixirConter) { Errors.AddBigError("Elixirlist.Length <= ElixirConter"); return; }
-            int indexinarray = -1;
-            for (int i = 0; i <= ElixirConter; i++) if (Elixirlist[i].IdName == el.IdName) { indexinarray = i; }
-            if (indexinarray == -1)
-            {
-                el.index = ElixirConter;
-                Elixirlist[ElixirConter] = el;
-                ElixirConter++;
-                //DatabaseManager.AddElixirToDataBase(el);
-            }
-            else
-            {
-                el.index = indexinarray;
-                Elixirlist[indexinarray] = el;
-                //DatabaseManager.AddElixirToDataBase(el);
-            }
-        }
-
-
-        public static void FillArrays()
-        {
-            for(int i=0; i< arraylengh; i++)
-            {
-                Pawnlist[i] = new Pawn();
-                Elixirlist[i] = new Elixir();
-                Formationlist[i] = new Formation();
-            }
-        }
     }
-    
+
 }
 

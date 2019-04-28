@@ -5,6 +5,7 @@ using System.Web;
 using System.Data.Entity;
 using soccer1.Models.main_blocks;
 using System.ComponentModel.DataAnnotations;
+using soccer1.Models.utilites;
 
 
 
@@ -21,7 +22,7 @@ namespace soccer1.Models.main_blocks
                 Name = "uuuuuu";
                 PowerLevel = 1.0f;
                 team = new TeamForConnectedPlayers();
-                property = new Property();
+                PlayerProperty = new Property();
             }
 
            
@@ -35,7 +36,7 @@ namespace soccer1.Models.main_blocks
         
         public TeamForConnectedPlayers team { get; set; }
 
-        public Property property;
+        public Property PlayerProperty;
 
         public int pawnOutOfTeamCounter =0;
         public int elixirOutOfTeamCounter = 0;
@@ -43,40 +44,83 @@ namespace soccer1.Models.main_blocks
         public int[] pawnOutOfTeam = new int[Statistics.MaxPawnOutOfTeam];
 
         public int[] elixirOutOfTeam = new int[Statistics.MaxElixirOutOfTeam];
-        public void  AddPawnOutOfTeam(int pawnindex) {
-            
-        }
-    }
 
-/*
-    public class ReadOnlyPlayer
-    {
 
-        public Player()
+        #region public functions
+
+        public bool BuyAsset(AssetType assetType, string AssetIdName, Property price)
         {
-            connectedId = 0;
-            Name = "uuuuuu";
-            PowerLevel = 1.0f;
+            
+            if(utilities.CheckIfFirstPropertyIsBigger(PlayerProperty, price)) {
+                SubtractProperty(price);
+                switch (assetType)
+                {
+                    case AssetType.Pawn:
+                        pawnOutOfTeam[pawnOutOfTeamCounter] = AssetManager.ReturnAssetIndex(AssetType.Pawn, AssetIdName);
+                        pawnOutOfTeamCounter++;
+                        break;
+
+
+                }
+                return true;
+            }
+            else{
+                return false;
+            }
+        }
+        
+        public bool SubtractProperty(Property prop)
+        {
+            if (utilities.CheckIfFirstPropertyIsBigger(PlayerProperty, prop))
+            {
+                PlayerProperty.coin = -prop.coin;
+                PlayerProperty.SoccerSpetial = -prop.SoccerSpetial;
+                PlayerProperty.fan = -prop.fan;
+                return true;
+            }
+            else
+            {
+                Errors.AddClientError("Not Enogh property");
+                return false;
+            }
         }
 
 
-        public string id { get; set; }
+        #endregion
 
-        public string Name { get; set; }
-
-        public int connectedId { get; set; }
-
-        public float PowerLevel { get; set; }
-
-        public Team team { get; set; }
-
-        public Property property { get; set; }
-
-        public int[] pawnOutOfTeam = new int[Statistics.MaxPawnOutOfTeam];
-
-        public int[] elixirOutOfTeam = new int[Statistics.MaxElixirOutOfTeam];
-
+        #region inner function
+        #endregion
     }
-    */
+
+    /*
+        public class ReadOnlyPlayer
+        {
+
+            public Player()
+            {
+                connectedId = 0;
+                Name = "uuuuuu";
+                PowerLevel = 1.0f;
+            }
+
+
+            public string id { get; set; }
+
+            public string Name { get; set; }
+
+            public int connectedId { get; set; }
+
+            public float PowerLevel { get; set; }
+
+            public Team team { get; set; }
+
+            public Property property { get; set; }
+
+            public int[] pawnOutOfTeam = new int[Statistics.MaxPawnOutOfTeam];
+
+            public int[] elixirOutOfTeam = new int[Statistics.MaxElixirOutOfTeam];
+
+        }
+        */
 
 }
