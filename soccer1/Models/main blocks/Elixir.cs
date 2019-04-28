@@ -25,9 +25,5 @@ namespace soccer1.Models.main_blocks
     
 
 
-    public class ElixirInfoDBContext : DbContext
-    {
-        public DbSet<Elixir> Elixirs { get; set; }
-    }
    
 }

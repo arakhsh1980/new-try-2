@@ -43,10 +43,6 @@ namespace soccer1.Models.main_blocks
         public int y;
     }
 
-    public class FormationInfoDBContext : DbContext
-    {
-        public DbSet<Formation> Formationss { get; set; }
-    }
 
 
 

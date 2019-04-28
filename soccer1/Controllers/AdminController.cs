@@ -11,7 +11,7 @@ namespace soccer1.Controllers
 {
     public class AdminController : Controller
     {
-        public void AddPawn(FormCollection collection)
+        public string AddPawn(FormCollection collection)
         {            
             Pawn pawn = new Pawn();
             pawn.abilityShower= Request.Form["abilityShower"];
@@ -32,7 +32,10 @@ namespace soccer1.Controllers
             pawn.price = price;
             pawn.redForSale= Request.Form["redForSale"];
             pawn.ShowName = Request.Form["redForSale"];
+            Log.AddLog("AddPawn" + pawn.IdName);
             AssetManager.AddPawnToAssets(pawn);
+            return "Pawn Loaded"+ pawn.IdName;
+
         }
 
         public void AddElixir(FormCollection collection)

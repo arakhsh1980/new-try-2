@@ -71,7 +71,15 @@ namespace soccer1.Models.utilites
            
             for (int i = 0; i < pl.PlayeingPawns.Length; i++) { plsrs.PlayeingPawns[i] = AssetManager.ReturnAssetIndex(AssetType.Pawn,   pl.PlayeingPawns[i]); }
             for (int i = 0; i < pl.pawnsInBench.Length; i++) { plsrs.pawnsInBench[i] = AssetManager.ReturnAssetIndex(AssetType.Pawn, pl.pawnsInBench[i]); }
-            for (int i = 0; i < pl.UsableFormations.Length; i++) { plsrs.UsableFormations[i] = AssetManager.ReturnAssetIndex(AssetType.Formation, pl.UsableFormations[i]); }
+            int usableFormationCounter = 0;
+            for (int i = 0; i < pl.UsableFormations.Length; i++)
+            {
+                if (pl.UsableFormations[i] != "null")
+                {
+                    plsrs.UsableFormations[usableFormationCounter] = AssetManager.ReturnAssetIndex(AssetType.Formation, pl.UsableFormations[i]);
+                    usableFormationCounter++;
+                }
+            }
             for (int i = 0; i < pl.ElixirInBench.Length; i++) { plsrs.pawnsInBench[i] = AssetManager.ReturnAssetIndex(AssetType.Elixir, pl.ElixirInBench[i]); }
 
             plsrs.CurrentFormation = AssetManager.ReturnAssetIndex(AssetType.Formation, pl.CurrentFormation); 

@@ -210,7 +210,9 @@
     </Compile>
     <Compile Include="Models\AssetManager.cs" />
     <Compile Include="Models\ConnectedPlayersList.cs" />
+    <Compile Include="Models\DataBase\databaseFomat.cs" />
     <Compile Include="Models\DataBase\DatabaseManager.cs" />
+    <Compile Include="Models\DataBase\DataBaseInitializer.cs" />
     <Compile Include="Models\Log.cs" />
     <Compile Include="Models\main blocks\Elixir.cs" />
     <Compile Include="Models\main blocks\ErrorView.cs" />

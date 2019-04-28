@@ -79,6 +79,7 @@ public struct PawnAbility
     }
 public struct SpetialPower
 {
+       
     public string IdName { get; set; }
         public string ShowName { get; set; }
         //public PawnSpetialPowerType spPower;
@@ -86,10 +87,6 @@ public struct SpetialPower
         public string image { get; set; }
     }
 
-public class PawnInfoDBContext : DbContext
-{
-    public DbSet<Pawn> Pawnss { get; set; }
-}
 
 
 

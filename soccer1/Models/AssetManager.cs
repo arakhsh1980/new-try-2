@@ -38,10 +38,10 @@ namespace soccer1.Models
                     for (int i = 0; i < Formationlist.Length; i++) if (Formationlist[i].IdName == IdNamePawn) { IndexOfAsset = i; }
                     break;
             }
-            
+            if (IdNamePawn == "null") { return -1; }
             if (IndexOfAsset < 0)
             {
-                Log.AddLog("Error : Can Not Find This Pawn");
+                Log.AddLog("Error :Assetmanager. ReturnAssetIndex. Can Not Find This Pawn");
             }
             return IndexOfAsset;
         }
@@ -81,9 +81,13 @@ namespace soccer1.Models
 
         public static string ReturnAssetName(AssetType type, int index)
         {
-            if(arraylengh<= index || index < 0)
+            if(index == -1)
             {
-                Errors.AddBigError(" index out of reng");
+                return "null";
+            }
+            if(arraylengh<= index || index < -1)
+            {
+                Errors.AddBigError("AssetManager. ReturnAssetName.  index out of reng1");
                 return "Error";
             }
             int maxAssined=0;
@@ -105,7 +109,7 @@ namespace soccer1.Models
             }
             if (maxAssined < index )
             {
-                Errors.AddBigError(" index out of reng");
+                Errors.AddBigError("AssetManager. ReturnAssetName. index out of reng2");
                 return "Error";
             }
             return idName;
@@ -119,7 +123,7 @@ namespace soccer1.Models
             Property thisprop = new Property();
             if (arraylengh <= index || index < 0)
             {
-                Errors.AddBigError(" index out of reng");
+                Errors.AddBigError(" ReturnAssetPrice.index out of reng1");
                 return pop;
             }
 
@@ -141,7 +145,7 @@ namespace soccer1.Models
             }
             if (maxAssined < index)
             {
-                Errors.AddBigError(" index out of reng");
+                Errors.AddBigError(" ReturnAssetPrice. index out of reng2");
                 return pop;
             }
             pop.coin = thisprop.coin;
@@ -158,7 +162,7 @@ namespace soccer1.Models
 
         public static void AddPawnToAssets(Pawn p)
         {
-            if(Pawnlist.Length <= pawnsConter) { Errors.AddBigError("Pawnlist.Length <= pawnsConter"); return; }
+            if(Pawnlist.Length <= pawnsConter) { Errors.AddBigError("AddPawnToAssets. Pawnlist.Length <= pawnsConter"); return; }
             int indexinarray = -1;
             for (int i=0; i<= pawnsConter; i++) if (Pawnlist[i].IdName == p.IdName) { indexinarray = i; }
             if(indexinarray == -1)
@@ -166,13 +170,14 @@ namespace soccer1.Models
                 p.index = pawnsConter;
                 Pawnlist[pawnsConter] = p;
                 pawnsConter++;
-                //DatabaseManager.AddPawnToDataBase(p);
+                
+                DatabaseManager.AddPawnToDataBase(p);
             }
             else
             {
                 p.index = indexinarray;
                 Pawnlist[indexinarray] = p;                
-                //DatabaseManager.AddPawnToDataBase(p);
+                DatabaseManager.AddPawnToDataBase(p);
             }
         }
         
@@ -186,13 +191,13 @@ namespace soccer1.Models
                 ff.index = FormationConter;
                 Formationlist[FormationConter] = ff;
                 FormationConter++;
-                //DatabaseManager.AddFormationToDataBase(ff);
+                DatabaseManager.AddFormationToDataBase(ff);
             }
             else
             {
                 ff.index = indexinarray;
                 Formationlist[indexinarray] = ff;
-                //DatabaseManager.AddFormationToDataBase(ff);
+                DatabaseManager.AddFormationToDataBase(ff);
             }
         }
         
@@ -206,13 +211,13 @@ namespace soccer1.Models
                 el.index = ElixirConter;
                 Elixirlist[ElixirConter] = el;
                 ElixirConter++;
-                //DatabaseManager.AddElixirToDataBase(el);
+                DatabaseManager.AddElixirToDataBase(el);
             }
             else
             {
                 el.index = indexinarray;
                 Elixirlist[indexinarray] = el;
-                //DatabaseManager.AddElixirToDataBase(el);
+                DatabaseManager.AddElixirToDataBase(el);
             }
         }
         
@@ -224,6 +229,7 @@ namespace soccer1.Models
                 Elixirlist[i] = new Elixir();
                 Formationlist[i] = new Formation();
             }
+            
         }
 
 

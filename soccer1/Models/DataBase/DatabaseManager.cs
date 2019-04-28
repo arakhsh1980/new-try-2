@@ -4,7 +4,9 @@ using System.Linq;
 using System.Web;
 using soccer1.Models.main_blocks;
 using soccer1.Models.utilites;
+using soccer1.Models.DataBase;
 using System.Data.Entity;
+
 
 
 
@@ -12,17 +14,16 @@ namespace soccer1.Models
 {
     public class DatabaseManager
     {
+
         
-        private static playerInfoDBContext db = new playerInfoDBContext();
-        private static PawnInfoDBContext Pawndb = new PawnInfoDBContext();
-        private static ElixirInfoDBContext Elixirdb = new ElixirInfoDBContext();
-        private static FormationInfoDBContext Formationdb = new FormationInfoDBContext();
+       
         
 
 
         //load a player and add it to array
         public static PlayerForConnectedPlayer LoadPlayerData(string PlayerId)
         {
+            DataDBContext dataBase = new DataDBContext();
             PlayerForConnectedPlayer playerInfo;
             PlayerForDatabase playerForPlayer;
             if (PlayerId == null)
@@ -30,9 +31,9 @@ namespace soccer1.Models
                 playerInfo = AddNewDefultPlayerAndReturnIt();
             }
             else
-            {
-
-                playerForPlayer = db.playerInfoes2.Find(PlayerId);
+            {                
+                playerForPlayer = dataBase.playerInfoes.Find(PlayerId);
+                    
                 //playerInfo = db.playerInfoes2.Find(PlayerId);                
                 if (playerForPlayer == null)
                 {
@@ -50,10 +51,11 @@ namespace soccer1.Models
 
         public static Pawn LoadPawnData(int numberofpawn)
         {
+            DataDBContext dataBase = new DataDBContext();
             Pawn PawnInfo;
 
             // PawnInfo = db.playerInfoes2.Find(numberofpawn);
-            PawnInfo = Pawndb.Pawnss.Find(numberofpawn);
+            PawnInfo = dataBase.allPawns.Find(numberofpawn);
 
             return PawnInfo;
         }
@@ -61,10 +63,11 @@ namespace soccer1.Models
 
         public static Elixir LoadElixirData(int numberofElixir)
         {
+            DataDBContext dataBase = new DataDBContext();
             Elixir ElixirInfo;
 
             // PawnInfo = db.playerInfoes2.Find(numberofpawn);
-            ElixirInfo = Elixirdb.Elixirs.Find(numberofElixir);
+            ElixirInfo = dataBase.allElixires.Find(numberofElixir);
 
             return ElixirInfo;
         }
@@ -74,15 +77,17 @@ namespace soccer1.Models
             SaveChangesOnPlayerInDataBase(Convertors.PlayerToPlayerForDatabase(pl));
         }
 
-        public static void SaveChangesOnPlayerInDataBase(PlayerForDatabase pl)
+        static void SaveChangesOnPlayerInDataBase(PlayerForDatabase pl)
         {
-            PlayerForDatabase playerInfo = db.playerInfoes2.Find(pl.id);
+            DataDBContext dataBase = new DataDBContext();
+            PlayerForDatabase playerInfo = dataBase.playerInfoes.Find(pl.id);
             if (playerInfo == null)
             {
                 Errors.AddBigError("player dident find for saveing");
             }
             else
             {
+                
                 playerInfo.CurrentFormation = pl.CurrentFormation;
                 playerInfo.ElixirInBench = pl.ElixirInBench;
                 playerInfo.Fan = pl.Fan;
@@ -94,25 +99,29 @@ namespace soccer1.Models
                 playerInfo.PlayeingPawns = pl.PlayeingPawns;
                 playerInfo.PowerLevel = pl.PowerLevel;
                 playerInfo.SoccerSpetial = pl.SoccerSpetial;
-                playerInfo.UsableFormations = pl.UsableFormations;
-                db.Entry(playerInfo).State = EntityState.Modified;
-                db.SaveChanges();
+                playerInfo.UsableFormations = pl.UsableFormations;                
+                
+                dataBase.Entry(playerInfo).State = EntityState.Modified;
+                dataBase.SaveChanges();
             }
         }
 
         public static void AddPawnToDataBase(Pawn p)
         {
-            if (Pawndb.Pawnss.Find(p.IdName) == null)
+            DataDBContext dataBase = new DataDBContext();
+
+            Pawn pp = dataBase.allPawns.Find(p.IdName);
+            if (pp == null)
             {
-                Pawndb.Pawnss.Add(p);
-                Pawndb.SaveChanges();
+                dataBase.allPawns.Add(p);
+                dataBase.SaveChanges();
             }
             else
             {
-                Pawn pp = Pawndb.Pawnss.Find(p.IdName);
-                pp = p;
-                Pawndb.Entry(pp).State = EntityState.Modified;
-                Pawndb.SaveChanges();
+                dataBase.allPawns.Remove(pp);
+                dataBase.SaveChanges();
+                dataBase.allPawns.Add(p);
+                dataBase.SaveChanges();
             }
         }
 
@@ -120,45 +129,51 @@ namespace soccer1.Models
 
         public static void AddFormationToDataBase(Formation ff)
         {
-            if (Formationdb.Formationss.Find(ff.IdName) == null)
+            DataDBContext dataBase = new DataDBContext();
+            Formation pp = dataBase.allFormations.Find(ff.IdName);
+            if (pp == null)
             {
-                Formationdb.Formationss.Add(ff);
-                Formationdb.SaveChanges();
+                dataBase.allFormations.Add(ff);
+                dataBase.SaveChanges();
             }
             else
             {
-                Formation pp = Formationdb.Formationss.Find(ff.IdName);
-                pp = ff;
-                Formationdb.Entry(pp).State = EntityState.Modified;
-                Formationdb.SaveChanges();
+                dataBase.allFormations.Remove(pp);
+                dataBase.SaveChanges();
+                dataBase.allFormations.Add(ff);
+                dataBase.SaveChanges();                
             }
         }
 
 
         public static void AddElixirToDataBase(Elixir el)
         {
-            if (Elixirdb.Elixirs.Find(el.IdName) == null)
+            DataDBContext dataBase = new DataDBContext();
+            Elixir elold = dataBase.allElixires.Find(el.IdName);
+            if (elold == null)
             {
-                Elixirdb.Elixirs.Add(el);
-                Elixirdb.SaveChanges();
+                dataBase.allElixires.Add(el);
+                dataBase.SaveChanges();
             }
             else
             {
-                Elixir pp = Elixirdb.Elixirs.Find(el.IdName);
-                pp = el;
-                Elixirdb.Entry(pp).State = EntityState.Modified;
-                Elixirdb.SaveChanges();
+                dataBase.allElixires.Remove(elold);
+                dataBase.SaveChanges();
+                dataBase.allElixires.Add(el);
+                dataBase.SaveChanges();
             }
         }
 
         private static PlayerForConnectedPlayer AddNewDefultPlayerAndReturnIt()
-        {   
+        {
+            DataDBContext dataBase = new DataDBContext();
             PlayerForConnectedPlayer starterPlyer = utilities.ReturnDefultPlayer();
-            string ss = new Random().NextDouble().ToString();            
-            starterPlyer.id = db.playerInfoes2.Count<PlayerForDatabase>().ToString()+ ss;
+            string ss = new Random().NextDouble().ToString();
+            int index = dataBase.playerInfoes.Count<PlayerForDatabase>() + 1;
+            starterPlyer.id = index.ToString()+ ss;
             PlayerForDatabase player = Convertors.PlayerToPlayerForDatabase(starterPlyer);
-            db.playerInfoes2.Add(player);
-            db.SaveChanges();
+            dataBase.playerInfoes.Add(player);
+            dataBase.SaveChanges();
             return starterPlyer;
         }      
 

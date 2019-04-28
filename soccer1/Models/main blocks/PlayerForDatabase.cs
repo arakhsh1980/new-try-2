@@ -46,8 +46,5 @@ namespace soccer1.Models.main_blocks
 
 
     }
-    public class playerInfoDBContext : DbContext
-    {
-        public DbSet<PlayerForDatabase> playerInfoes2 { get; set; }
-    }
+    
 }
