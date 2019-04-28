@@ -12,7 +12,7 @@ namespace soccer1.Models
 {
     public static class AssetManager
     {
-
+        
         const int arraylengh = 100;
         private static Pawn[] Pawnlist = new Pawn[arraylengh];
         private static Elixir[] Elixirlist = new Elixir[arraylengh];
@@ -169,14 +169,15 @@ namespace soccer1.Models
             {
                 p.index = pawnsConter;
                 Pawnlist[pawnsConter] = p;
+                Log.AddLog("pawn Added. Name:" + p.IdName + "  index:" + pawnsConter.ToString());
                 pawnsConter++;
-                
                 DatabaseManager.AddPawnToDataBase(p);
             }
             else
             {
                 p.index = indexinarray;
-                Pawnlist[indexinarray] = p;                
+                Pawnlist[indexinarray] = p;
+                Log.AddLog("pawn Updated. Name:" + p.IdName + "  index:" + indexinarray.ToString());
                 DatabaseManager.AddPawnToDataBase(p);
             }
         }

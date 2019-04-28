@@ -419,8 +419,11 @@ namespace soccer1.Models
             }
 
         }
-        public static void changeProfileData(TeamForConnectedPlayers playerteam, int ConnectionId)
+        public static void changePlayerTeam(TeamForConnectedPlayers playerteam, int ConnectionId)
         {
+            connectedPlayers[ConnectionId].ChangeTeam(playerteam);
+            DatabaseManager.SaveChangesOnPlayer(connectedPlayers[ConnectionId]);
+            /*
             ////////////////change Pawn info
             //convert array to list
             List<int> pawnOutOfTeamlist = new List<int>(connectedPlayers[ConnectionId].pawnOutOfTeam);
@@ -466,7 +469,7 @@ namespace soccer1.Models
             connectedPlayers[ConnectionId].team.CurrentFormation = CurentFormationTeamlistNew;
             ////////////////save changes of Pawn&Formation&elixir in database
             DatabaseManager.SaveChangesOnPlayer(connectedPlayers[ConnectionId]);
-
+            */
 
         }
     }

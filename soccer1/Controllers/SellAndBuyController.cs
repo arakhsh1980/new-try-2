@@ -36,7 +36,7 @@ namespace soccer1.Controllers
             }
         }
 
-
+        /*
 
         [HttpPost]
         public string BuyPawn(FormCollection collection)
@@ -121,7 +121,7 @@ namespace soccer1.Controllers
             }
         }
 
-       
+       */
 
     }
 }

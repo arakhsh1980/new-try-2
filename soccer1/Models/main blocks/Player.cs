@@ -85,7 +85,88 @@ namespace soccer1.Models.main_blocks
             }
         }
 
+        public bool ChangeTeam(TeamForConnectedPlayers newTeammm)
+        {
+            List<int> allPawns = new List<int>();
+            List<int> allElixirs = new List<int>();
+            allPawns.Clear();
+            allElixirs.Clear();
+            for(int i=0; i< team.PlayeingPawns.Length; i++)
+            {
+                allPawns.Add(team.PlayeingPawns[i]);
+            }
+            for (int i = 0; i < team.pawnsInBench.Length; i++)
+            {
+                allPawns.Add(team.pawnsInBench[i]);
+            }
+            for (int i = 0; i < pawnOutOfTeam.Length; i++)
+            {
+                allPawns.Add(pawnOutOfTeam[i]);
+            }
 
+            for (int i = 0; i < newTeammm.PlayeingPawns.Length; i++)
+            {
+                if (allPawns.Exists(p => p== newTeammm.PlayeingPawns[i]))
+                {
+                    allPawns.Remove(newTeammm.PlayeingPawns[i]);
+                }
+                else
+                {
+                    return false;
+                }                
+            }
+
+            for (int i = 0; i < newTeammm.pawnsInBench.Length; i++)
+            {
+                if (allPawns.Exists(p => p == newTeammm.pawnsInBench[i]))
+                {
+                    allPawns.Remove(newTeammm.pawnsInBench[i]);
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            pawnOutOfTeamCounter = 0;
+            foreach(int p in allPawns)
+            {
+                pawnOutOfTeam[pawnOutOfTeamCounter] = p;
+                pawnOutOfTeamCounter++;
+            }
+
+
+            
+            for (int i = 0; i < team.ElixirInBench.Length; i++)
+            {
+                allElixirs.Add(team.ElixirInBench[i]);
+            }
+            for (int i = 0; i < elixirOutOfTeam.Length; i++)
+            {
+                allElixirs.Add(elixirOutOfTeam[i]);
+            }
+
+            for (int i = 0; i < newTeammm.ElixirInBench.Length; i++)
+            {
+                if (allElixirs.Exists(p => p == newTeammm.ElixirInBench[i]))
+                {
+                    allElixirs.Remove(newTeammm.ElixirInBench[i]);
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+            elixirOutOfTeamCounter = 0;
+            foreach (int p in allElixirs)
+            {
+                elixirOutOfTeam[elixirOutOfTeamCounter] = p;
+                elixirOutOfTeamCounter++;
+            }
+
+            team = newTeammm;
+            return true;
+        }
         #endregion
 
         #region inner function
