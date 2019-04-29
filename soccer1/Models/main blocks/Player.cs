@@ -57,7 +57,7 @@ namespace soccer1.Models.main_blocks
 
         #region public functions
 
-        public bool BuyAsset(AssetType assetType, string AssetIdName, Property price)
+        public bool BuyAsset(AssetType assetType, string AssetIdName, Property price, int CooId)
         {
             Utilities utilities = new Utilities();
             if (utilities.CheckIfFirstPropertyIsBigger(PlayerProperty, price)) {
@@ -65,11 +65,18 @@ namespace soccer1.Models.main_blocks
                 switch (assetType)
                 {
                     case AssetType.Pawn:
-                       // pawnOutOfTeam.Add()
+                        pawnOutOfTeam.Add(AssetManager.ReturnAssetIndex(AssetType.Pawn, AssetIdName));
+                     
+                        break;
+                    case AssetType.Elixir:
+                        elixirOutOfTeam.Add(AssetManager.ReturnAssetIndex(AssetType.Elixir, AssetIdName));
+                        break;
+                    case AssetType.Formation:
+                       team.AddToUsableFormations(AssetManager.ReturnAssetIndex(AssetType.Formation, AssetIdName));
                         break;
 
-
                 }
+                SaveChanges();
                 return true;
             }
             else{

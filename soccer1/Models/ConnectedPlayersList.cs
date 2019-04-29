@@ -86,7 +86,7 @@ namespace soccer1.Models
         public static bool BuyAssetForPlayer(int ConnectionId, AssetType type, string AssetName)
         {
             Property price= AssetManager.ReturnAssetPrice(type, AssetName);
-            return connectedPlayers[ConnectionId].BuyAsset(type, AssetName, price);           
+            return connectedPlayers[ConnectionId].BuyAsset(type, AssetName, price, ConnectionId);           
         }
 
         /*
