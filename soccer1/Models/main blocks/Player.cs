@@ -91,9 +91,9 @@ namespace soccer1.Models.main_blocks
             Utilities utilities = new Utilities();
             if (utilities.CheckIfFirstPropertyIsBigger(PlayerProperty, prop))
             {
-                PlayerProperty.coin = -prop.coin;
-                PlayerProperty.SoccerSpetial = -prop.SoccerSpetial;
-                PlayerProperty.fan = -prop.fan;
+                PlayerProperty.coin -= prop.coin;
+                PlayerProperty.SoccerSpetial -= prop.SoccerSpetial;
+                PlayerProperty.fan -= prop.fan;
                 return true;
             }
             else
