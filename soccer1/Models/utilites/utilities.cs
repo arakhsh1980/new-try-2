@@ -11,10 +11,11 @@ namespace soccer1.Models.utilites
         public bool CheckIfFirstPropertyIsBigger(Property property1, Property property2)
         {
             bool check = true;
-            if (property1.coin <= property2.coin) { check = false; }
-            if (property1.fan <= property2.fan) { check = false; }
-            if (property1.level <= property2.level) { check = false; }
-            if (property1.SoccerSpetial <= property2.SoccerSpetial) { check = false; }
+            if (property1.coin < property2.coin ) { check = false; }
+            if (property1.fan < property2.fan) { check = false; }
+            if (property1.level < property2.level) { check = false; }
+            if (property1.SoccerSpetial < property2.SoccerSpetial) { check = false; }
+             
             return check;
         }
 
