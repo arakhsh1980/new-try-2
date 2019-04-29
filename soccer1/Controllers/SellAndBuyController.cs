@@ -28,7 +28,7 @@ namespace soccer1.Controllers
             if (ConnectedPlayersList.IsConnectedById(ConnectionId, PlayerId))
             {
                 reusult = ConnectedPlayersList.BuyAssetForPlayer(ConnectionId, assetType, IdName);
-                Log.AddLog("Error : Can Not Add Pawn");
+                Log.AddLog("Error : reusult:"+ reusult.ToString());
                 return reusult.ToString();
             }
             else

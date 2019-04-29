@@ -62,8 +62,10 @@ namespace soccer1.Models.main_blocks
             Utilities utilities = new Utilities();
             if (utilities.CheckIfFirstPropertyIsBigger(PlayerProperty, price)) {
                 SubtractProperty(price);
+                Log.AddLog("Error : assetType of asset:" + assetType);
                 switch (assetType)
                 {
+
                     case AssetType.Pawn:
                         pawnOutOfTeam.Add(AssetManager.ReturnAssetIndex(AssetType.Pawn, AssetIdName));
                      
