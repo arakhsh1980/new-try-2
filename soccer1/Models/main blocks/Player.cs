@@ -273,8 +273,22 @@ namespace soccer1.Models.main_blocks
         public void SaveChanges()
         {
             DataDBContext dataBase = new DataDBContext();
-            PlayerForDatabase playerInfo = returnDataBaseVersion();
-            dataBase.Entry(playerInfo).State = EntityState.Modified;
+            PlayerForDatabase thisPlayerAtServer =dataBase.playerInfoes.Find(id);
+            thisPlayerAtServer.CurrentFormation = team.CurrentFormation;
+            thisPlayerAtServer.ElixirInBench = convertor.IntArrayToSrting(team.ElixirInBench);
+            thisPlayerAtServer.Fan = PlayerProperty.fan;
+            //plsrs.id = id;
+            thisPlayerAtServer.level = PlayerProperty.level;
+            thisPlayerAtServer.Money = PlayerProperty.coin;
+            thisPlayerAtServer.Name = Name;
+            thisPlayerAtServer.otherElixirs = convertor.IntArrayToSrting(convertor.outOfTeamPawnToIntArray(elixirOutOfTeam));
+            thisPlayerAtServer.otherPawns = convertor.IntArrayToSrting(convertor.outOfTeamPawnToIntArray(pawnOutOfTeam));
+            thisPlayerAtServer.pawnsInBench = convertor.IntArrayToSrting(team.pawnsInBench);
+            thisPlayerAtServer.PlayeingPawns = convertor.IntArrayToSrting(team.PlayeingPawns);
+            thisPlayerAtServer.PowerLevel = PowerLevel;
+            thisPlayerAtServer.SoccerSpetial = PlayerProperty.SoccerSpetial;
+            thisPlayerAtServer.UsableFormations = convertor.IntArrayToSrting(team.UsableFormations);            
+            dataBase.Entry(thisPlayerAtServer).State = EntityState.Modified;
             dataBase.SaveChanges();
         }
 
