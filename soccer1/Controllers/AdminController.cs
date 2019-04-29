@@ -32,7 +32,7 @@ namespace soccer1.Controllers
             pawn.price = price;
             pawn.redForSale= Request.Form["redForSale"];
             pawn.ShowName = Request.Form["redForSale"];
-            Log.AddLog("AddPawn" + pawn.IdName);
+            //Log.AddLog("AddPawn" + pawn.IdName);
             AssetManager.AddPawnToAssets(pawn);
             return "Pawn Loaded"+ pawn.IdName;
 

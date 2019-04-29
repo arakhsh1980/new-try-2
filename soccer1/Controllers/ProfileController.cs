@@ -23,17 +23,17 @@ namespace soccer1.Controllers
         {
             int ConnectionId = Int32.Parse(Request.Form["ConnectionId"]);
             string PlayerId = Request.Form["PlayerId"];
-
+            bool interactionResult=false;
             if (ConnectedPlayersList.IsConnectedById(ConnectionId, PlayerId))
             {
                 string Team1 = collection["Team"];
                 TeamForSerialize teamfs = new JavaScriptSerializer().Deserialize<TeamForSerialize>(Team1);
                 TeamForConnectedPlayers playerteam = Convertors.TeamForSerializeToTeam(teamfs);
-                ConnectedPlayersList.changePlayerTeam(playerteam, ConnectionId);
+                interactionResult=ConnectedPlayersList.changePlayerTeam(playerteam, ConnectionId);
                 //PlayerForConnectedPlayer playera = DatabaseManager.LoadPlayerData(PlayerId);
                 //DatabaseManager.SaveChangesOnPlayer(playera);
 
-                return true.ToString();
+                return interactionResult.ToString();
             }
             else
             {

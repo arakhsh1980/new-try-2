@@ -23,7 +23,7 @@ namespace soccer1.Models
         //load a player and add it to array
         public static PlayerForConnectedPlayer LoadPlayerData(string PlayerId)
         {
-            DataDBContext dataBase = new DataDBContext();
+            DataDBContext soccerDataBase = new DataDBContext();
             PlayerForConnectedPlayer playerInfo;
             PlayerForDatabase playerForPlayer;
             if (PlayerId == null)
@@ -32,7 +32,7 @@ namespace soccer1.Models
             }
             else
             {                
-                playerForPlayer = dataBase.playerInfoes.Find(PlayerId);
+                playerForPlayer = soccerDataBase.playerInfoes.Find(PlayerId);
                     
                 //playerInfo = db.playerInfoes2.Find(PlayerId);                
                 if (playerForPlayer == null)

@@ -80,7 +80,7 @@ namespace soccer1.Models.utilites
                     usableFormationCounter++;
                 }
             }
-            for (int i = 0; i < pl.ElixirInBench.Length; i++) { plsrs.pawnsInBench[i] = AssetManager.ReturnAssetIndex(AssetType.Elixir, pl.ElixirInBench[i]); }
+            for (int i = 0; i < pl.ElixirInBench.Length; i++) { plsrs.ElixirInBench[i] = AssetManager.ReturnAssetIndex(AssetType.Elixir, pl.ElixirInBench[i]); }
 
             plsrs.CurrentFormation = AssetManager.ReturnAssetIndex(AssetType.Formation, pl.CurrentFormation); 
 

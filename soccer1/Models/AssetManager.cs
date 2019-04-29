@@ -7,6 +7,7 @@ using soccer1.Models.utilites;
 using System.Data.Entity;
 using System.Web.Mvc;
 using soccer1;
+using System.Threading;
 
 namespace soccer1.Models
 {
@@ -21,6 +22,7 @@ namespace soccer1.Models
         private static int ElixirConter = 0;
         private static int FormationConter = 0;
         //give pawnname add return pawnindex
+        private static Mutex mutex = new Mutex();
 
         public static int ReturnAssetIndex(AssetType type, string IdNamePawn)
         {
@@ -162,14 +164,15 @@ namespace soccer1.Models
 
         public static void AddPawnToAssets(Pawn p)
         {
-            if(Pawnlist.Length <= pawnsConter) { Errors.AddBigError("AddPawnToAssets. Pawnlist.Length <= pawnsConter"); return; }
+            mutex.WaitOne();
+            if (Pawnlist.Length <= pawnsConter) { Errors.AddBigError("AddPawnToAssets. Pawnlist.Length <= pawnsConter"); return; }
             int indexinarray = -1;
             for (int i=0; i<= pawnsConter; i++) if (Pawnlist[i].IdName == p.IdName) { indexinarray = i; }
             if(indexinarray == -1)
             {
                 p.index = pawnsConter;
                 Pawnlist[pawnsConter] = p;
-                Log.AddLog("pawn Added. Name:" + p.IdName + "  index:" + pawnsConter.ToString());
+                Log.AddLog("AssetManager.AddPawnToAssets:  pawn Added. Name:" + p.IdName + "  index:" + pawnsConter.ToString());
                 pawnsConter++;
                 DatabaseManager.AddPawnToDataBase(p);
             }
@@ -177,9 +180,10 @@ namespace soccer1.Models
             {
                 p.index = indexinarray;
                 Pawnlist[indexinarray] = p;
-                Log.AddLog("pawn Updated. Name:" + p.IdName + "  index:" + indexinarray.ToString());
+                Log.AddLog("AssetManager.AddPawnToAssets: pawn Updated. Name:" + p.IdName + "  index:" + indexinarray.ToString());
                 DatabaseManager.AddPawnToDataBase(p);
             }
+            mutex.ReleaseMutex();
         }
         
         public static void AddFormationToAssets(Formation ff)

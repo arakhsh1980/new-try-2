@@ -112,7 +112,7 @@ namespace soccer1.Models.main_blocks
                 }
                 else
                 {
-                    return false;
+                   // return false;
                 }                
             }
 
@@ -124,11 +124,11 @@ namespace soccer1.Models.main_blocks
                 }
                 else
                 {
-                    return false;
+                  //  return false;
                 }
             }
             pawnOutOfTeamCounter = 0;
-            foreach(int p in allPawns)
+            foreach(int p in allPawns)if(p!=-1)
             {
                 pawnOutOfTeam[pawnOutOfTeamCounter] = p;
                 pawnOutOfTeamCounter++;
@@ -153,12 +153,12 @@ namespace soccer1.Models.main_blocks
                 }
                 else
                 {
-                    return false;
+                   // return false;
                 }
             }
 
             elixirOutOfTeamCounter = 0;
-            foreach (int p in allElixirs)
+            foreach (int p in allElixirs) if (p != -1)
             {
                 elixirOutOfTeam[elixirOutOfTeamCounter] = p;
                 elixirOutOfTeamCounter++;

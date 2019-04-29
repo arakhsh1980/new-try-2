@@ -30,4 +30,8 @@ namespace soccer1.Models
         public const int StartingSS = 10;
         public const float maxAcceptedPowerDiference = 10;
     }
+
+    
+
+
 }

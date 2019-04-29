@@ -395,7 +395,7 @@ namespace soccer1.Models
 
         public static void FillArrays()
         {
-            Log.AddLog("fill array is done");
+            ///Log.AddLog("Connected palyer list. FillArrays: fill array is done");
             for(int i=0; i< connectionInfos.Length; i++)
             {
                 connectionInfos[i] = new playerCennectionInfo();
@@ -419,10 +419,14 @@ namespace soccer1.Models
             }
 
         }
-        public static void changePlayerTeam(TeamForConnectedPlayers playerteam, int ConnectionId)
+
+        public static bool changePlayerTeam(TeamForConnectedPlayers playerteam, int ConnectionId)
         {
-            connectedPlayers[ConnectionId].ChangeTeam(playerteam);
-            DatabaseManager.SaveChangesOnPlayer(connectedPlayers[ConnectionId]);
+            bool result = false;
+            result = connectedPlayers[ConnectionId].ChangeTeam(playerteam);
+            if (result) { DatabaseManager.SaveChangesOnPlayer(connectedPlayers[ConnectionId]); }
+            return result;
+
             /*
             ////////////////change Pawn info
             //convert array to list
