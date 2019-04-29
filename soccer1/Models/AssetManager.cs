@@ -30,14 +30,22 @@ namespace soccer1.Models
             switch (type)
             {
                 case AssetType.Pawn:
-                    for (int i = 0; i < Pawnlist.Length; i++) if (Pawnlist[i].IdName == IdNamePawn) { IndexOfAsset = i; }
+                    for (int i = 0; i < Pawnlist.Length; i++) if (Pawnlist[i] != null) {
+                            if(Pawnlist[i].IdName == IdNamePawn) { IndexOfAsset = i; }
+                        }
                    
                     break;
                 case AssetType.Elixir:
-                    for (int i = 0; i < Elixirlist.Length; i++) if (Elixirlist[i].IdName == IdNamePawn) { IndexOfAsset = i; }
+                    for (int i = 0; i < Elixirlist.Length; i++) if (Elixirlist[i] != null)
+                        {
+                            if (Elixirlist[i].IdName == IdNamePawn) { IndexOfAsset = i; }
+                        }
                     break;
                 case AssetType.Formation:
-                    for (int i = 0; i < Formationlist.Length; i++) if (Formationlist[i].IdName == IdNamePawn) { IndexOfAsset = i; }
+                    for (int i = 0; i < Formationlist.Length; i++) if (Formationlist[i] != null)
+                        {
+                            if (Formationlist[i].IdName == IdNamePawn) { IndexOfAsset = i; }
+                        }
                     break;
             }
             if (IdNamePawn == "null") { return -1; }

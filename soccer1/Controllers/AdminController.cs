@@ -6,13 +6,20 @@ using System.Web.Mvc;
 using soccer1.Models;
 using System.Web.Script.Serialization;
 using soccer1.Models.main_blocks;
+using System.Threading;
 
 namespace soccer1.Controllers
 {
     public class AdminController : Controller
     {
+        private static Mutex AddPawnmutex = new Mutex();
+        private static Mutex AddElixirmutex = new Mutex();
+        private static Mutex AddFormationmutex = new Mutex();
+
+        [HttpPost]
         public string AddPawn(FormCollection collection)
-        {            
+        {
+            //AddPawnmutex.WaitOne();
             Pawn pawn = new Pawn();
             pawn.abilityShower= Request.Form["abilityShower"];
             pawn.ForMatch = Request.Form["ForMatch"];
@@ -34,12 +41,14 @@ namespace soccer1.Controllers
             pawn.ShowName = Request.Form["redForSale"];
             //Log.AddLog("AddPawn" + pawn.IdName);
             AssetManager.AddPawnToAssets(pawn);
-            return "Pawn Loaded"+ pawn.IdName;
-
+            //AddPawnmutex.ReleaseMutex();
+            return "Pawn Loaded"+ pawn.IdName;            
         }
 
+        [HttpPost]
         public void AddElixir(FormCollection collection)
         {
+            //AddElixirmutex.WaitOne(); 
             Elixir elixir = new Elixir();
             elixir.forSale = Request.Form["forSale"];            
             elixir.IdName = Request.Form["IdName"];
@@ -57,11 +66,13 @@ namespace soccer1.Controllers
             price.SoccerSpetial = Int32.Parse(Request.Form["price.SoccerSpetial"]);
             elixir.price = price;
             AssetManager.AddElixirToAssets(elixir);
+            //AddElixirmutex.WaitOne();
         }
 
-
+        [HttpPost]
         public void AddFormation(FormCollection collection)
         {
+            //AddFormationmutex.WaitOne();
             Formation formation = new Formation();
             formation.discription = Request.Form["discription"];
             formation.IdName = Request.Form["IdName"];
@@ -81,6 +92,7 @@ namespace soccer1.Controllers
             }
 
             AssetManager.AddFormationToAssets(formation);
+            //AddElixirmutex.WaitOne();
         }
 
     }

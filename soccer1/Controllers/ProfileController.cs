@@ -28,7 +28,8 @@ namespace soccer1.Controllers
             {
                 string Team1 = collection["Team"];
                 TeamForSerialize teamfs = new JavaScriptSerializer().Deserialize<TeamForSerialize>(Team1);
-                TeamForConnectedPlayers playerteam = Convertors.TeamForSerializeToTeam(teamfs);
+                Convertors convertor = new Convertors();
+                TeamForConnectedPlayers playerteam = convertor.TeamForSerializeToTeam(teamfs);
                 interactionResult=ConnectedPlayersList.changePlayerTeam(playerteam, ConnectionId);
                 //PlayerForConnectedPlayer playera = DatabaseManager.LoadPlayerData(PlayerId);
                 //DatabaseManager.SaveChangesOnPlayer(playera);

@@ -12,9 +12,9 @@ using soccer1.Models;
 
 namespace soccer1.Models.utilites
 {
-    public static class Convertors
+    public class Convertors
     {
-        public static ShootActionCode FormToShoot(FormCollection collection)
+        public  ShootActionCode FormToShoot(FormCollection collection)
         {
             ShootActionCode shoot = new ShootActionCode();
             /*
@@ -44,7 +44,7 @@ namespace soccer1.Models.utilites
             */
         }
 
-        public static TeamForSerialize TeamToTeamForSerialize(TeamForConnectedPlayers team)
+        public  TeamForSerialize TeamToTeamForSerialize(TeamForConnectedPlayers team)
         {
             TeamForSerialize slteam = new TeamForSerialize();
             slteam.CurrentFormation = AssetManager.ReturnAssetName(AssetType.Formation,  team.CurrentFormation);
@@ -63,7 +63,7 @@ namespace soccer1.Models.utilites
             return slteam;
         }
 
-        public static TeamForConnectedPlayers TeamForSerializeToTeam(TeamForSerialize pl)
+        public  TeamForConnectedPlayers TeamForSerializeToTeam(TeamForSerialize pl)
         {
             //convert of Teamforserialize Class to Team Class 
             //convert string to int
@@ -87,27 +87,82 @@ namespace soccer1.Models.utilites
             return plsrs;
         }
 
-        public static string IntArrayToSrting(int[] ar)
+        public  string IntArrayToSrting(int[] ar)
         {
             string uu;
             uu = new JavaScriptSerializer().Serialize(ar);
             return uu;
         }
 
-        public static int[] SrtingTointArray(string ar)
+        public  string ListToString(List<int> list)
+        {
+            string uu;
+            uu = new JavaScriptSerializer().Serialize(list);
+            return uu;
+        }
+
+        public   int[] outOfTeamPawnToIntArray(List<int> list)
+        {
+            int[] buffer = new int[Statistics.MaxPawnOutOfTeam];
+            for(int i =0; i< buffer.Length; i++)
+            {
+                buffer[i] = -1;
+            }
+            int counter = 0;
+            foreach (int i in list)
+            {
+                if (counter < buffer.Length)
+                {
+                    buffer[counter] = i;
+                    counter++;
+                }
+                else
+                {
+                    Errors.AddBigError("Eroor - convertors.outOfTeamPawnToIntArray: out of reng");
+                }
+            }
+            return buffer;
+        }
+
+
+        public int[] outOfTeamElixirToIntArray(List<int> list)
+        {
+            int[] buffer = new int[Statistics.MaxElixirOutOfTeam];
+            for (int i = 0; i < buffer.Length; i++)
+            {
+                buffer[i] = -1;
+            }
+            int counter = 0;
+            foreach (int i in list)
+            {
+                if (counter < buffer.Length)
+                {
+                    buffer[counter] = i;
+                    counter++;
+                }
+                else
+                {
+                    Errors.AddBigError("Eroor - convertors.outOfTeamPawnToIntArray: out of reng");
+                }
+            }
+            return buffer;
+        }
+
+
+        public  int[] SrtingTointArray(string ar)
         {
             int[] kk = new JavaScriptSerializer().Deserialize<int[]>(ar);
             return kk;
         }
 
-        
-        public static TeamForConnectedPlayers JsonToTeam(string teamJson)
+
+        public  TeamForConnectedPlayers JsonToTeam(string teamJson)
         {
             TeamForConnectedPlayers kk = new JavaScriptSerializer().Deserialize<TeamForConnectedPlayers>(teamJson);
             return kk;
         }
 
-
+        /*
         public static PlayerForSerial PlayerToPlayrSerial(PlayerForConnectedPlayer pl)
         {
             PlayerForSerial plsr = new PlayerForSerial();
@@ -124,6 +179,8 @@ namespace soccer1.Models.utilites
             plsr.OutOfTeamElixirs = IntArrayToSrting(pl.elixirOutOfTeam);
             return plsr;
          }
+         
+
         public static PlayerForConnectedPlayer PlayerForDatabaseToPlayer(PlayerForDatabase pl)
         {
             PlayerForConnectedPlayer plsrs = new PlayerForConnectedPlayer();
@@ -146,7 +203,9 @@ namespace soccer1.Models.utilites
             plsrs.team.ElixirInBench = SrtingTointArray(pl.ElixirInBench); 
             return plsrs;
         }
+        */
 
+            /*
         public static PlayerForDatabase PlayerToPlayerForDatabase(PlayerForConnectedPlayer pl)
         {
             PlayerForDatabase plsrs = new PlayerForDatabase();
@@ -166,9 +225,9 @@ namespace soccer1.Models.utilites
             plsrs.UsableFormations = IntArrayToSrting(pl.team.UsableFormations);
             return plsrs;
         }
+        */
 
-
-        public static TeamForSerializeSingleString teamCompresor(TeamForSerialize team)
+        public TeamForSerializeSingleString teamCompresor(TeamForSerialize team)
         {
             TeamForSerializeSingleString teamArrayless = new TeamForSerializeSingleString();
             teamArrayless.CurrentFormation = team.CurrentFormation;
@@ -179,7 +238,7 @@ namespace soccer1.Models.utilites
             return teamArrayless;
         }
 
-        public static TeamForSerialize teamDecompresor(TeamForSerializeSingleString team)
+        public TeamForSerialize teamDecompresor(TeamForSerializeSingleString team)
         {
             TeamForSerialize teamwithArray = new TeamForSerialize();
             teamwithArray.CurrentFormation = team.CurrentFormation;
@@ -190,7 +249,7 @@ namespace soccer1.Models.utilites
             return teamwithArray;
         }
 
-        public static string TeamForSerializeToJson(TeamForSerialize team)
+        public string TeamForSerializeToJson(TeamForSerialize team)
         {
             string uu;
             TeamForSerializeSingleString singluarTeam = teamCompresor(team);
@@ -198,14 +257,14 @@ namespace soccer1.Models.utilites
             return uu;
         }
 
-        public static string StringArrayToSrting(string[] ar)
+        public string StringArrayToSrting(string[] ar)
         {
             string uu;
             uu = new JavaScriptSerializer().Serialize(ar);
             return uu;
         }
 
-        public static string[] StringToSrtingArray(string ar)
+        public string[] StringToSrtingArray(string ar)
         {
             string[] kk = new JavaScriptSerializer().Deserialize<string[]>(ar);
             return kk;

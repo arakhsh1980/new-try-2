@@ -15,9 +15,9 @@ namespace soccer1.Models
 
     public static class Statistics
     {
-            public const int ConnectedPlayersMaxNumber = 10000;
-            public const int ActiveMatchesMaxNumber = 5000;
-         public const float ConnectionTimeOut = 60f;
+        public const int ConnectedPlayersMaxNumber = 10000;
+        public const int ActiveMatchesMaxNumber = 5000;
+        public const float ConnectionTimeOut = 60f;
         public const float AllCleanMinIntervals = 0.9f;
         public const float MinServerCallIntervals = 0.05f;
         public const int MaxPawnOutOfTeam = 30;

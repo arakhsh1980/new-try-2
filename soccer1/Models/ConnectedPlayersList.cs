@@ -31,15 +31,7 @@ namespace soccer1.Models
         private static eventtt[] eventStogage = new eventtt[Statistics.ActiveMatchesMaxNumber];
 
         #region return functions
-        public static Property ReturnPropertyOfPlayer(int coonId)
-        {
-            Property pop = new Property();
-            pop.coin = connectedPlayers[coonId].PlayerProperty.coin;
-            pop.fan = connectedPlayers[coonId].PlayerProperty.fan;
-            pop.level = connectedPlayers[coonId].PlayerProperty.level;
-            pop.SoccerSpetial = connectedPlayers[coonId].PlayerProperty.SoccerSpetial;
-            return pop;
-        }
+       
 
         public static DateTime LastTimeConection(int playerId)
         {
@@ -49,9 +41,8 @@ namespace soccer1.Models
         }
 
         public static TeamForConnectedPlayers ReturnPlayerTeam(int connectionId)
-        {
-            TeamForConnectedPlayers team = new TeamForConnectedPlayers();
-            team = connectedPlayers[connectionId].team;
+        {           
+            TeamForConnectedPlayers team = connectedPlayers[connectionId].ReturnYourTeam();
             return team;
         }
         public static int ReturnPlayerActiveMatch(int connectionId)
@@ -65,6 +56,7 @@ namespace soccer1.Models
         {
             return connectedPlayers[connectionId].PowerLevel;
         }
+
         public static string ReturnIdbyConnId(int ConnId)
         {
             if (connectedPlayers[ConnId] == null) { return ""; }
@@ -84,37 +76,39 @@ namespace soccer1.Models
 
 
         
-
+        /*
         public static void AddPawnToPlayer(int ConnectionId, int pawnIndex)
         {
             connectedPlayers[ConnectionId].pawnOutOfTeam[connectedPlayers[ConnectionId].pawnOutOfTeamCounter] = pawnIndex;
             connectedPlayers[ConnectionId].pawnOutOfTeamCounter++;            
         }
-
+        */
         public static bool BuyAssetForPlayer(int ConnectionId, AssetType type, string AssetName)
         {
             Property price= AssetManager.ReturnAssetPrice(type, AssetName);
             return connectedPlayers[ConnectionId].BuyAsset(type, AssetName, price);           
         }
 
+        /*
         public static void AddElixirToPlayer(int ConnectionId, int ElixirIndex)
         {
             connectedPlayers[ConnectionId].elixirOutOfTeam[connectedPlayers[ConnectionId].elixirOutOfTeamCounter] = ElixirIndex;
             connectedPlayers[ConnectionId].elixirOutOfTeamCounter++;
         }
+        */
 
-
+            /*
         public static void AddFormationToPlayer(int ConnectionId, int FormationIndex)
         {
             connectedPlayers[ConnectionId].team.AddToUsableFormations(FormationIndex) ;
         }
-
+        */
+        
         public static void SubtractProperty(int ConnectionId, Property prop)
         {
-            connectedPlayers[ConnectionId].PlayerProperty.coin = - prop.coin;
-            connectedPlayers[ConnectionId].PlayerProperty.SoccerSpetial = - prop.SoccerSpetial ;
+            connectedPlayers[ConnectionId].SubtractProperty(prop);            
         }
-
+        
 
         public static bool IsConnected(int ConnectionId)
         {            
@@ -300,9 +294,8 @@ namespace soccer1.Models
             connectionInfos[playerInfo.connectedId].ConnecttionTime = DateTime.Now;
             connectionInfos[playerInfo.connectedId].connected = true;
             connectionInfos[playerInfo.connectedId].PlayerId = playerInfo.id;
-            connectionInfos[playerInfo.connectedId].ActiveMatchId = -1;
-            //Player pl = ConnectedPlayersList.LoadPlayerDataFromServer(id);
-            PlayerForSerial plsr = Convertors.PlayerToPlayrSerial(playerInfo);
+            connectionInfos[playerInfo.connectedId].ActiveMatchId = -1;            
+            PlayerForSerial plsr = playerInfo.ReturnPlayrSerial();
             return plsr;
         }
 
@@ -370,12 +363,13 @@ namespace soccer1.Models
         */
 
 
+            /*
         public static void ChangePlayerProperty(Property newProperty , int PlayerId)
         {
             connectedPlayers[PlayerId].PlayerProperty = newProperty;
             connectedPlayers[PlayerId].PlayerProperty = newProperty;
         }
-
+        */
         
         
         //public static void DecreasePropertyForBuyingThisPawn ( int PlayerId, int  NumberOfPawnArray)
@@ -423,8 +417,7 @@ namespace soccer1.Models
         public static bool changePlayerTeam(TeamForConnectedPlayers playerteam, int ConnectionId)
         {
             bool result = false;
-            result = connectedPlayers[ConnectionId].ChangeTeam(playerteam);
-            if (result) { DatabaseManager.SaveChangesOnPlayer(connectedPlayers[ConnectionId]); }
+            result = connectedPlayers[ConnectionId].ChangeTeam(playerteam);           
             return result;
 
             /*

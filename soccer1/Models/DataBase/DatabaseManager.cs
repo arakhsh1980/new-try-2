@@ -41,7 +41,8 @@ namespace soccer1.Models
                 }
                 else
                 {
-                    playerInfo = Convertors.PlayerForDatabaseToPlayer(playerForPlayer);
+                    playerInfo = new PlayerForConnectedPlayer();
+                    playerInfo.reWriteAccordingTo(playerForPlayer);
                 }
             }
             
@@ -71,12 +72,13 @@ namespace soccer1.Models
 
             return ElixirInfo;
         }
-
+        /*
         public static void SaveChangesOnPlayer(PlayerForConnectedPlayer pl)
         {   
             SaveChangesOnPlayerInDataBase(Convertors.PlayerToPlayerForDatabase(pl));
         }
-
+        */
+        /*
         static void SaveChangesOnPlayerInDataBase(PlayerForDatabase pl)
         {
             DataDBContext dataBase = new DataDBContext();
@@ -105,6 +107,7 @@ namespace soccer1.Models
                 dataBase.SaveChanges();
             }
         }
+        */
 
         public static void AddPawnToDataBase(Pawn p)
         {
@@ -167,13 +170,12 @@ namespace soccer1.Models
         private static PlayerForConnectedPlayer AddNewDefultPlayerAndReturnIt()
         {
             DataDBContext dataBase = new DataDBContext();
+            Utilities utilities = new Utilities();
             PlayerForConnectedPlayer starterPlyer = utilities.ReturnDefultPlayer();
             string ss = new Random().NextDouble().ToString();
             int index = dataBase.playerInfoes.Count<PlayerForDatabase>() + 1;
             starterPlyer.id = index.ToString()+ ss;
-            PlayerForDatabase player = Convertors.PlayerToPlayerForDatabase(starterPlyer);
-            dataBase.playerInfoes.Add(player);
-            dataBase.SaveChanges();
+            starterPlyer.AddTodDataBase();  
             return starterPlyer;
         }      
 

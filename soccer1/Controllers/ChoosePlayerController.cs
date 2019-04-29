@@ -25,7 +25,8 @@ namespace soccer1.Controllers
             int opponentId = MatchList.ReturnOpponentOf(ConnectionId, matchId);
             if (opponentId == -1) { return "Error"; }
             TeamForConnectedPlayers opponentTeam =ConnectedPlayersList.ReturnPlayerTeam(opponentId);
-            return Convertors.TeamForSerializeToJson(Convertors.TeamToTeamForSerialize(opponentTeam));
+            Convertors convertor = new Convertors();
+            return convertor.TeamForSerializeToJson(convertor.TeamToTeamForSerialize(opponentTeam));
         }
     }
     

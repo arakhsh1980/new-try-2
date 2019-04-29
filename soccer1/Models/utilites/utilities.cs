@@ -6,9 +6,9 @@ using soccer1.Models.main_blocks;
 
 namespace soccer1.Models.utilites
 {
-    public static class utilities
+    public class Utilities
     {
-        public static bool CheckIfFirstPropertyIsBigger(Property property1, Property property2)
+        public bool CheckIfFirstPropertyIsBigger(Property property1, Property property2)
         {
             bool check = true;
             if (property1.coin < property2.coin) { check = false; }
@@ -18,27 +18,16 @@ namespace soccer1.Models.utilites
             return check;
         }
 
-        public static PlayerForConnectedPlayer ReturnDefultPlayer()
+        public PlayerForConnectedPlayer ReturnDefultPlayer()
         {
-            PlayerForConnectedPlayer pl = new PlayerForConnectedPlayer();
-            pl.Name = "Defult";
-            pl.PowerLevel = 0;
-            pl.elixirOutOfTeam = new int[Statistics.MaxElixirOutOfTeam];
-            for(int i=0; i< pl.elixirOutOfTeam.Length; i++) { pl.elixirOutOfTeam[i] = -1; }
-            pl.pawnOutOfTeam = new int[Statistics.MaxPawnOutOfTeam];
-            for (int i = 0; i < pl.pawnOutOfTeam.Length; i++) { pl.pawnOutOfTeam[i] = -1; }
-            pl.team = utilities.returnDefultTeam();
-            pl.PlayerProperty = new Property();
-            pl.PlayerProperty.fan = 0;
-            pl.PlayerProperty.coin = Statistics.StartingCoin;
-            pl.PlayerProperty.level = 1;
-            pl.PlayerProperty.SoccerSpetial = Statistics.StartingSS;
+
+            PlayerForConnectedPlayer pl = new PlayerForConnectedPlayer();           
             return pl;
         }
 
 
 
-        public static TeamForConnectedPlayers returnDefultTeam()
+        public TeamForConnectedPlayers returnDefultTeam()
         {
             TeamForConnectedPlayers team = new TeamForConnectedPlayers();
             int defultPawnIndex = AssetManager.ReturnAssetIndex(AssetType.Pawn , "Defult");            
@@ -52,7 +41,7 @@ namespace soccer1.Models.utilites
             return team;
         }
 
-        public static AssetType ReturnAssetTypeByName(string typeName)
+        public AssetType ReturnAssetTypeByName(string typeName)
         {
             AssetType type = AssetType.none;
             switch (typeName)

@@ -23,6 +23,7 @@ namespace soccer1.Controllers
             string IdName = Request.Form["IdName"];
             string AssetTypestring = Request.Form["AssetType"];
             bool reusult = false;
+            Utilities utilities = new Utilities();
             AssetType assetType = utilities.ReturnAssetTypeByName(AssetTypestring);
             if (ConnectedPlayersList.IsConnectedById(ConnectionId, PlayerId))
             {
