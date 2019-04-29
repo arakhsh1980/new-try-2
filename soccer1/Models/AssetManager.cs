@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using soccer1.Models.main_blocks;
 using soccer1.Models.utilites;
+using soccer1.Models.DataBase;
 using System.Data.Entity;
 using System.Web.Mvc;
 using soccer1;
@@ -51,7 +52,8 @@ namespace soccer1.Models
             if (IdNamePawn == "null") { return -1; }
             if (IndexOfAsset < 0)
             {
-                Log.AddLog("Error :Assetmanager. ReturnAssetIndex. Can Not Find This Pawn");
+                Log.AddLog("Error :Assetmanager. ReturnAssetIndex. Can Not Find This Pawn"+ IdNamePawn);
+
             }
             return IndexOfAsset;
         }
@@ -236,16 +238,38 @@ namespace soccer1.Models
         
         public static void FillArrays()
         {
-            for(int i=0; i< arraylengh; i++)
+            LoadAssets();
+            /*
+            for (int i=0; i< arraylengh; i++)
             {
                 Pawnlist[i] = new Pawn();
                 Elixirlist[i] = new Elixir();
                 Formationlist[i] = new Formation();
             }
-            
+            */
         }
 
+        public static void LoadAssets()
+        {
+            DataDBContext dataBase = new DataDBContext();
+            Formation[] formations = dataBase.allFormations.ToArray();
+            for(int i =0; i< formations.Length; i++)
+            {
+                Formationlist[i] = formations[i];
+            }
 
+            Elixir[] elixirs = dataBase.allElixires.ToArray();
+            for (int i = 0; i < elixirs.Length; i++)
+            {
+                Elixirlist[i] = elixirs[i];
+            }
+
+            Pawn[] pawns = dataBase.allPawns.ToArray();
+            for (int i = 0; i < pawns.Length; i++)
+            {
+                Pawnlist[i] = pawns[i];
+            }
+        }
 
         /*
         public static string ReturnPawnName(int pawnId)
