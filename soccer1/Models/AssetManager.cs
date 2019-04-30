@@ -128,7 +128,8 @@ namespace soccer1.Models
 
         public static Property ReturnAssetPrice(AssetType type, int index)
         {
-            Property pop = new Property();
+            
+               Property pop = new Property();
             pop.coin = int.MaxValue;
             pop.fan = int.MaxValue;
             Property thisprop = new Property();
@@ -251,6 +252,7 @@ namespace soccer1.Models
 
         public static void LoadAssets()
         {
+            mutex.WaitOne();
             DataDBContext dataBase = new DataDBContext();
             Formation[] formations = dataBase.allFormations.ToArray();
             for(int i =0; i< formations.Length; i++)
@@ -269,6 +271,7 @@ namespace soccer1.Models
             {
                 Pawnlist[i] = pawns[i];
             }
+            mutex.ReleaseMutex();
         }
 
         /*
