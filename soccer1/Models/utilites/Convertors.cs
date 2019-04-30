@@ -94,6 +94,13 @@ namespace soccer1.Models.utilites
             return uu;
         }
 
+        public string StringArrayToSrting(string[] ar)
+        {
+            string uu;
+            uu = new JavaScriptSerializer().Serialize(ar);
+            return uu;
+        }
+
         public  string ListToString(List<int> list)
         {
             string uu;
@@ -257,12 +264,6 @@ namespace soccer1.Models.utilites
             return uu;
         }
 
-        public string StringArrayToSrting(string[] ar)
-        {
-            string uu;
-            uu = new JavaScriptSerializer().Serialize(ar);
-            return uu;
-        }
 
         public string[] StringToSrtingArray(string ar)
         {

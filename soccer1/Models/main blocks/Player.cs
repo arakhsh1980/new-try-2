@@ -193,12 +193,29 @@ namespace soccer1.Models.main_blocks
             plsr.SoccerSpetial = PlayerProperty.SoccerSpetial;
             
             plsr.Team = convertor.TeamToTeamForSerialize(team);
+            string[] pawnsarray = new string[pawnOutOfTeam.Count];
+            int pawncounter = 0;
+            foreach (int i in pawnOutOfTeam)
+            {
+                pawnsarray[pawncounter]=AssetManager.ReturnAssetName(AssetType.Pawn, i);
+                pawncounter++;
+            }
+            string[] elixirsarray = new string[elixirOutOfTeam.Count];
+            int elixirCounter = 0;
+            foreach (int i in elixirOutOfTeam)
+            {
+                elixirsarray[elixirCounter] = AssetManager.ReturnAssetName(AssetType.Elixir, i); ;
+                elixirCounter++;
+            }
+
+            /*
+
             int[] pawnBuffer = new int[Statistics.MaxPawnOutOfTeam];
             for(int i=0; i< pawnBuffer.Length; i++) { pawnBuffer[i] = -1; }
             int[] elixirBuffer = new int[Statistics.MaxElixirOutOfTeam];
             for (int i = 0; i < elixirBuffer.Length; i++) { elixirBuffer[i] = -1; }
-            int pawncounter = 0;
-            int elixirCounter = 0;
+            
+            
             foreach(int i in pawnOutOfTeam)
             {
                 pawnBuffer[pawncounter] = i;
@@ -209,8 +226,9 @@ namespace soccer1.Models.main_blocks
                 elixirBuffer[elixirCounter] = i;
                 elixirCounter++;
             }
-            plsr.OutOfTeamPawns = convertor.IntArrayToSrting(pawnBuffer);
-            plsr.OutOfTeamElixirs = convertor.IntArrayToSrting(elixirBuffer);
+            */
+            plsr.OutOfTeamPawns = pawnsarray; 
+            plsr.OutOfTeamElixirs = elixirsarray; 
             return plsr;
         }
         #endregion
