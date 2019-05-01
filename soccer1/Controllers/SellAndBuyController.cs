@@ -6,6 +6,7 @@ using System.Web.Mvc;
 using soccer1.Models;
 using soccer1.Models.main_blocks;
 using soccer1.Models.utilites;
+using soccer1.Models.DataBase;
 using System.Data.Entity;
 
 
@@ -19,15 +20,32 @@ namespace soccer1.Controllers
         public string BuyAsset(FormCollection collection)
         {            
             string PlayerId = Request.Form["PlayerId"];
-            string IdName = Request.Form["IdName"];
+            string assetId = Request.Form["IdName"];
             string AssetTypestring = Request.Form["AssetType"];
-            bool reusult = false;            
-            AssetType assetType = new Utilities().ReturnAssetTypeByName(AssetTypestring); 
-            new
-            reusult = ConnectedPlayersList.BuyAssetForPlayer(ConnectionId, assetType, IdName);
-                Log.AddLog("Error : reusult:"+ reusult.ToString());
-                return reusult.ToString();
-            
+            bool result = false;            
+           
+            DataDBContext dataBase = new DataDBContext();
+            PlayerForDatabase player = dataBase.playerInfoes.Find(PlayerId);
+            if(player != null)
+            {
+                AssetType assetType = new Utilities().ReturnAssetTypeByName(AssetTypestring);
+                Property AssetPrice = new AssetManager().ReturnAssetPrice(assetType,assetId);
+                PlayerForConnectedPlayer pl = new PlayerForConnectedPlayer();
+                pl.reWriteAccordingTo(player);
+                result =pl.BuyAsset(assetType, assetId, AssetPrice);
+                if (result) {
+                    pl.returnDataBaseVersion();
+                    player.
+                        dataBase.Entry(player).State = EntityState.Modified;
+                    dataBase.SaveChanges();
+                }
+                 
+                
+                Log.AddLog("Error : reusult:" + result.ToString());
+                return result.ToString();
+            }
+            return result.ToString();
+
         }
 
         /*

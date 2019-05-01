@@ -60,7 +60,7 @@ namespace soccer1.Models.main_blocks
 
         #region public functions
 
-        public bool BuyAsset(AssetType assetType, string AssetIdName, Property price, int CooId)
+        public bool BuyAsset(AssetType assetType, string AssetIdName, Property price)
         {
             Utilities utilities = new Utilities();
             if (utilities.CheckIfFirstPropertyIsBigger(PlayerProperty, price)) {
@@ -271,7 +271,7 @@ namespace soccer1.Models.main_blocks
         }
 
 
-        PlayerForDatabase returnDataBaseVersion()
+        public PlayerForDatabase returnDataBaseVersion()
         {
             PlayerForDatabase plsrs = new PlayerForDatabase();
             plsrs.CurrentFormation =team.CurrentFormation;
