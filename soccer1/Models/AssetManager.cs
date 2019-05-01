@@ -13,7 +13,7 @@ using System.Threading;
 
 namespace soccer1.Models
 {
-    public static class AssetManager
+    public  class AssetManager
     {        
         const int arraylengh = 100;
         private static Pawn[] Pawnlist = new Pawn[arraylengh];
@@ -25,7 +25,7 @@ namespace soccer1.Models
         //give pawnname add return pawnindex
         public static Mutex assentsLoaded = new Mutex();
         //public static AutoResetEvent assentsLoaded = new AutoResetEvent(false);
-        public static int ReturnAssetIndex(AssetType type, string IdNamePawn)
+        public int ReturnAssetIndex(AssetType type, string IdNamePawn)
         {
             int IndexOfAsset=-1;
             switch (type)
@@ -58,7 +58,7 @@ namespace soccer1.Models
             return IndexOfAsset;
         }
         
-        public static Pawn RetrunPawnByIdName(string IdNamePawn)
+        public  Pawn RetrunPawnByIdName(string IdNamePawn)
         {
             Pawn p = new Pawn();
             p.IdName = "null";            
@@ -69,7 +69,7 @@ namespace soccer1.Models
             return p;
         }
 
-        public static Elixir ReturnElixirByIdName(string IdNamePawn)
+        public  Elixir ReturnElixirByIdName(string IdNamePawn)
         {
             Elixir p = new Elixir();
             p.IdName = "null";            
@@ -80,7 +80,7 @@ namespace soccer1.Models
             return p;
         }
 
-        public static Formation ReturnFormationByIdName(string IdNamePawn)
+        public  Formation ReturnFormationByIdName(string IdNamePawn)
         {
             Formation p = new Formation();
             p.IdName = "null";            
@@ -91,7 +91,7 @@ namespace soccer1.Models
             return p;
         }
 
-        public static string ReturnAssetName(AssetType type, int index)
+        public string ReturnAssetName(AssetType type, int index)
         {
             if(index == -1)
             {
@@ -127,7 +127,7 @@ namespace soccer1.Models
             return idName;
         }
 
-        public static Property ReturnAssetPrice(AssetType type, int index)
+        public  Property ReturnAssetPrice(AssetType type, int index)
         {
             
                Property pop = new Property();
@@ -168,12 +168,12 @@ namespace soccer1.Models
             return pop;
         }
 
-        public static Property ReturnAssetPrice(AssetType type, string  IdName)
+        public  Property ReturnAssetPrice(AssetType type, string  IdName)
         {
             return ReturnAssetPrice(type, ReturnAssetIndex(type, IdName));
         }
 
-        public static void AddPawnToAssets(Pawn p)
+        public  void AddPawnToAssets(Pawn p)
         {
             
             if (Pawnlist.Length <= pawnsConter) { Errors.AddBigError("AddPawnToAssets. Pawnlist.Length <= pawnsConter"); return; }
@@ -197,7 +197,7 @@ namespace soccer1.Models
             
         }
         
-        public static void AddFormationToAssets(Formation ff)
+        public  void AddFormationToAssets(Formation ff)
         {
             if (Formationlist.Length <= FormationConter) { Errors.AddBigError("Formationlist.Length <= FormationConter"); return; }
             int indexinarray = -1;
@@ -217,7 +217,7 @@ namespace soccer1.Models
             }
         }
         
-        public static void AddElixirToAssets(Elixir el)
+        public  void AddElixirToAssets(Elixir el)
         {
             if (Elixirlist.Length <= ElixirConter) { Errors.AddBigError("Elixirlist.Length <= ElixirConter"); return; }
             int indexinarray = -1;

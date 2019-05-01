@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using soccer1.Models.main_blocks;
+using soccer1.Models.DataBase;
+using soccer1.Models.utilites;
 
 namespace soccer1.Models.utilites
 {
@@ -19,11 +21,26 @@ namespace soccer1.Models.utilites
             return check;
         }
 
-        public PlayerForConnectedPlayer ReturnDefultPlayer()
+        public PlayerForDatabase ReturnDefultPlayer()
         {
-
-            PlayerForConnectedPlayer pl = new PlayerForConnectedPlayer();           
-            return pl;
+            PlayerForDatabase player = new PlayerForDatabase();            
+            TeamForConnectedPlayers team =returnDefultTeam();
+            List<int> pawnOutOfTeam = new List<int>();
+            List<int> elixirOutOfTeam = new List<int>();
+            player.CurrentFormation = team.CurrentFormation;
+            player.ElixirInBench = new Convertors().IntArrayToSrting(team.ElixirInBench);
+            player.Fan = 0;            
+            player.level = 1;
+            player.Money = Statistics.StartingCoin;
+            player.Name = "Defult";
+            player.otherElixirs = new Convertors().IntArrayToSrting(new Convertors().outOfTeamPawnToIntArray(elixirOutOfTeam));
+            player.otherPawns = new Convertors().IntArrayToSrting(new Convertors().outOfTeamPawnToIntArray(pawnOutOfTeam));
+            player.pawnsInBench = new Convertors().IntArrayToSrting(team.pawnsInBench);
+            player.PlayeingPawns = new Convertors().IntArrayToSrting(team.PlayeingPawns);
+            player.PowerLevel = 1;
+            player.SoccerSpetial = Statistics.StartingSS;
+            player.UsableFormations = new Convertors().IntArrayToSrting(team.UsableFormations);           
+            return player;
         }
 
 
