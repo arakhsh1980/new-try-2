@@ -4,6 +4,9 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using soccer1.Models;
+using soccer1.Models.DataBase;
+using soccer1.Models.main_blocks;
+using System.Data.Entity;
 
 
 namespace soccer1.Controllers
@@ -18,35 +21,35 @@ namespace soccer1.Controllers
         {
             int ConnectionId = Int32.Parse(Request.Form["ConnectionId"]);
             string PlayerId = Request.Form["PlayerId"];
-            if (ConnectedPlayersList.IsConnectedById(ConnectionId, PlayerId))
-            {
+            
                 string mm = ConnectedPlayersList.ReadPlayerEvent(ConnectionId);                
                 return mm;               
-            }
-            else
-            {                
-                return ServrMasage.Disconcted.ToString();
-            }
+            
                 
         }
+
 
         
         // POST: if first player return true.
         [HttpPost]
         public string ReadyToPlay(FormCollection collection)
         {
-            int ConnectionId = Int32.Parse(Request.Form["ConnectionId"]);
+            
             string  PlayerId = Request.Form["PlayerId"];
             string  SelectedLeage = Request.Form["SelectedLeage"];
-            if(ConnectedPlayersList.IsConnectedById(ConnectionId, PlayerId) && (ConnectedPlayersList.ReturnPlayerActiveMatch(ConnectionId) == -1))
+            DataDBContext dataBase = new DataDBContext();
+            PlayerForDatabase player = dataBase.playerInfoes.Find(PlayerId);
+            if (player != null)
             {
-                
+                PlayerForConnectedPlayer pl = new PlayerForConnectedPlayer();
+                pl.reWriteAccordingTo(player);
+                int bestmatch = MatchList.FindSutableMatch(pl.PowerLevel, SelectedLeage);
+
                 // FindSutableMatch return -1 if dident find a sutable match
-                int bestmatch = MatchList.FindSutableMatch(ConnectedPlayersList.ReturnPlayerPowerLevel(ConnectionId), SelectedLeage);
                 if (bestmatch == -1)
                 {
                     MatchList.AddNewMatchWithPlayerOne(ConnectionId, SelectedLeage);
-                    
+
                     return "You Are Fisrt";
                 }
                 else
@@ -55,10 +58,9 @@ namespace soccer1.Controllers
                     return "You Are Second";
                 }
             }
-            else
-            {
-                return "You Are Disconnectid";
-            }
+            return "you are connected";
         }
+
+
     }
 }
