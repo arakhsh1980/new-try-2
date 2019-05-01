@@ -7,7 +7,7 @@ using System.Web.Script.Serialization;
 
 namespace soccer1.Models
 {
-    public static class MatchList
+    public class MatchList
     {
 
         
@@ -15,7 +15,7 @@ namespace soccer1.Models
 
        
         // reaturn best sutable match... id there is no match return -1
-        public static int FindSutableMatch(float PlayerPowerLevel, string SelectedLeage)
+        public int FindSutableMatch(float PlayerPowerLevel, string SelectedLeage)
         {
             float bestpowerDiference = float.MaxValue;
             int bestMatch = -1;
@@ -43,7 +43,7 @@ namespace soccer1.Models
             }            
         }
 
-        public static int ReturnOpponentOf(int connectionId, int matchId)
+        public int ReturnOpponentOf(int connectionId, int matchId)
         {
             int firstId=matchList[matchId].ReturnFirstPlayer();
             int SecId = matchList[matchId].ReturnSecondPlayer();
@@ -52,24 +52,24 @@ namespace soccer1.Models
             Errors.AddBigError("this player is not in its clamed match");
             return -1;
         }
-        public static void AddSecondPlayerToMatch(int matchNumber , int playerConnId)
+        public void AddSecondPlayerToMatch(int matchNumber , int playerConnId)
         {
             matchList[matchNumber].AddSecondPlayerToMatch(playerConnId);
             Log.AddMatchLog(matchNumber, "Second player added to match by id:"+ playerConnId.ToString());
             //ConnectedPlayersList.SetPlayerMatch(playerConnId, matchNumber);
         }
 
-        public static void shootHapened(ShootActionCode shoot, string jsonpart)
+        public void shootHapened(ShootActionCode shoot, string jsonpart)
         {
             matchList[shoot.MatchID].ShootHappeded(shoot, jsonpart);
         }
 
-        public static void stopedPosition(int matchId, int ConnectionId, string jsonpart)
+        public void stopedPosition(int matchId, int ConnectionId, string jsonpart)
         {
             matchList[matchId].GetStationeryPostion(ConnectionId, jsonpart);           
         }
         
-        public static void playerOfMatchLost(int matchId, int playerId)
+        public void playerOfMatchLost(int matchId, int playerId)
         {
             if (matchId < 0) {
                 Errors.AddBigError("unacceptable match id at playerOfMatchLost. match id: "+ matchId.ToString());
@@ -79,7 +79,7 @@ namespace soccer1.Models
             matchList[matchId].playerLost(playerId);
         }
 
-        public static void AddNewMatchWithPlayerOne(int playerConnId, string SelectedLeage)
+        public void AddNewMatchWithPlayerOne(int playerConnId, string SelectedLeage)
         {
             int bestMatch = -1;
             for (int i = (matchList.Length - 1); 0 <= i; i--)
@@ -99,12 +99,12 @@ namespace soccer1.Models
             
         
         //cliam will be 1 or -1
-        public static void GoalClaim(int matchId, int ConnectionId, int Claim) {
+        public void GoalClaim(int matchId, int ConnectionId, int Claim) {
             matchList[matchId].GoalReport(ConnectionId, Claim);
         }
 
         // this function will be called ones at start of server
-        public static void FillArrays()
+        public void FillArrays()
         {
             for (int i = 0; i < matchList.Length; i++)
             {
@@ -112,17 +112,17 @@ namespace soccer1.Models
             }
         }
 
-        public static void PlayerLeaveMatch(int matchId, int ConnectionId)
+        public void PlayerLeaveMatch(int matchId, int ConnectionId)
         {
             matchList[matchId].playerLost(ConnectionId);            
         }
 
-        public static void ItsMyTurn(int matchId, int ConnectionId)
+        public void ItsMyTurn(int matchId, int ConnectionId)
         {
             matchList[matchId].ItsMyTimeClaim(ConnectionId);
         }
 
-        public static DateTime ReturnMatchConnectionTime(int matchId)
+        public DateTime ReturnMatchConnectionTime(int matchId)
         {
             return matchList[matchId].ReturnConnectionTime();
         }

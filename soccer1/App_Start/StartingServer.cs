@@ -10,7 +10,7 @@ namespace soccer1.App_Start
     {
         public static void StartAll()
         {
-            ConnectedPlayersList.FillArrays();
+            //ConnectedPlayersList.FillArrays();
             AssetManager.FillArrays();
             MatchList.FillArrays();
         }

@@ -58,10 +58,10 @@ namespace soccer1.Models
 
         }
 
-        public void StartMatch(int StarterId, int Matchnum, string SelectedLeage)
+        public void StartMatch(int StarterId, float StarterPower, int Matchnum, string SelectedLeage)
         {
             playerOneId = StarterId;
-            PlayerOnePower = ConnectedPlayersList.ReturnPlayerPowerLevel(StarterId);
+            PlayerOnePower = StarterPower;
            // PlayerOneShootTime = ConnectedPlayersList.connectedPlayers[StarterId].ShootTime;
             playerOnePawnsPositions = null;
             playerTwoPawnsPositions = null;
@@ -72,10 +72,10 @@ namespace soccer1.Models
             ConnectedPlayersList.AddPlayerEvent(StarterId, ServrMasage.WatForOthr, "");            
         }
 
-        public void AddSecondPlayerToMatch(int connectionId)
+        public void AddSecondPlayerToMatch(int connectionId,float power)
         {
             playerTwoId = connectionId;
-            PlayerTwoPower = ConnectedPlayersList.ReturnPlayerPowerLevel(connectionId);
+            PlayerTwoPower = power;
            //PlayerTwoShootTime = ConnectedPlayersList.connectedPlayers[connectionId].ShootTime;
             ConnectedPlayersList.SetPlayerMatch(playerOneId, matchNumber);
             ConnectedPlayersList.SetPlayerMatch(playerTwoId, matchNumber);

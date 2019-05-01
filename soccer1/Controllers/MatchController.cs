@@ -17,17 +17,15 @@ namespace soccer1.Controllers
         // POST: Match/Create
         [HttpPost]
         public void PlayerShootDesition(FormCollection collection)
-        {
-            int ConnectionId = Int32.Parse(Request.Form["ConnectionId"]);
+        {           
             string PlayerId = Request.Form["PlayerId"];
-            int matchId = Int32.Parse(Request.Form["MatchId"]);
-            if (!ConnectedPlayersList.IsConnectedByIdAndMatch(ConnectionId, PlayerId, matchId)){ return; }
+            int matchId = Int32.Parse(Request.Form["MatchId"]);           
             string jsonpart = collection["jsonCode"];
             ShootActionCode shoot = new JavaScriptSerializer().Deserialize<ShootActionCode>(jsonpart);
             Log.AddLog("shoot resived. shotter : " + shoot.playerID);
             if (/*ConnectedPlayersList.IsShootValid(shoot)*/ true)
             {
-                MatchList.shootHapened(shoot, jsonpart);
+                new MatchList().shootHapened(shoot, jsonpart);
             }
             else
             {

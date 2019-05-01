@@ -12,7 +12,7 @@ using soccer1;
 
 namespace soccer1.Models
 {
-    public  class ConnectedPlayersList
+    class ConnectedPlayersList
     {
         private class eventtt
         {
