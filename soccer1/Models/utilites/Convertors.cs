@@ -62,6 +62,27 @@ namespace soccer1.Models.utilites
         
             return slteam;
         }
+        public PlayerForSerial PForDatabaseToPForSerial(PlayerForDatabase player)
+        {
+            PlayerForSerial serialplayer = new PlayerForSerial();
+            serialplayer.id = player.id;
+            serialplayer.Fan = player.Fan;
+            serialplayer.level = player.level;
+            serialplayer.Money = player.Money;
+            serialplayer.Name = player.Name;
+            serialplayer.SoccerSpetial = player.SoccerSpetial;
+            serialplayer.OutOfTeamElixirs = StringToStringArray(player.otherElixirs);
+            serialplayer.OutOfTeamPawns = StringToStringArray(player.otherPawns);
+            serialplayer.PowerLevel = player.PowerLevel;
+            serialplayer.SoccerSpetial = player.SoccerSpetial;
+            serialplayer.Team.CurrentFormation = player.CurrentFormation.ToString();
+            serialplayer.Team.ElixirInBench = StringToStringArray(player.ElixirInBench);
+            serialplayer.Team.pawnsInBench = StringToStringArray(player.pawnsInBench);
+            serialplayer.Team.PlayeingPawns = StringToStringArray(player.PlayeingPawns);
+            serialplayer.Team.UsableFormations = StringToStringArray(player.UsableFormations);
+            
+            return serialplayer;
+        }
 
         public  TeamForConnectedPlayers TeamForSerializeToTeam(TeamForSerialize pl)
         {
@@ -160,6 +181,11 @@ namespace soccer1.Models.utilites
         {
             int[] kk = new JavaScriptSerializer().Deserialize<int[]>(ar);
             return kk;
+        }
+        public string[] StringToStringArray(string ar)
+        {
+            string[] ss = new JavaScriptSerializer().Deserialize<string[]>(ar);
+            return ss;
         }
 
 
