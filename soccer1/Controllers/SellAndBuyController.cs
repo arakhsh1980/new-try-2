@@ -34,18 +34,14 @@ namespace soccer1.Controllers
                 pl.reWriteAccordingTo(player);
                 result =pl.BuyAsset(assetType, assetId, AssetPrice);
                 if (result) {
-                    pl.returnDataBaseVersion();
-                    player.
-                        dataBase.Entry(player).State = EntityState.Modified;
+                    player.changePlayer(pl.returnDataBaseVersion());
+                    dataBase.Entry(player).State = EntityState.Modified;
                     dataBase.SaveChanges();
                 }
-                 
-                
                 Log.AddLog("Error : reusult:" + result.ToString());
                 return result.ToString();
             }
             return result.ToString();
-
         }
 
         /*

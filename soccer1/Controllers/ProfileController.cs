@@ -11,7 +11,9 @@ using System.Text;
 using System.Runtime.Serialization.Json;
 using System.Web.Script.Serialization;
 using soccer1.Models.utilites;
+using soccer1.Models.DataBase;
 using soccer1.Models.main_blocks;
+using System.Data.Entity;
 
 namespace soccer1.Controllers
 {
@@ -20,38 +22,28 @@ namespace soccer1.Controllers
         // GET: ProfileConnection
         [HttpPost]
         public string UpdateProfile(FormCollection collection)
-        {
-            int ConnectionId = Int32.Parse(Request.Form["ConnectionId"]);
+        {            
             string PlayerId = Request.Form["PlayerId"];
-            bool interactionResult=false;
-            if (ConnectedPlayersList.IsConnectedById(ConnectionId, PlayerId))
+            bool interactionResult=false;           
+            string Team1 = collection["Team"];
+            TeamForSerialize teamfs = new JavaScriptSerializer().Deserialize<TeamForSerialize>(Team1);                
+            TeamForConnectedPlayers playerteam = new Convertors().TeamForSerializeToTeam(teamfs);
+            DataDBContext dataBase = new DataDBContext();
+            PlayerForDatabase player = dataBase.playerInfoes.Find(PlayerId);
+            if (player != null)
             {
-                string Team1 = collection["Team"];
-                TeamForSerialize teamfs = new JavaScriptSerializer().Deserialize<TeamForSerialize>(Team1);
-                Convertors convertor = new Convertors();
-                TeamForConnectedPlayers playerteam = convertor.TeamForSerializeToTeam(teamfs);
-                interactionResult=ConnectedPlayersList.changePlayerTeam(playerteam, ConnectionId);
-                //PlayerForConnectedPlayer playera = DatabaseManager.LoadPlayerData(PlayerId);
-                //DatabaseManager.SaveChangesOnPlayer(playera);
-
-                return interactionResult.ToString();
+                PlayerForConnectedPlayer pl = new PlayerForConnectedPlayer();
+                pl.reWriteAccordingTo(player);
+                interactionResult= pl.ChangeTeam(playerteam);
+                if (interactionResult)
+                {
+                    player.changePlayer(pl.returnDataBaseVersion());
+                    dataBase.Entry(player).State = EntityState.Modified;
+                    dataBase.SaveChanges();
+                } 
             }
-            else
-            {
-                Log.AddLog("Error : Can Not Add Pawn");
-                return false.ToString();
-            }
+            return interactionResult.ToString();
         }
 
-        public string LoadTeamPlayerData(FormCollection collection)
-        {
-            string id = Request.Form["PlayerId"];
-
-            PlayerForSerial plsr = ConnectedPlayersList.LoadPlayerDataFromServer(id);
-            Log.AddPlayerLog(plsr.CoonId, "player" + plsr.CoonId.ToString() + " added by " + plsr.id + " ID");
-            string uu = new JavaScriptSerializer().Serialize(plsr);
-            return uu;
-
-        }
     }
 }

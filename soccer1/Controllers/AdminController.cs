@@ -43,7 +43,7 @@ namespace soccer1.Controllers
             pawn.redForSale= Request.Form["redForSale"];
             pawn.ShowName = Request.Form["redForSale"];
             
-            AssetManager.AddPawnToAssets(pawn);
+            new AssetManager().AddPawnToAssets(pawn);
             AddPawnmutex.ReleaseMutex();            
             return "Pawn Loaded"+ pawn.IdName;            
         }
@@ -70,8 +70,8 @@ namespace soccer1.Controllers
             price.level = Int32.Parse(Request.Form["price.level"]);
             price.SoccerSpetial = Int32.Parse(Request.Form["price.SoccerSpetial"]);
             elixir.price = price;
-            AssetManager.AddElixirToAssets(elixir);
-            AddElixirmutex.WaitOne();           
+            new AssetManager().AddElixirToAssets(elixir);
+            AddElixirmutex.ReleaseMutex();           
             return "Elixir Loaded" + elixir.IdName;
         }
 
@@ -98,8 +98,8 @@ namespace soccer1.Controllers
                 formation.positions[i].y = Int32.Parse(Request.Form["positions" + i.ToString() + "y"]);
             }
 
-            AssetManager.AddFormationToAssets(formation);
-            AddElixirmutex.WaitOne();
+            new AssetManager().AddFormationToAssets(formation);
+            AddElixirmutex.ReleaseMutex();
             return "Formation Loaded" + formation.IdName;
         }
 
