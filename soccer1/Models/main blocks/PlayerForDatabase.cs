@@ -44,12 +44,23 @@ namespace soccer1.Models.main_blocks
 
         public string ElixirInBench { get; set; }
 
-        public void changePlayer(PlayerForDatabase otherplayer) {
+        public void changePlayer(PlayerForDatabase otherplayer)
+        {
 
-        Fan = otherplayer.Fan;
-
-    }
-
+            Fan = otherplayer.Fan;
+            Name = otherplayer.Name;
+            Money = otherplayer.Money;
+            PowerLevel = otherplayer.PowerLevel;
+            level = otherplayer.level;
+            SoccerSpetial = otherplayer.SoccerSpetial;
+            CurrentFormation = otherplayer.CurrentFormation;
+            otherPawns = otherplayer.otherPawns;
+            PlayeingPawns = otherplayer.PlayeingPawns;
+            pawnsInBench = otherplayer.pawnsInBench;
+            UsableFormations = otherplayer.UsableFormations;
+            otherElixirs = otherplayer.otherElixirs;
+            ElixirInBench = otherplayer.ElixirInBench;
+        }
 
     }
     
