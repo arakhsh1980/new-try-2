@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Threading;
 
 namespace soccer1.Models
 {
@@ -29,6 +30,7 @@ namespace soccer1.Models
         public const int StartingCoin = 1000;
         public const int StartingSS = 10;
         public const float maxAcceptedPowerDiference = 10;
+        //public static Mutex LoadDataBaseMutex = new Mutex();
     }
 
     

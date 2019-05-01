@@ -12,6 +12,7 @@ using System.Runtime.Serialization.Json;
 using System.Web.Script.Serialization;
 using soccer1.Models.utilites;
 using soccer1.Models.main_blocks;
+using System.Threading;
 
 
 
@@ -26,7 +27,9 @@ namespace soccer1.Controllers
         // POST: Loading/LoadPlayerData
         [HttpPost]
         public string LoadPlayerData(FormCollection collection)
-        {           
+        {
+            AssetManager.assentsLoaded.WaitOne();
+            AssetManager.assentsLoaded.ReleaseMutex();
             string id = Request.Form["PlayerId"];
             
             PlayerForSerial plsr = ConnectedPlayersList.LoadPlayerDataFromServer(id);
@@ -35,6 +38,7 @@ namespace soccer1.Controllers
             //plsr.testTeam = Convertors.TeamToTeamForSerialize(thisteam); 
             Log.AddPlayerLog(plsr.CoonId, "player"+ plsr.CoonId.ToString() + " added by " + plsr.id + " ID");
             string uu = new JavaScriptSerializer().Serialize(plsr);
+            
             return uu;        
 
         }

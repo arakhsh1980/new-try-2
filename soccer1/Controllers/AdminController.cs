@@ -12,19 +12,22 @@ namespace soccer1.Controllers
 {
     public class AdminController : Controller
     {
-        private static Mutex AddPawnmutex = new Mutex();
-        private static Mutex AddElixirmutex = new Mutex();
-        private static Mutex AddFormationmutex = new Mutex();
+        public static Mutex AddPawnmutex = new Mutex();
+        public static Mutex AddElixirmutex = new Mutex();
+        public static Mutex AddFormationmutex = new Mutex();       
 
         [HttpPost]
         public string AddPawn(FormCollection collection)
         {
-            //AddPawnmutex.WaitOne();
+            AddPawnmutex.WaitOne();
+            
+            //AssetManager.assentsLoaded.WaitOne();
             Pawn pawn = new Pawn();
             pawn.abilityShower= Request.Form["abilityShower"];
             pawn.ForMatch = Request.Form["ForMatch"];
             pawn.blueForSale = Request.Form["blueForSale"];
             pawn.IdName = Request.Form["IdName"];
+            Log.AddLog("AddPawnStarted" + pawn.IdName);
             PawnAbility pa = new PawnAbility();
             pa.aiming = Int32.Parse(Request.Form["mainAbility.aiming"]);
             pa.boddyMass = Int32.Parse(Request.Form["mainAbility.boddyMass"]);
@@ -39,20 +42,22 @@ namespace soccer1.Controllers
             pawn.price = price;
             pawn.redForSale= Request.Form["redForSale"];
             pawn.ShowName = Request.Form["redForSale"];
-            Log.AddLog("AddPawn" + pawn.IdName);
+            
             AssetManager.AddPawnToAssets(pawn);
-            //AddPawnmutex.ReleaseMutex();
+            AddPawnmutex.ReleaseMutex();            
             return "Pawn Loaded"+ pawn.IdName;            
         }
 
         [HttpPost]
-        public void AddElixir(FormCollection collection)
+        public string AddElixir(FormCollection collection)
         {
-            //AddElixirmutex.WaitOne(); 
+            AddElixirmutex.WaitOne();
+            //AssetManager.assentsLoaded.WaitOne();
             Elixir elixir = new Elixir();
             elixir.forSale = Request.Form["forSale"];            
             elixir.IdName = Request.Form["IdName"];
             elixir.showName = Request.Form["showName"];
+            Log.AddLog("AddElixirStarted" + elixir.IdName);
             SpetialPower sp = new SpetialPower();
             sp.IdName = Request.Form["spPower.IdName"];
             sp.image = Request.Form["spPower.image"];
@@ -66,13 +71,15 @@ namespace soccer1.Controllers
             price.SoccerSpetial = Int32.Parse(Request.Form["price.SoccerSpetial"]);
             elixir.price = price;
             AssetManager.AddElixirToAssets(elixir);
-            //AddElixirmutex.WaitOne();
+            AddElixirmutex.WaitOne();           
+            return "Elixir Loaded" + elixir.IdName;
         }
 
         [HttpPost]
-        public void AddFormation(FormCollection collection)
+        public string AddFormation(FormCollection collection)
         {
-            //AddFormationmutex.WaitOne();
+            AddFormationmutex.WaitOne();
+            //AssetManager.assentsLoaded.WaitOne();
             Formation formation = new Formation();
             formation.discription = Request.Form["discription"];
             formation.IdName = Request.Form["IdName"];
@@ -92,7 +99,8 @@ namespace soccer1.Controllers
             }
 
             AssetManager.AddFormationToAssets(formation);
-            //AddElixirmutex.WaitOne();
+            AddElixirmutex.WaitOne();
+            return "Formation Loaded" + formation.IdName;
         }
 
     }

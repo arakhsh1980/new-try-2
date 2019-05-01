@@ -6,7 +6,7 @@ using soccer1.Models.main_blocks;
 using soccer1.Models.utilites;
 using soccer1.Models.DataBase;
 using System.Data.Entity;
-
+using System.Threading;
 
 
 
@@ -18,12 +18,13 @@ namespace soccer1.Models
         
        
         
-
+        
 
         //load a player and add it to array
         public static PlayerForConnectedPlayer LoadPlayerData(string PlayerId)
         {
-            DataDBContext soccerDataBase = new DataDBContext();
+
+            
             PlayerForConnectedPlayer playerInfo;
             PlayerForDatabase playerForPlayer;
             if (PlayerId == null)
@@ -31,7 +32,9 @@ namespace soccer1.Models
                 playerInfo = AddNewDefultPlayerAndReturnIt();
             }
             else
-            {                
+            {
+
+                DataDBContext soccerDataBase = new DataDBContext();
                 playerForPlayer = soccerDataBase.playerInfoes.Find(PlayerId);
                     
                 //playerInfo = db.playerInfoes2.Find(PlayerId);                
@@ -49,7 +52,7 @@ namespace soccer1.Models
             return playerInfo;
         }
 
-
+        /*
         public static Pawn LoadPawnData(int numberofpawn)
         {
             DataDBContext dataBase = new DataDBContext();
@@ -72,6 +75,8 @@ namespace soccer1.Models
 
             return ElixirInfo;
         }
+        */
+
         /*
         public static void SaveChangesOnPlayer(PlayerForConnectedPlayer pl)
         {   
@@ -167,15 +172,20 @@ namespace soccer1.Models
             }
         }
 
+
+        private static Mutex addDefultPlayer = new Mutex();
         private static PlayerForConnectedPlayer AddNewDefultPlayerAndReturnIt()
         {
+            
             DataDBContext dataBase = new DataDBContext();
             Utilities utilities = new Utilities();
             PlayerForConnectedPlayer starterPlyer = utilities.ReturnDefultPlayer();
             string ss = new Random().NextDouble().ToString();
+            addDefultPlayer.WaitOne();
             int index = dataBase.playerInfoes.Count<PlayerForDatabase>() + 1;
             starterPlyer.id = index.ToString()+ ss;
-            starterPlyer.AddTodDataBase();  
+            starterPlyer.AddTodDataBase();
+            addDefultPlayer.ReleaseMutex();
             return starterPlyer;
         }      
 

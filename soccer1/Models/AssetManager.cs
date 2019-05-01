@@ -5,6 +5,7 @@ using System.Web;
 using soccer1.Models.main_blocks;
 using soccer1.Models.utilites;
 using soccer1.Models.DataBase;
+using soccer1.Controllers;
 using System.Data.Entity;
 using System.Web.Mvc;
 using soccer1;
@@ -22,8 +23,8 @@ namespace soccer1.Models
         private static int ElixirConter = 0;
         private static int FormationConter = 0;
         //give pawnname add return pawnindex
-        private static Mutex mutex = new Mutex();
-
+        public static Mutex assentsLoaded = new Mutex();
+        //public static AutoResetEvent assentsLoaded = new AutoResetEvent(false);
         public static int ReturnAssetIndex(AssetType type, string IdNamePawn)
         {
             int IndexOfAsset=-1;
@@ -174,7 +175,7 @@ namespace soccer1.Models
 
         public static void AddPawnToAssets(Pawn p)
         {
-            mutex.WaitOne();
+            
             if (Pawnlist.Length <= pawnsConter) { Errors.AddBigError("AddPawnToAssets. Pawnlist.Length <= pawnsConter"); return; }
             int indexinarray = -1;
             for (int i=0; i<= pawnsConter; i++) if (Pawnlist[i].IdName == p.IdName) { indexinarray = i; }
@@ -193,7 +194,7 @@ namespace soccer1.Models
                 //Log.AddLog("AssetManager.AddPawnToAssets: pawn Updated. Name:" + p.IdName + "  index:" + indexinarray.ToString());
                 DatabaseManager.AddPawnToDataBase(p);
             }
-            mutex.ReleaseMutex();
+            
         }
         
         public static void AddFormationToAssets(Formation ff)
@@ -252,26 +253,32 @@ namespace soccer1.Models
 
         public static void LoadAssets()
         {
-            mutex.WaitOne();
+            AdminController.AddElixirmutex.WaitOne();
+            AdminController.AddFormationmutex.WaitOne();
+            AdminController.AddPawnmutex.WaitOne();
+            assentsLoaded.WaitOne();
             DataDBContext dataBase = new DataDBContext();
             Formation[] formations = dataBase.allFormations.ToArray();
             for(int i =0; i< formations.Length; i++)
             {
-                Formationlist[i] = formations[i];
+                Formationlist[formations[i].index] = formations[i];
             }
 
             Elixir[] elixirs = dataBase.allElixires.ToArray();
             for (int i = 0; i < elixirs.Length; i++)
             {
-                Elixirlist[i] = elixirs[i];
+                Elixirlist[elixirs[i].index] = elixirs[i];
             }
 
             Pawn[] pawns = dataBase.allPawns.ToArray();
             for (int i = 0; i < pawns.Length; i++)
             {
-                Pawnlist[i] = pawns[i];
+                Pawnlist[pawns[i].index] = pawns[i];
             }
-            mutex.ReleaseMutex();
+            AdminController.AddElixirmutex.ReleaseMutex();
+            AdminController.AddFormationmutex.ReleaseMutex();
+            AdminController.AddPawnmutex.ReleaseMutex();
+            assentsLoaded.ReleaseMutex();
         }
 
         /*

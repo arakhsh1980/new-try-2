@@ -8,6 +8,7 @@ using System.ComponentModel.DataAnnotations;
 using soccer1.Models.utilites;
 using soccer1.Models.DataBase;
 using System.Web.Script.Serialization;
+using System.Threading;
 
 
 
@@ -27,7 +28,7 @@ namespace soccer1.Models.main_blocks
             team = new TeamForConnectedPlayers();
             PlayerProperty = new Property();
             Utilities utilities = new Utilities();
-            team = utilities.returnDefultTeam();
+            //team = utilities.returnDefultTeam();
             PlayerProperty = new Property();
             PlayerProperty.fan = 0;
             PlayerProperty.coin = Statistics.StartingCoin;
@@ -36,6 +37,8 @@ namespace soccer1.Models.main_blocks
         }
 
         public string id { get; set; }
+
+        public static Mutex mainMutex = new Mutex();
 
         private string Name { get; set; }
 
@@ -290,6 +293,7 @@ namespace soccer1.Models.main_blocks
 
         public void SaveChanges()
         {
+            mainMutex.WaitOne();
             DataDBContext dataBase = new DataDBContext();
             PlayerForDatabase thisPlayerAtServer =dataBase.playerInfoes.Find(id);
             thisPlayerAtServer.CurrentFormation = team.CurrentFormation;
@@ -308,14 +312,17 @@ namespace soccer1.Models.main_blocks
             thisPlayerAtServer.UsableFormations = convertor.IntArrayToSrting(team.UsableFormations);            
             dataBase.Entry(thisPlayerAtServer).State = EntityState.Modified;
             dataBase.SaveChanges();
+            mainMutex.ReleaseMutex();
         }
 
         public void AddTodDataBase()
         {
+            mainMutex.WaitOne();
             DataDBContext dataBase = new DataDBContext();
             PlayerForDatabase playerInfo = returnDataBaseVersion();
             dataBase.playerInfoes.Add(playerInfo);
             dataBase.SaveChanges();
+            mainMutex.ReleaseMutex();
         }
 
 
