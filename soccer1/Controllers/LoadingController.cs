@@ -13,6 +13,7 @@ using System.Web.Script.Serialization;
 using soccer1.Models.utilites;
 using soccer1.Models.main_blocks;
 using System.Threading;
+using soccer1.Models.DataBase;
 
 
 
@@ -22,17 +23,25 @@ namespace soccer1.Controllers
 {
     public class LoadingController : Controller
     {
-        
 
+        private static Mutex AddNew = new Mutex();
         // POST: Loading/LoadPlayerData
         [HttpPost]
         public string LoadPlayerData(FormCollection collection)
-        {
-            AssetManager.assentsLoaded.WaitOne();
-            AssetManager.assentsLoaded.ReleaseMutex();
+        {            
             string id = Request.Form["PlayerId"];
-            
-            PlayerForSerial plsr = ConnectedPlayersList.LoadPlayerDataFromServer(id);
+            DataDBContext dataBase = new DataDBContext();
+            PlayerForDatabase player = dataBase.playerInfoes.Find(id);
+            if(player== null) {
+                AddNew.WaitOne();
+                player = new Utilities().ReturnDefultPlayer();
+                string ss = new Random().NextDouble().ToString();               
+                int index = dataBase.playerInfoes.Count<PlayerForDatabase>() + 1;
+                player.id = index.ToString() + ss;
+                dataBase.playerInfoes.Add(player);
+                AddNew.ReleaseMutex();
+            }           
+            PlayerForSerial plsr = new Convertors().
             
             //TeamForConnectedPlayers thisteam = new TeamForConnectedPlayers();
             //plsr.testTeam = Convertors.TeamToTeamForSerialize(thisteam); 

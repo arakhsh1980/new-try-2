@@ -12,7 +12,7 @@ using soccer1;
 
 namespace soccer1.Models
 {
-    public static class ConnectedPlayersList
+    public  class ConnectedPlayersList
     {
         private class eventtt
         {
@@ -20,8 +20,8 @@ namespace soccer1.Models
             public string eventBody="";
             //public bool isReal=false;
         }
-       
 
+       
         private static playerCennectionInfo[] connectionInfos = new playerCennectionInfo[Statistics.ActiveMatchesMaxNumber];
 
         private static PlayerForConnectedPlayer[] connectedPlayers = new PlayerForConnectedPlayer[Statistics.ActiveMatchesMaxNumber];
@@ -33,14 +33,14 @@ namespace soccer1.Models
         #region return functions
        
 
-        public static DateTime LastTimeConection(int playerId)
+        public  DateTime LastTimeConection(int playerId)
         {
             DateTime time = new DateTime();
             time = connectionInfos[playerId].lastTimeConnecttion;
             return time;
         }
 
-        public static TeamForConnectedPlayers ReturnPlayerTeam(int connectionId)
+        public  TeamForConnectedPlayers ReturnPlayerTeam(int connectionId)
         {           
             TeamForConnectedPlayers team = connectedPlayers[connectionId].ReturnYourTeam();
             return team;
@@ -52,18 +52,18 @@ namespace soccer1.Models
             return match;
         }
 
-        public static float ReturnPlayerPowerLevel(int connectionId)
+        public  float ReturnPlayerPowerLevel(int connectionId)
         {
             return connectedPlayers[connectionId].PowerLevel;
         }
 
-        public static string ReturnIdbyConnId(int ConnId)
+        public  string ReturnIdbyConnId(int ConnId)
         {
             if (connectedPlayers[ConnId] == null) { return ""; }
             else { return connectedPlayers[ConnId].id; }
         }
 
-        public static DateTime ReturnPlayerConnectionTime(int playerId)
+        public  DateTime ReturnPlayerConnectionTime(int playerId)
         {
             if (connectionInfos[playerId] == null) { return DateTime.MinValue; }
             else
@@ -83,7 +83,7 @@ namespace soccer1.Models
             connectedPlayers[ConnectionId].pawnOutOfTeamCounter++;            
         }
         */
-        public static bool BuyAssetForPlayer(int ConnectionId, AssetType type, string AssetName)
+        public  bool BuyAssetForPlayer(int ConnectionId, AssetType type, string AssetName)
         {
             Property price= AssetManager.ReturnAssetPrice(type, AssetName);
             Log.AddLog("Error : price of asset:" + price);
@@ -106,13 +106,13 @@ namespace soccer1.Models
         }
         */
         
-        public static void SubtractProperty(int ConnectionId, Property prop)
+        public  void SubtractProperty(int ConnectionId, Property prop)
         {
             connectedPlayers[ConnectionId].SubtractProperty(prop);            
         }
         
 
-        public static bool IsConnected(int ConnectionId)
+        public  bool IsConnected(int ConnectionId)
         {            
             if (!connectionInfos[ConnectionId].connected) {
                 CleanId(ConnectionId);
@@ -129,7 +129,7 @@ namespace soccer1.Models
             
         }
 
-        public static bool IsConnectedById(int ConnectionId,string PlayerId)
+        public  bool IsConnectedById(int ConnectionId,string PlayerId)
         {
             if (!connectionInfos[ConnectionId].connected)
             {
@@ -153,7 +153,7 @@ namespace soccer1.Models
             }
         }
 
-        public static bool IsConnectedByIdAndMatch(int ConnectionId, string PlayerId, int matchNum)
+        public  bool IsConnectedByIdAndMatch(int ConnectionId, string PlayerId, int matchNum)
         {
             if(IsConnectedById(ConnectionId, PlayerId) && connectionInfos[ConnectionId].ActiveMatchId == matchNum)
             {
