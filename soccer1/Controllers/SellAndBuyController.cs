@@ -17,25 +17,17 @@ namespace soccer1.Controllers
 
         [HttpPost]
         public string BuyAsset(FormCollection collection)
-        {
-            int ConnectionId = Int32.Parse(Request.Form["ConnectionId"]);
+        {            
             string PlayerId = Request.Form["PlayerId"];
             string IdName = Request.Form["IdName"];
             string AssetTypestring = Request.Form["AssetType"];
-            bool reusult = false;
-            Utilities utilities = new Utilities();
-            AssetType assetType = utilities.ReturnAssetTypeByName(AssetTypestring);
-            if (ConnectedPlayersList.IsConnectedById(ConnectionId, PlayerId))
-            {
-                reusult = ConnectedPlayersList.BuyAssetForPlayer(ConnectionId, assetType, IdName);
+            bool reusult = false;            
+            AssetType assetType = new Utilities().ReturnAssetTypeByName(AssetTypestring); 
+            new
+            reusult = ConnectedPlayersList.BuyAssetForPlayer(ConnectionId, assetType, IdName);
                 Log.AddLog("Error : reusult:"+ reusult.ToString());
                 return reusult.ToString();
-            }
-            else
-            {
-                Log.AddLog("Error : Can Not Add Pawn");
-                return false.ToString();
-            }
+            
         }
 
         /*

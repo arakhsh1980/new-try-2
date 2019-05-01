@@ -44,6 +44,12 @@ namespace soccer1.Models.main_blocks
 
         public string ElixirInBench { get; set; }
 
+        public void changePlayer(PlayerForDatabase otherplayer) {
+
+        Fan = otherplayer.Fan;
+
+    }
+
 
     }
     

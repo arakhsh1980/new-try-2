@@ -40,19 +40,12 @@ namespace soccer1.Controllers
                 player.id = index.ToString() + ss;
                 dataBase.playerInfoes.Add(player);
                 AddNew.ReleaseMutex();
-            }           
-            PlayerForSerial plsr = new Convertors().
-            
-            //TeamForConnectedPlayers thisteam = new TeamForConnectedPlayers();
-            //plsr.testTeam = Convertors.TeamToTeamForSerialize(thisteam); 
+            }
+            PlayerForSerial plsr = new Convertors().PForDatabaseToPForSerial(player); 
             Log.AddPlayerLog(plsr.CoonId, "player"+ plsr.CoonId.ToString() + " added by " + plsr.id + " ID");
             string uu = new JavaScriptSerializer().Serialize(plsr);
-            
-            return uu;        
-
+            return uu;  
         }
-
-
 
     }
 }
