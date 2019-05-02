@@ -28,7 +28,7 @@ namespace soccer1.Controllers
                 PlayerForConnectedPlayer pl = new PlayerForConnectedPlayer();
                 pl.reWriteAccordingTo(player);
                 string IdName = pl.id;
-                string opponentId = MatchList.ReturnOpponentOf(IdName, matchId);
+                string opponentId = new MatchList().ReturnOpponentOf(IdName, matchId);
                 if (opponentId == "Erroer") { return "Error"; }
                 // TeamForConnectedPlayers opponentTeam =ConnectedPlayersList.ReturnPlayerTeam(opponentId);
 
