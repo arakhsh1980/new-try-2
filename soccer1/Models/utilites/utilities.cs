@@ -48,9 +48,9 @@ namespace soccer1.Models.utilites
         public TeamForConnectedPlayers returnDefultTeam()
         {
             TeamForConnectedPlayers team = new TeamForConnectedPlayers();
-            int defultPawnIndex = AssetManager.ReturnAssetIndex(AssetType.Pawn , "Defult");            
-            int defultElixirIndex = AssetManager.ReturnAssetIndex(AssetType.Elixir, "Defult");            
-            int defultFormationIndex = AssetManager.ReturnAssetIndex(AssetType.Formation, "Defult");            
+            int defultPawnIndex = new AssetManager().ReturnAssetIndex(AssetType.Pawn , "Defult");            
+            int defultElixirIndex = new AssetManager().ReturnAssetIndex(AssetType.Elixir, "Defult");            
+            int defultFormationIndex = new AssetManager().ReturnAssetIndex(AssetType.Formation, "Defult");            
             team.CurrentFormation = defultFormationIndex;
             for (int i = 0; i < team.PlayeingPawns.Length; i++) { team.PlayeingPawns[i] = defultPawnIndex; }
             for (int i = 0; i < team.pawnsInBench.Length; i++) { team.pawnsInBench[i] = defultPawnIndex; }

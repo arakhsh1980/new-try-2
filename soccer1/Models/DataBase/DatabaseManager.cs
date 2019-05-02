@@ -21,6 +21,7 @@ namespace soccer1.Models
         
 
         //load a player and add it to array
+        /*
         public static PlayerForConnectedPlayer LoadPlayerData(string PlayerId)
         {
 
@@ -51,7 +52,7 @@ namespace soccer1.Models
             
             return playerInfo;
         }
-
+        */
         /*
         public static Pawn LoadPawnData(int numberofpawn)
         {
@@ -173,13 +174,13 @@ namespace soccer1.Models
         }
 
 
+        /*
         private static Mutex addDefultPlayer = new Mutex();
         private static PlayerForConnectedPlayer AddNewDefultPlayerAndReturnIt()
         {
             
-            DataDBContext dataBase = new DataDBContext();
-            Utilities utilities = new Utilities();
-            PlayerForConnectedPlayer starterPlyer = utilities.ReturnDefultPlayer();
+            DataDBContext dataBase = new DataDBContext();            
+            PlayerForConnectedPlayer starterPlyer = new Utilities().ReturnDefultPlayer();
             string ss = new Random().NextDouble().ToString();
             addDefultPlayer.WaitOne();
             int index = dataBase.playerInfoes.Count<PlayerForDatabase>() + 1;
@@ -188,7 +189,7 @@ namespace soccer1.Models
             addDefultPlayer.ReleaseMutex();
             return starterPlyer;
         }      
-
+        */
         //public static Pawn LoadPawnDataFromServer(string PlayerId , string IdName)
         //{
         //    Player playerInfo;

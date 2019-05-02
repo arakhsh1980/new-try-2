@@ -12,7 +12,7 @@ namespace soccer1.Models
 
         public int ShooterMathNumber;
         public int MatchID;
-        public int playerID;
+        public string playerIDName;
         public int pawnNumber;
         public float XDirection ;
         public float YDirection ;
