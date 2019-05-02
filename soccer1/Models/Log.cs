@@ -31,7 +31,7 @@ namespace soccer1.Models
             //logDataBase.SaveChanges();
         }
 
-        public static void AddPlayerLog(int PlayerId, string LogBody)
+        public static void AddPlayerLog(string PlayerId, string LogBody)
         {
 
 
@@ -39,8 +39,8 @@ namespace soccer1.Models
             NewMassage.MassageLog = LogBody;
             NewMassage.LogTime = "";
             //NewMassage.LogTime = DateTime.Now.ToString();
-            NewMassage.PlayerConnectionTime = ConnectedPlayersList.ReturnPlayerConnectionTime(PlayerId).ToString();
-            AddStringLog(" palyer Id "+ PlayerId.ToString()+". ", LogBody);
+            NewMassage.PlayerConnectionTime = ""; // ConnectedPlayersList.ReturnPlayerConnectionTime(PlayerId).ToString();
+            AddStringLog(" palyer Id "+ PlayerId+". ", LogBody);
             //logDataBase.GameLog3.Add(NewMassage);
             //logDataBase.SaveChanges();
         }

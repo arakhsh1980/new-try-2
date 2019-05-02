@@ -43,7 +43,7 @@ namespace soccer1.Models
             }            
         }
 
-        public int ReturnOpponentOf(string IdName, int matchId)
+        public string ReturnOpponentOf(string IdName, int matchId)
         {
 
             string firstId = matchList[matchId].ReturnFirstPlayerByIdName();
@@ -55,12 +55,12 @@ namespace soccer1.Models
             //if (firstId == connectionId) { return SecId; }
             //if (SecId == connectionId) { return firstId; }
             Errors.AddBigError("this player is not in its clamed match");
-            return -1;
+            return "Erroer";
         }
-        public void AddSecondPlayerToMatch(int matchNumber , int playerConnId)
+        public void AddSecondPlayerToMatch(int matchNumber , string playerNameId,float playerPower )
         {
-            matchList[matchNumber].AddSecondPlayerToMatch(playerConnId);
-            Log.AddMatchLog(matchNumber, "Second player added to match by id:"+ playerConnId.ToString());
+            matchList[matchNumber].AddSecondPlayerToMatch(playerNameId, playerPower);
+            Log.AddMatchLog(matchNumber, "Second player added to match by id:"+ playerNameId.ToString());
             //ConnectedPlayersList.SetPlayerMatch(playerConnId, matchNumber);
         }
 
@@ -69,22 +69,22 @@ namespace soccer1.Models
             matchList[shoot.MatchID].ShootHappeded(shoot, jsonpart);
         }
 
-        public void stopedPosition(int matchId, int ConnectionId, string jsonpart)
+        public void stopedPosition(int matchId, string nameId, string jsonpart)
         {
-            matchList[matchId].GetStationeryPostion(ConnectionId, jsonpart);           
+            matchList[matchId].GetStationeryPostion(nameId, jsonpart);           
         }
         
-        public void playerOfMatchLost(int matchId, int playerId)
+        public void playerOfMatchLost(int matchId, string PlayerNameId)
         {
             if (matchId < 0) {
                 Errors.AddBigError("unacceptable match id at playerOfMatchLost. match id: "+ matchId.ToString());
                 return;                
             }
-            Log.AddMatchLog(matchId, " player " + ConnectedPlayersList.ReturnIdbyConnId(playerId) + " Of Match Lost");
-            matchList[matchId].playerLost(playerId);
+            Log.AddMatchLog(matchId, " player " + PlayerNameId + " Of Match Lost");
+            matchList[matchId].playerLost(PlayerNameId);
         }
 
-        public void AddNewMatchWithPlayerOne(int playerConnId, string SelectedLeage)
+        public void AddNewMatchWithPlayerOne(string playerIdName,float playerPower, string SelectedLeage)
         {
             int bestMatch = -1;
             for (int i = (matchList.Length - 1); 0 <= i; i--)
@@ -95,17 +95,17 @@ namespace soccer1.Models
                 }
             }
             if(bestMatch == -1) { Errors.AddBigError(" find no empty match to add player one"); return; }
-            matchList[bestMatch].StartMatch(playerConnId, bestMatch, SelectedLeage);
+            matchList[bestMatch].StartMatch(playerIdName, playerPower, bestMatch, SelectedLeage);
             
 
-            Log.AddMatchLog(bestMatch ,  "added with player" + playerConnId + " as first player");
-            ConnectedPlayersList.SetPlayerMatch(playerConnId, bestMatch);            
+            Log.AddMatchLog(bestMatch ,  "added with player" + playerIdName + " as first player");
+            //ConnectedPlayersList.SetPlayerMatch(playerIdName, bestMatch);            
         }
             
         
         //cliam will be 1 or -1
-        public void GoalClaim(int matchId, int ConnectionId, int Claim) {
-            matchList[matchId].GoalReport(ConnectionId, Claim);
+        public void GoalClaim(int matchId, string  nameId, int Claim) {
+            matchList[matchId].GoalReport(nameId, Claim);
         }
 
         // this function will be called ones at start of server
@@ -117,17 +117,17 @@ namespace soccer1.Models
             }
         }
 
-        public void PlayerLeaveMatch(int matchId, int ConnectionId)
+        public void PlayerLeaveMatch(int matchId, string NameId)
         {
-            matchList[matchId].playerLost(ConnectionId);            
+            matchList[matchId].playerLost(NameId);            
         }
 
-        public void ItsMyTurn(int matchId, int ConnectionId)
+        public void ItsMyTurn(int matchId, string nameId)
         {
-            matchList[matchId].ItsMyTimeClaim(ConnectionId);
+            matchList[matchId].ItsMyTimeClaim(nameId);
         }
 
-        public DateTime ReturnMatchConnectionTime(int matchId)
+        public static DateTime ReturnMatchConnectionTime(int matchId)
         {
             return matchList[matchId].ReturnConnectionTime();
         }
