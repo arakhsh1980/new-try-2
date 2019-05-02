@@ -8,7 +8,7 @@ namespace soccer1.Models
     public class playerCennectionInfo
     {   public playerCennectionInfo()
         {
-             EventMassage = ServrMasage.NothingNew.ToString();
+             EventMassage = MatchMassageType.NothingNew.ToString();
              PlayerId = "?";
              connected = false;
              lastTimeConnecttion = DateTime.MinValue;
@@ -18,7 +18,7 @@ namespace soccer1.Models
         }
 
 
-        public string EventMassage = ServrMasage.NothingNew.ToString();
+        public string EventMassage = MatchMassageType.NothingNew.ToString();
         public string PlayerId = "?";
         public bool connected =false;
         //public float powerLevel = 10.0f;

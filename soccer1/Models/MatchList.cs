@@ -101,7 +101,11 @@ namespace soccer1.Models
             Log.AddMatchLog(bestMatch ,  "added with player" + playerIdName + " as first player");
             //ConnectedPlayersList.SetPlayerMatch(playerIdName, bestMatch);            
         }
-            
+        
+        public MatchMassage ReturnEvent(string playerId, int matchId)
+        {
+           return  matchList[matchId].ReturnEvent(playerId);
+        }
         
         //cliam will be 1 or -1
         public void GoalClaim(int matchId, string  nameId, int Claim) {
