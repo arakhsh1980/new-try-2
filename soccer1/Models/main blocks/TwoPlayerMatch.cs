@@ -219,6 +219,15 @@ namespace soccer1.Models
         {
             return playerOneId;
         }
+        
+        public string ReturnFirstPlayerByIdName()
+        {
+            return IdNameplayerOneId;
+        }
+        public string ReturnSeccondPlayerByIdName()
+        {
+            return IdNameplayerTwoId;
+        }
 
         public int ReturnSecondPlayer()
         {
@@ -316,6 +325,8 @@ namespace soccer1.Models
 
 
         private int playerOneId;
+        private string IdNameplayerOneId;
+        private string IdNameplayerTwoId;
         private float PlayerOnePower;
         private int playerOneScore;
         private int PlayerOneShootTime;
