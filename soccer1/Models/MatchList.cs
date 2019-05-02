@@ -15,7 +15,7 @@ namespace soccer1.Models
 
        
         // reaturn best sutable match... id there is no match return -1
-        public int FindSutableMatch(float PlayerPowerLevel, string SelectedLeage)
+        public static int  FindSutableMatch(float PlayerPowerLevel, string SelectedLeage)
         {
             float bestpowerDiference = float.MaxValue;
             int bestMatch = -1;
@@ -43,7 +43,7 @@ namespace soccer1.Models
             }            
         }
 
-        public static string ReturnOpponentOf(string IdName, int matchId)
+        public string ReturnOpponentOf(string IdName, int matchId)
         {
 
             string firstId = matchList[matchId].ReturnFirstPlayerByIdName();

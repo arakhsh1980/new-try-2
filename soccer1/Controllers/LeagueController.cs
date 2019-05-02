@@ -44,17 +44,18 @@ namespace soccer1.Controllers
                 PlayerForConnectedPlayer pl = new PlayerForConnectedPlayer();
                 pl.reWriteAccordingTo(player);
                 int bestmatch = MatchList.FindSutableMatch(pl.PowerLevel, SelectedLeage);
-
+                string PlIdName = pl.id;
+                float PlPower = pl.PowerLevel;
                 // FindSutableMatch return -1 if dident find a sutable match
                 if (bestmatch == -1)
                 {
-                    MatchList.AddNewMatchWithPlayerOne(ConnectionId, SelectedLeage);
+                   new MatchList().AddNewMatchWithPlayerOne(PlIdName, PlPower, SelectedLeage);
 
                     return "You Are Fisrt";
                 }
                 else
                 {
-                    MatchList.AddSecondPlayerToMatch(bestmatch, ConnectionId);
+                   new MatchList().AddSecondPlayerToMatch(bestmatch, PlIdName, PlPower);
                     return "You Are Second";
                 }
             }
