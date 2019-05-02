@@ -18,10 +18,8 @@ namespace soccer1.Controllers
         [HttpPost]
         public string OtherPlayerTeam(FormCollection collection)
         {
-            int ConnectionId = Int32.Parse(Request.Form["ConnectionId"]);
             string PlayerId = Request.Form["PlayerId"];
             int matchId = Int32.Parse(Request.Form["MatchId"]);
-            if (!ConnectedPlayersList.IsConnectedByIdAndMatch(ConnectionId, PlayerId, matchId)) { return"Error In Load"; }
             int opponentId = MatchList.ReturnOpponentOf(ConnectionId, matchId);
             if (opponentId == -1) { return "Error"; }
             TeamForConnectedPlayers opponentTeam =ConnectedPlayersList.ReturnPlayerTeam(opponentId);

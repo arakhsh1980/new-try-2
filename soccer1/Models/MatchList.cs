@@ -43,12 +43,17 @@ namespace soccer1.Models
             }            
         }
 
-        public int ReturnOpponentOf(int connectionId, int matchId)
+        public int ReturnOpponentOf(string IdName, int matchId)
         {
-            int firstId=matchList[matchId].ReturnFirstPlayer();
-            int SecId = matchList[matchId].ReturnSecondPlayer();
-            if(firstId== connectionId) { return SecId; }
-            if (SecId == connectionId) { return firstId; }
+
+            string firstId = matchList[matchId].ReturnFirstPlayerByIdName();
+            string SecId = matchList[matchId].ReturnSeccondPlayerByIdName();
+            if (firstId == IdName) { return SecId; }
+            if (SecId == IdName) { return firstId; }
+            //int firstId = matchList[matchId].ReturnFirstPlayer();
+            //int SecId = matchList[matchId].ReturnSecondPlayer();
+            //if (firstId == connectionId) { return SecId; }
+            //if (SecId == connectionId) { return firstId; }
             Errors.AddBigError("this player is not in its clamed match");
             return -1;
         }
