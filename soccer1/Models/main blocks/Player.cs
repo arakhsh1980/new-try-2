@@ -70,14 +70,14 @@ namespace soccer1.Models.main_blocks
                 {
 
                     case AssetType.Pawn:
-                        pawnOutOfTeam.Add(AssetManager.ReturnAssetIndex(AssetType.Pawn, AssetIdName));
+                        pawnOutOfTeam.Add(new AssetManager().ReturnAssetIndex(AssetType.Pawn, AssetIdName));
                      
                         break;
                     case AssetType.Elixir:
-                        elixirOutOfTeam.Add(AssetManager.ReturnAssetIndex(AssetType.Elixir, AssetIdName));
+                        elixirOutOfTeam.Add(new AssetManager().ReturnAssetIndex(AssetType.Elixir, AssetIdName));
                         break;
                     case AssetType.Formation:
-                       team.AddToUsableFormations(AssetManager.ReturnAssetIndex(AssetType.Formation, AssetIdName));
+                       team.AddToUsableFormations(new AssetManager().ReturnAssetIndex(AssetType.Formation, AssetIdName));
                         break;
 
                 }
@@ -200,14 +200,14 @@ namespace soccer1.Models.main_blocks
             int pawncounter = 0;
             foreach (int i in pawnOutOfTeam)
             {
-                pawnsarray[pawncounter]=AssetManager.ReturnAssetName(AssetType.Pawn, i);
+                pawnsarray[pawncounter]= new AssetManager().ReturnAssetName(AssetType.Pawn, i);
                 pawncounter++;
             }
             string[] elixirsarray = new string[elixirOutOfTeam.Count];
             int elixirCounter = 0;
             foreach (int i in elixirOutOfTeam)
             {
-                elixirsarray[elixirCounter] = AssetManager.ReturnAssetName(AssetType.Elixir, i); ;
+                elixirsarray[elixirCounter] = new AssetManager().ReturnAssetName(AssetType.Elixir, i); ;
                 elixirCounter++;
             }
 

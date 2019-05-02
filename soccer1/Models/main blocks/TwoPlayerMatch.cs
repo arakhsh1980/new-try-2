@@ -88,8 +88,8 @@ namespace soccer1.Models
 
         public void ShootHappeded(ShootActionCode shot, string shoot)
         {
-            if(shot.playerID!= playerOneIdName && isPlayerOnTurn) { Log.AddPlayerLog(shot.playerID,"out of turn shoot " ); return; }
-            if (shot.playerID != playerTwoIdName && !isPlayerOnTurn) { Log.AddPlayerLog(shot.playerID, "out of turn shoot "); return; }
+            if(shot.playerIDName!= playerOneIdName && isPlayerOnTurn) { Log.AddPlayerLog(shot.playerIDName,"out of turn shoot " ); return; }
+            if (shot.playerIDName != playerTwoIdName && !isPlayerOnTurn) { Log.AddPlayerLog(shot.playerIDName, "out of turn shoot "); return; }
             if (situation != MatchSituation.WFShoot) { Errors.AddSmallError("untiming shoot resived"); return; }
 
             playerOnePawnsPositions = null;
@@ -193,7 +193,7 @@ namespace soccer1.Models
         public PreMatchSituation GivePreSituation()
         {
             PreMatchSituation x;
-            x = preSituation
+            x = preSituation;
             return x;
         }
 
@@ -219,28 +219,23 @@ namespace soccer1.Models
         public DateTime ReturnConnectionTime()
         {
             DateTime time;
-            time=
-            return CreationTime;
+            time = CreationTime;
+            return time;
         }
 
-        public string ReturnFirstPlayer()
-        {
-            return playerOneIdName;
-        }
-        
         public string ReturnFirstPlayerByIdName()
         {
-            return playerOneIdName;
+            string name;
+            name = playerOneIdName;
+            return name;
         }
         public string ReturnSeccondPlayerByIdName()
         {
-            return playerTwoIdName;
+            string name;
+            name = playerTwoIdName;
+            return name;
         }
 
-        public string ReturnSecondPlayer()
-        {
-            return playerTwoIdName;
-        }
 
         //public bool isPlayersConnected()
         //{

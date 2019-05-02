@@ -47,18 +47,18 @@ namespace soccer1.Models.utilites
         public  TeamForSerialize TeamToTeamForSerialize(TeamForConnectedPlayers team)
         {
             TeamForSerialize slteam = new TeamForSerialize();
-            slteam.CurrentFormation = AssetManager.ReturnAssetName(AssetType.Formation,  team.CurrentFormation);
+            slteam.CurrentFormation = new AssetManager().ReturnAssetName(AssetType.Formation,  team.CurrentFormation);
             slteam.ElixirInBench = new string[team.ElixirInBench.Length];
-            for (int i=0; i< team.ElixirInBench.Length; i++) { slteam.ElixirInBench[i] = AssetManager.ReturnAssetName(AssetType.Elixir, team.ElixirInBench[i]); }
+            for (int i=0; i< team.ElixirInBench.Length; i++) { slteam.ElixirInBench[i] = new AssetManager().ReturnAssetName(AssetType.Elixir, team.ElixirInBench[i]); }
 
             slteam.pawnsInBench = new string[team.pawnsInBench.Length];
-            for (int i = 0; i < team.pawnsInBench.Length; i++) { slteam.pawnsInBench[i] = AssetManager.ReturnAssetName(AssetType.Pawn, team.pawnsInBench[i]); }
+            for (int i = 0; i < team.pawnsInBench.Length; i++) { slteam.pawnsInBench[i] = new AssetManager().ReturnAssetName(AssetType.Pawn, team.pawnsInBench[i]); }
 
             slteam.PlayeingPawns = new string[team.PlayeingPawns.Length];
-            for (int i = 0; i < team.PlayeingPawns.Length; i++) { slteam.PlayeingPawns[i] = AssetManager.ReturnAssetName(AssetType.Pawn, team.PlayeingPawns[i]); }
+            for (int i = 0; i < team.PlayeingPawns.Length; i++) { slteam.PlayeingPawns[i] = new AssetManager().ReturnAssetName(AssetType.Pawn, team.PlayeingPawns[i]); }
 
             slteam.UsableFormations = new string[team.UsableFormations.Length];
-            for (int i = 0; i < team.UsableFormations.Length; i++) { slteam.UsableFormations[i] = AssetManager.ReturnAssetName(AssetType.Formation, team.UsableFormations[i]); }
+            for (int i = 0; i < team.UsableFormations.Length; i++) { slteam.UsableFormations[i] = new AssetManager().ReturnAssetName(AssetType.Formation, team.UsableFormations[i]); }
         
             return slteam;
         }
@@ -90,20 +90,20 @@ namespace soccer1.Models.utilites
             //convert string to int
             TeamForConnectedPlayers plsrs = new TeamForConnectedPlayers();
            
-            for (int i = 0; i < pl.PlayeingPawns.Length; i++) { plsrs.PlayeingPawns[i] = AssetManager.ReturnAssetIndex(AssetType.Pawn,   pl.PlayeingPawns[i]); }
-            for (int i = 0; i < pl.pawnsInBench.Length; i++) { plsrs.pawnsInBench[i] = AssetManager.ReturnAssetIndex(AssetType.Pawn, pl.pawnsInBench[i]); }
+            for (int i = 0; i < pl.PlayeingPawns.Length; i++) { plsrs.PlayeingPawns[i] = new AssetManager().ReturnAssetIndex(AssetType.Pawn,   pl.PlayeingPawns[i]); }
+            for (int i = 0; i < pl.pawnsInBench.Length; i++) { plsrs.pawnsInBench[i] = new AssetManager().ReturnAssetIndex(AssetType.Pawn, pl.pawnsInBench[i]); }
             int usableFormationCounter = 0;
             for (int i = 0; i < pl.UsableFormations.Length; i++)
             {
                 if (pl.UsableFormations[i] != "null")
                 {
-                    plsrs.UsableFormations[usableFormationCounter] = AssetManager.ReturnAssetIndex(AssetType.Formation, pl.UsableFormations[i]);
+                    plsrs.UsableFormations[usableFormationCounter] = new AssetManager().ReturnAssetIndex(AssetType.Formation, pl.UsableFormations[i]);
                     usableFormationCounter++;
                 }
             }
-            for (int i = 0; i < pl.ElixirInBench.Length; i++) { plsrs.ElixirInBench[i] = AssetManager.ReturnAssetIndex(AssetType.Elixir, pl.ElixirInBench[i]); }
+            for (int i = 0; i < pl.ElixirInBench.Length; i++) { plsrs.ElixirInBench[i] = new AssetManager().ReturnAssetIndex(AssetType.Elixir, pl.ElixirInBench[i]); }
 
-            plsrs.CurrentFormation = AssetManager.ReturnAssetIndex(AssetType.Formation, pl.CurrentFormation); 
+            plsrs.CurrentFormation = new AssetManager().ReturnAssetIndex(AssetType.Formation, pl.CurrentFormation); 
 
             return plsrs;
         }
