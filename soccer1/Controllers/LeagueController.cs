@@ -21,11 +21,9 @@ namespace soccer1.Controllers
         {
             int ConnectionId = Int32.Parse(Request.Form["ConnectionId"]);
             string PlayerId = Request.Form["PlayerId"];
-            
-                string mm = ConnectedPlayersList.ReadPlayerEvent(ConnectionId);                
-                return mm;               
-            
-                
+            int matchId = Int32.Parse(Request.Form["MatchId"]);
+            MatchMassage massage = new MatchList().ReturnEvent(PlayerId, matchId);
+            return massage.type.ToString() + massage.body;
         }
 
 
