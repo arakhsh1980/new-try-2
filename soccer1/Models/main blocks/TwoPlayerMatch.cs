@@ -69,7 +69,7 @@ namespace soccer1.Models
             league = SelectedLeage;
             CreationTime = DateTime.Now;            
             preSituation = PreMatchSituation.WithOnePlayer;
-            ConnectedPlayersList.AddPlayerEvent(StarterId, ServrMasage.WatForOthr, "");            
+            AddPlayerEvent(StarterId, ServrMasage.WatForOthr, "");            
         }
 
         public void AddSecondPlayerToMatch(int connectionId,float power)
@@ -77,8 +77,9 @@ namespace soccer1.Models
             playerTwoId = connectionId;
             PlayerTwoPower = power;
            //PlayerTwoShootTime = ConnectedPlayersList.connectedPlayers[connectionId].ShootTime;
-            ConnectedPlayersList.SetPlayerMatch(playerOneId, matchNumber);
-            ConnectedPlayersList.SetPlayerMatch(playerTwoId, matchNumber);
+           
+            //ConnectedPlayersList.SetPlayerMatch(playerOneId, matchNumber);
+            //ConnectedPlayersList.SetPlayerMatch(playerTwoId, matchNumber);
             situation = MatchSituation.WFShoot;
             preSituation = PreMatchSituation.WithTwoPlayer;
             lastShootTime = DateTime.Now;
@@ -280,13 +281,13 @@ namespace soccer1.Models
             Log.AddMatchLog(matchNumber, " player "+ winer.ToString() + " wined");
             if (winer == 1)
             {
-                ConnectedPlayersList.PlayerWined(playerOneId, betedMoney);
+                //ConnectedPlayersList.PlayerWined(playerOneId, betedMoney);
                 SendMassageToPlayers(ServrMasage.Winnerisii, playerOneId.ToString());
                 GoNonExistance();
             }
             if (winer == 2)
             {
-                ConnectedPlayersList.PlayerWined(playerTwoId, betedMoney);
+                //ConnectedPlayersList.PlayerWined(playerTwoId, betedMoney);
                 SendMassageToPlayers(ServrMasage.Winnerisii, playerTwoId.ToString());
                 GoNonExistance();
             }
@@ -296,10 +297,24 @@ namespace soccer1.Models
 
         private void SendMassageToPlayers(ServrMasage type, string massage)
         {
-            ConnectedPlayersList.AddPlayerEvent(playerOneId, type, massage);
-            ConnectedPlayersList.AddPlayerEvent(playerTwoId, type, massage);
+            AddPlayerEvent(playerOneId, type, massage);
+            AddPlayerEvent(playerTwoId, type, massage);
         }
         
+        private void AddPlayerEvent(int Id, ServrMasage massageType, string eventMassage)
+        {
+            if(Id== playerOneId) {
+                playerOneEventType = massageType;
+                playerOneEvent = eventMassage;
+            }
+            else
+            {
+                playerTwoEventType = massageType;
+                playerTwoEvent = eventMassage;
+            }
+
+        }
+
         private void GoNonExistance()
         {
             preSituation = PreMatchSituation.NonExistance;
@@ -312,8 +327,11 @@ namespace soccer1.Models
             goalForWin = 2;
     }
 
-        
 
+        private ServrMasage playerOneEventType;
+        private ServrMasage playerTwoEventType;
+        private string playerOneEvent;
+        private string playerTwoEvent;
 
         private int playerOneId;
         private float PlayerOnePower;
