@@ -43,7 +43,7 @@ namespace soccer1.Models
             }            
         }
 
-        public string ReturnOpponentOf(string IdName, int matchId)
+        public static string ReturnOpponentOf(string IdName, int matchId)
         {
 
             string firstId = matchList[matchId].ReturnFirstPlayerByIdName();

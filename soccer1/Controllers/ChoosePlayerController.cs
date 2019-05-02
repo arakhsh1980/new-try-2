@@ -6,12 +6,12 @@ using System.Web.Mvc;
 using soccer1.Models;
 using soccer1.Models.utilites;
 using soccer1.Models.main_blocks;
-using System.Web.Script.Serialization;
+using soccer1.Models.DataBase;
 
 namespace soccer1.Controllers
 {
 
-   
+
 
     public class ChoosePlayerController : Controller
     {
@@ -20,11 +20,23 @@ namespace soccer1.Controllers
         {
             string PlayerId = Request.Form["PlayerId"];
             int matchId = Int32.Parse(Request.Form["MatchId"]);
-            int opponentId = MatchList.ReturnOpponentOf(ConnectionId, matchId);
-            if (opponentId == -1) { return "Error"; }
-            TeamForConnectedPlayers opponentTeam =ConnectedPlayersList.ReturnPlayerTeam(opponentId);
-            Convertors convertor = new Convertors();
-            return convertor.TeamForSerializeToJson(convertor.TeamToTeamForSerialize(opponentTeam));
+            DataDBContext dataBase = new DataDBContext();
+            PlayerForDatabase player = dataBase.playerInfoes.Find(PlayerId);
+
+            if (player != null)
+            {
+                PlayerForConnectedPlayer pl = new PlayerForConnectedPlayer();
+                pl.reWriteAccordingTo(player);
+                string IdName = pl.id;
+                string opponentId = MatchList.ReturnOpponentOf(IdName, matchId);
+                if (opponentId == "Erroer") { return "Error"; }
+                // TeamForConnectedPlayers opponentTeam =ConnectedPlayersList.ReturnPlayerTeam(opponentId);
+
+                TeamForConnectedPlayers opponentTeam = pl.ReturnYourTeam();
+                Convertors convertor = new Convertors();
+                return convertor.TeamForSerializeToJson(convertor.TeamToTeamForSerialize(opponentTeam));
+            }
+            return "This Player Not Exist";
         }
     }
     
