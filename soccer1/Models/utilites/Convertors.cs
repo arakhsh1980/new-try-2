@@ -57,11 +57,32 @@ namespace soccer1.Models.utilites
             slteam.PlayeingPawns = new string[team.PlayeingPawns.Length];
             for (int i = 0; i < team.PlayeingPawns.Length; i++) { slteam.PlayeingPawns[i] = new AssetManager().ReturnAssetName(AssetType.Pawn, team.PlayeingPawns[i]); }
 
-            slteam.UsableFormations = new string[team.UsableFormations.Length];
-            for (int i = 0; i < team.UsableFormations.Length; i++) { slteam.UsableFormations[i] = new AssetManager().ReturnAssetName(AssetType.Formation, team.UsableFormations[i]); }
+            
+            int counter = 0;
+            for (int i = 0; i < team.UsableFormations.Length; i++) if (0 < team.UsableFormations[i]) { counter++; }
+            slteam.UsableFormations = new string[counter];
+            int counter2 = 0;
+            for (int i = 0; i < team.UsableFormations.Length; i++) if (0 < team.UsableFormations[i]) {
+                    slteam.UsableFormations[counter2] = new AssetManager().ReturnAssetName(AssetType.Formation, team.UsableFormations[i]);
+                    counter2++;
+                }
         
             return slteam;
         }
+
+        private string[] AssetIntStringToNames(string[] inputString, AssetType type)
+        {
+            
+            string[] st = new string[inputString.Length];
+            int cash = 0;
+            for (int i = 0; i < st.Length; i++)
+            {
+                cash = Int32.Parse(inputString[i]);
+                st[i] = new AssetManager().ReturnAssetName(type, cash);
+            }
+            return st;
+        }
+
         public PlayerForSerial PForDatabaseToPForSerial(PlayerForDatabase player)
         {
             PlayerForSerial serialplayer = new PlayerForSerial();
@@ -71,16 +92,18 @@ namespace soccer1.Models.utilites
             serialplayer.Money = player.Money;
             serialplayer.Name = player.Name;
             serialplayer.SoccerSpetial = player.SoccerSpetial;
-            serialplayer.OutOfTeamElixirs = StringToStringArray(player.otherElixirs);
-            serialplayer.OutOfTeamPawns = StringToStringArray(player.otherPawns);
+            serialplayer.OutOfTeamElixirs = AssetIntStringToNames(StringToStringArray(player.otherElixirs), AssetType.Elixir);            
+            
+            serialplayer.OutOfTeamPawns = AssetIntStringToNames(StringToStringArray(player.otherPawns), AssetType.Pawn);
             serialplayer.PowerLevel = player.PowerLevel;
             serialplayer.SoccerSpetial = player.SoccerSpetial;
-            serialplayer.Team.CurrentFormation = player.CurrentFormation.ToString();
-            serialplayer.Team.ElixirInBench = StringToStringArray(player.ElixirInBench);
-            serialplayer.Team.pawnsInBench = StringToStringArray(player.pawnsInBench);
-            serialplayer.Team.PlayeingPawns = StringToStringArray(player.PlayeingPawns);
-            serialplayer.Team.UsableFormations = StringToStringArray(player.UsableFormations);
-            
+            serialplayer.Team.CurrentFormation = new AssetManager().ReturnAssetName(AssetType.Formation, player.CurrentFormation  );
+            serialplayer.Team.ElixirInBench = AssetIntStringToNames(StringToStringArray(player.ElixirInBench), AssetType.Elixir);
+            serialplayer.Team.pawnsInBench = AssetIntStringToNames(StringToStringArray(player.pawnsInBench), AssetType.Pawn);
+            serialplayer.Team.PlayeingPawns = AssetIntStringToNames(StringToStringArray(player.PlayeingPawns), AssetType.Pawn);
+            serialplayer.Team.UsableFormations = AssetIntStringToNames(StringToStringArray(player.UsableFormations), AssetType.Formation);
+
+
             return serialplayer;
         }
 
@@ -285,8 +308,8 @@ namespace soccer1.Models.utilites
         public string TeamForSerializeToJson(TeamForSerialize team)
         {
             string uu;
-            TeamForSerializeSingleString singluarTeam = teamCompresor(team);
-            uu = new JavaScriptSerializer().Serialize(singluarTeam);
+            //TeamForSerializeSingleString singluarTeam = teamCompresor(team);
+            uu = new JavaScriptSerializer().Serialize(team);
             return uu;
         }
 

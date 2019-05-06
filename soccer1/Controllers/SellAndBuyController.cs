@@ -38,7 +38,7 @@ namespace soccer1.Controllers
                     dataBase.Entry(player).State = EntityState.Modified;
                     dataBase.SaveChanges();
                 }
-                Log.AddLog("Error : reusult:" + result.ToString());
+                //Log.AddLog("Error : reusult:" + result.ToString());
                 return result.ToString();
             }
             return result.ToString();

@@ -28,6 +28,8 @@ namespace soccer1.Models.main_blocks
 
         public int level { get; set; }
 
+        public int lastMatchId { get; set; }
+
         public int SoccerSpetial { get; set; }
 
         public int CurrentFormation { get; set; }
@@ -52,6 +54,7 @@ namespace soccer1.Models.main_blocks
             Money = otherplayer.Money;
             PowerLevel = otherplayer.PowerLevel;
             level = otherplayer.level;
+            lastMatchId = otherplayer.lastMatchId;
             SoccerSpetial = otherplayer.SoccerSpetial;
             CurrentFormation = otherplayer.CurrentFormation;
             otherPawns = otherplayer.otherPawns;

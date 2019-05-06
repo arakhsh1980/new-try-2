@@ -22,7 +22,7 @@ namespace soccer1.Controllers
             int matchId = Int32.Parse(Request.Form["MatchId"]);           
             string jsonpart = collection["jsonCode"];
             ShootActionCode shoot = new JavaScriptSerializer().Deserialize<ShootActionCode>(jsonpart);
-            Log.AddLog("shoot resived. shotter : " + shoot.playerIDName);
+            //Log.AddLog("shoot resived. shotter : " + shoot.playerIDName);
             if (/*ConnectedPlayersList.IsShootValid(shoot)*/ true)
             {
                 new MatchList().shootHapened(shoot, jsonpart);

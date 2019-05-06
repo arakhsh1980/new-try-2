@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -15,7 +16,7 @@ namespace soccer1.Models
 
        
         // reaturn best sutable match... id there is no match return -1
-        public static int  FindSutableMatch(float PlayerPowerLevel, string SelectedLeage)
+        public int  FindSutableMatch(float PlayerPowerLevel, string SelectedLeage)
         {
             float bestpowerDiference = float.MaxValue;
             int bestMatch = -1;
@@ -60,7 +61,7 @@ namespace soccer1.Models
         public void AddSecondPlayerToMatch(int matchNumber , string playerNameId,float playerPower )
         {
             matchList[matchNumber].AddSecondPlayerToMatch(playerNameId, playerPower);
-            Log.AddMatchLog(matchNumber, "Second player added to match by id:"+ playerNameId.ToString());
+            
             //ConnectedPlayersList.SetPlayerMatch(playerConnId, matchNumber);
         }
 
@@ -73,19 +74,30 @@ namespace soccer1.Models
         {
             matchList[matchId].GetStationeryPostion(nameId, jsonpart);           
         }
-        
+
+        public void ClearMatchesOfPlayer(string nameId)
+        {
+            for(int i=0; i< matchList.Length; i++)
+            {
+                matchList[i].playerLost(nameId);
+            }
+        }
+
         public void playerOfMatchLost(int matchId, string PlayerNameId)
         {
             if (matchId < 0) {
                 Errors.AddBigError("unacceptable match id at playerOfMatchLost. match id: "+ matchId.ToString());
                 return;                
             }
-            Log.AddMatchLog(matchId, " player " + PlayerNameId + " Of Match Lost");
+            //Log.AddMatchLog(matchId, " player " + PlayerNameId + " Of Match Lost");
             matchList[matchId].playerLost(PlayerNameId);
         }
 
-        public void AddNewMatchWithPlayerOne(string playerIdName,float playerPower, string SelectedLeage)
+
+        private static Mutex addMatch = new Mutex();
+        public int AddNewMatchWithPlayerOne(string playerIdName,float playerPower, string SelectedLeage)
         {
+            addMatch.WaitOne();
             int bestMatch = -1;
             for (int i = (matchList.Length - 1); 0 <= i; i--)
             {
@@ -94,17 +106,39 @@ namespace soccer1.Models
                     bestMatch = i;
                 }
             }
-            if(bestMatch == -1) { Errors.AddBigError(" find no empty match to add player one"); return; }
-            matchList[bestMatch].StartMatch(playerIdName, playerPower, bestMatch, SelectedLeage);
-            
+            if(bestMatch == -1) {
+                Errors.AddBigError(" find no empty match to add player one");
+                addMatch.ReleaseMutex();
+                return -1;
+            }
+            else
+            {
+                matchList[bestMatch].StartMatch(playerIdName, playerPower, bestMatch, SelectedLeage);
 
-            Log.AddMatchLog(bestMatch ,  "added with player" + playerIdName + " as first player");
+
+                //Log.AddMatchLog(bestMatch, "added with player" + playerIdName + " as first player");
+                addMatch.ReleaseMutex();
+                return bestMatch;
+
+            }
+           
             //ConnectedPlayersList.SetPlayerMatch(playerIdName, bestMatch);            
         }
         
         public MatchMassage ReturnEvent(string playerId, int matchId)
         {
-           return  matchList[matchId].ReturnEvent(playerId);
+            if(0<=matchId && matchId< matchList.Length)
+            {
+                return matchList[matchId].ReturnEvent(playerId);
+            }
+            else
+            {
+                MatchMassage errormas = new MatchMassage();
+                errormas.type = MatchMassageType.Error;
+                errormas.body = "Matchlist. ReturnEvent. Error";
+                return errormas;
+            }
+           
         }
         
         //cliam will be 1 or -1

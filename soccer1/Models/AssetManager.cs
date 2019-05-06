@@ -25,6 +25,9 @@ namespace soccer1.Models
         //give pawnname add return pawnindex
         public static Mutex assentsLoaded = new Mutex();
         //public static AutoResetEvent assentsLoaded = new AutoResetEvent(false);
+        private static Mutex AddPawnmutex = new Mutex();
+        public static Mutex AddElixirmutex = new Mutex();
+        public static Mutex AddFormationmutex = new Mutex();
         public int ReturnAssetIndex(AssetType type, string IdNamePawn)
         {
             int IndexOfAsset=-1;
@@ -175,7 +178,7 @@ namespace soccer1.Models
 
         public  void AddPawnToAssets(Pawn p)
         {
-            
+            AddPawnmutex.WaitOne();
             if (Pawnlist.Length <= pawnsConter) { Errors.AddBigError("AddPawnToAssets. Pawnlist.Length <= pawnsConter"); return; }
             int indexinarray = -1;
             for (int i=0; i<= pawnsConter; i++) if (Pawnlist[i].IdName == p.IdName) { indexinarray = i; }
@@ -194,11 +197,13 @@ namespace soccer1.Models
                 //Log.AddLog("AssetManager.AddPawnToAssets: pawn Updated. Name:" + p.IdName + "  index:" + indexinarray.ToString());
                 DatabaseManager.AddPawnToDataBase(p);
             }
-            
+            AddPawnmutex.ReleaseMutex();
+
         }
-        
+
         public  void AddFormationToAssets(Formation ff)
         {
+            AddFormationmutex.WaitOne();
             if (Formationlist.Length <= FormationConter) { Errors.AddBigError("Formationlist.Length <= FormationConter"); return; }
             int indexinarray = -1;
             for (int i = 0; i <= FormationConter; i++) if (Formationlist[i].IdName == ff.IdName) { indexinarray = i; }
@@ -215,10 +220,12 @@ namespace soccer1.Models
                 Formationlist[indexinarray] = ff;
                 DatabaseManager.AddFormationToDataBase(ff);
             }
+            AddFormationmutex.ReleaseMutex();
         }
         
         public  void AddElixirToAssets(Elixir el)
         {
+            AddElixirmutex.WaitOne();
             if (Elixirlist.Length <= ElixirConter) { Errors.AddBigError("Elixirlist.Length <= ElixirConter"); return; }
             int indexinarray = -1;
             for (int i = 0; i <= ElixirConter; i++) if (Elixirlist[i].IdName == el.IdName) { indexinarray = i; }
@@ -235,12 +242,15 @@ namespace soccer1.Models
                 Elixirlist[indexinarray] = el;
                 DatabaseManager.AddElixirToDataBase(el);
             }
+            AddElixirmutex.ReleaseMutex();
         }
         
         public static void FillArrays()
         {
-            
-            
+            AddElixirmutex.WaitOne();
+            AddFormationmutex.WaitOne();
+            AddPawnmutex.WaitOne();
+
             for (int i=0; i< arraylengh; i++)
             {
                 Pawnlist[i] = new Pawn();
@@ -251,33 +261,35 @@ namespace soccer1.Models
 
         }
 
+        
         public static void LoadAssets()
         {
-            AdminController.AddElixirmutex.WaitOne();
-            AdminController.AddFormationmutex.WaitOne();
-            AdminController.AddPawnmutex.WaitOne();
+            
             assentsLoaded.WaitOne();
             DataDBContext dataBase = new DataDBContext();
             Formation[] formations = dataBase.allFormations.ToArray();
             for(int i =0; i< formations.Length; i++)
             {
                 Formationlist[formations[i].index] = formations[i];
+                FormationConter++;
             }
 
             Elixir[] elixirs = dataBase.allElixires.ToArray();
             for (int i = 0; i < elixirs.Length; i++)
             {
                 Elixirlist[elixirs[i].index] = elixirs[i];
+                ElixirConter++;
             }
 
             Pawn[] pawns = dataBase.allPawns.ToArray();
             for (int i = 0; i < pawns.Length; i++)
             {
                 Pawnlist[pawns[i].index] = pawns[i];
+                pawnsConter++;
             }
-            AdminController.AddElixirmutex.ReleaseMutex();
-            AdminController.AddFormationmutex.ReleaseMutex();
-            AdminController.AddPawnmutex.ReleaseMutex();
+            AddElixirmutex.ReleaseMutex();
+            AddFormationmutex.ReleaseMutex();
+            AddPawnmutex.ReleaseMutex();
             assentsLoaded.ReleaseMutex();
         }
 

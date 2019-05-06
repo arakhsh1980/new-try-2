@@ -58,6 +58,12 @@ namespace soccer1.Models.main_blocks
         public string[] ElixirInBench;
     }
 
+    [Serializable]
+    public struct testtt
+    {
+        public string CurrentFormation;
+    }
+
 
     [Serializable]
     public struct TeamForSerializeSingleString

@@ -27,7 +27,7 @@ namespace soccer1.Controllers
             pawn.ForMatch = Request.Form["ForMatch"];
             pawn.blueForSale = Request.Form["blueForSale"];
             pawn.IdName = Request.Form["IdName"];
-            Log.AddLog("AddPawnStarted" + pawn.IdName);
+            //Log.AddLog("AddPawnStarted" + pawn.IdName);
             PawnAbility pa = new PawnAbility();
             pa.aiming = Int32.Parse(Request.Form["mainAbility.aiming"]);
             pa.boddyMass = Int32.Parse(Request.Form["mainAbility.boddyMass"]);
@@ -57,7 +57,7 @@ namespace soccer1.Controllers
             elixir.forSale = Request.Form["forSale"];            
             elixir.IdName = Request.Form["IdName"];
             elixir.showName = Request.Form["showName"];
-            Log.AddLog("AddElixirStarted" + elixir.IdName);
+            //Log.AddLog("AddElixirStarted" + elixir.IdName);
             SpetialPower sp = new SpetialPower();
             sp.IdName = Request.Form["spPower.IdName"];
             sp.image = Request.Form["spPower.image"];
@@ -99,7 +99,7 @@ namespace soccer1.Controllers
             }
 
             new AssetManager().AddFormationToAssets(formation);
-            AddElixirmutex.ReleaseMutex();
+            AddFormationmutex.ReleaseMutex();
             return "Formation Loaded" + formation.IdName;
         }
 

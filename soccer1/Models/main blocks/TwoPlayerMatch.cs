@@ -25,21 +25,24 @@ namespace soccer1.Models
 
         public void playerLost(string playerid)
         {
+            Log.AddMatchLog(matchNumber,"twoPlayerMatch.playerlost.playerid:" + playerid+ "   matchID:");
+            if (preSituation == PreMatchSituation.NonExistance) {  return;  }
+            if( playerid != playerOneIdName && playerid != playerTwoIdName) { return; }
             mainMutex.WaitOne();
-            if (preSituation == PreMatchSituation.NonExistance) { Errors.AddBigError(" player on Non Existance match lost"); return; }
-            if(preSituation == PreMatchSituation.WithOnePlayer && playerid==playerOneIdName)
+            if (preSituation == PreMatchSituation.WithOnePlayer && playerid==playerOneIdName)
             {
                 GoNonExistance();
                 //ConnectedPlayersList.connectionInfos[playerOneId].ActiveMatchId = -1;
-                    return;
+                mainMutex.ReleaseMutex();
+                return;
             }
             if(preSituation == PreMatchSituation.WithTwoPlayer && playerid == playerOneIdName)
             {
-                PlayerWin(2); return;
+                PlayerWin(2); mainMutex.ReleaseMutex();  return;
             }
             if (preSituation == PreMatchSituation.WithTwoPlayer && playerid == playerTwoIdName)
             {
-                PlayerWin(1); return;
+                PlayerWin(1); mainMutex.ReleaseMutex();  return;
             }
             mainMutex.ReleaseMutex();
 
@@ -47,6 +50,8 @@ namespace soccer1.Models
 
         public void StartMatch(string StarterId, float StarterPower, int Matchnum, string SelectedLeage)
         {
+            Log.AddMatchLog(matchNumber, "twoPlayerMatch.StartMatch.StarterId:" + StarterId);
+
             mainMutex.WaitOne();
             playerOneIdName = StarterId;
             PlayerOnePower = StarterPower;
@@ -61,10 +66,11 @@ namespace soccer1.Models
             mainMutex.ReleaseMutex();
         }
 
-        public void AddSecondPlayerToMatch(string connectionId,float power)
+        public void AddSecondPlayerToMatch(string seconrPlayerID,float power)
         {
+            Log.AddMatchLog(matchNumber, "twoPlayerMatch.AddSecondPlayerToMatch.seconrPlayerID:" + seconrPlayerID);
             mainMutex.WaitOne();
-            playerTwoIdName = connectionId;
+            playerTwoIdName = seconrPlayerID;
             PlayerTwoPower = power;
            //PlayerTwoShootTime = ConnectedPlayersList.connectedPlayers[connectionId].ShootTime;
            
@@ -80,9 +86,10 @@ namespace soccer1.Models
 
         public void ShootHappeded(ShootActionCode shot, string shoot)
         {
+            Log.AddMatchLog(matchNumber, "twoPlayerMatch.ShootHappeded.shooter:" + shot.playerIDName);
             mainMutex.WaitOne();
-            if (shot.playerIDName!= playerOneIdName && isPlayerOnTurn) { Log.AddPlayerLog(shot.playerIDName,"out of turn shoot " ); return; }
-            if (shot.playerIDName != playerTwoIdName && !isPlayerOnTurn) { Log.AddPlayerLog(shot.playerIDName, "out of turn shoot "); return; }
+            if (shot.playerIDName!= playerOneIdName && isPlayerOnTurn) { Log.AddPlayerLog(shot.playerIDName, "ShootHappeded.out of turn shoot "); return; }
+            if (shot.playerIDName != playerTwoIdName && !isPlayerOnTurn) { Log.AddPlayerLog(shot.playerIDName, "ShootHappeded.out of turn shoot "); return; }
             if (situation != MatchSituation.WFShoot) { Errors.AddSmallError("untiming shoot resived"); return; }
 
             playerOnePawnsPositions = null;
@@ -96,31 +103,34 @@ namespace soccer1.Models
 
         public void GetStationeryPostion(string SenderId , string jsonpart)
         {
+            Log.AddMatchLog(matchNumber, "twoPlayerMatch.GetStationeryPostion.SenderId:" + SenderId);
             mainMutex.WaitOne();
             if (situation != MatchSituation.WFStationeryPositions)
             {
-                Errors.AddSmallError("untiming Stationery Positions resived");
+                Errors.AddSmallError("GetStationeryPostion.untiming Stationery Positions resived");
                 return;
             }
             if(SenderId== playerOneIdName) {
                 playerOnePawnsPositions = jsonpart;
-                Log.AddPlayerLog(playerOneIdName," Stationery position resived");
+                Log.AddPlayerLog(playerOneIdName, " GetStationeryPostion.Stationery position resived");
             }
             if(SenderId == playerTwoIdName) {
                 playerTwoPawnsPositions = jsonpart;
-                Log.AddPlayerLog(playerTwoIdName, " Stationery position resived");
+                Log.AddPlayerLog(playerTwoIdName, " GetStationeryPostion.Stationery position resived");
             }
             if(playerOnePawnsPositions != null && playerTwoPawnsPositions != null)
             {
                 if(isBothPositionsSimilar(playerOnePawnsPositions, playerTwoPawnsPositions))
                 {
                     situation = MatchSituation.WFShoot;
-                    Log.AddMatchLog(matchNumber, " Stationery position Accepted");
+                    Log.AddMatchLog(matchNumber, " GetStationeryPostion.Stationery position Accepted");
+                    playerOnePawnsPositions = null;
+                    playerTwoPawnsPositions = null;
                     SendMassageToPlayers(MatchMassageType.shotIsDown, "");
                 }
                 else
                 {
-                    Log.AddMatchLog(matchNumber, " Error Eroor different result of shoots");
+                    Log.AddMatchLog(matchNumber, "GetStationeryPostion. Error Eroor different result of shoots");
                     Errors.AddBigError("different result of shoots");
                     situation = MatchSituation.WFShoot;
                     SendMassageToPlayers(MatchMassageType.shotIsDown, "");
@@ -136,8 +146,8 @@ namespace soccer1.Models
         
         public void GoalReport(string SenderId, int GoalClaim)
         {
-            mainMutex.WaitOne();
-            Log.AddPlayerLog(SenderId, " Goal Cliam : " + GoalClaim.ToString());
+            Log.AddMatchLog(matchNumber, "twoPlayerMatch.GoalReport.SenderId:" + SenderId);
+            mainMutex.WaitOne();            
             if(situation != MatchSituation.WFStationeryPositions) { Errors.AddClientError("Goal claim out of time by "+ SenderId.ToString()); }
             string Scorer =null;
             //situation = MatchSituation.WFGoalClaim;
@@ -148,11 +158,13 @@ namespace soccer1.Models
                 if (playerOneGoalClaim == 1)
                 {
                     playerOneScore++;
+                    Log.AddMatchLog(matchNumber, "twoPlayerMatch.GoalReport.playerOneScore:" + playerOneScore);
                     Scorer = playerOneIdName;
                 }
                 if (playerOneGoalClaim == -1)
                 {
                     playerTwoScore++;
+                    Log.AddMatchLog(matchNumber, "twoPlayerMatch.GoalReport.playerTwoScore:" + playerTwoScore);
                     Scorer = playerTwoIdName;
                 }
                 if (goalForWin <= playerOneScore) {
@@ -172,6 +184,7 @@ namespace soccer1.Models
        
         public void ItsMyTimeClaim(string SenderId)
         {
+            Log.AddMatchLog(matchNumber, "twoPlayerMatch.ItsMyTimeClaim.SenderId:" + SenderId);
             mainMutex.WaitOne();
             if (isPlayerOnTurn && SenderId== playerOneIdName) { Errors.AddClientError("ItsMyTimeClaim on its turn");  return; }
             if(!isPlayerOnTurn && SenderId == playerTwoIdName) { Errors.AddClientError("ItsMyTimeClaim on its turn"); return; }
@@ -330,7 +343,7 @@ namespace soccer1.Models
 
         private void PlayerWin(int winer)
         {
-            Log.AddMatchLog(matchNumber, " player "+ winer.ToString() + " wined");
+            Log.AddMatchLog(matchNumber, "twoPlayerMatch.PlyaerWin. player: "+ winer.ToString() + " wined");
             if (winer == 1)
             {
                 //ConnectedPlayersList.PlayerWined(playerOneId, betedMoney);
