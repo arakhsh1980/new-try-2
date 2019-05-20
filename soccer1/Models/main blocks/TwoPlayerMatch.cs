@@ -4,10 +4,17 @@ using System.Linq;
 using System.Web;
 using soccer1.Models;
 using System.Threading;
+using System.Web.Script.Serialization;
 
 namespace soccer1.Models
 {
-   
+    [Serializable]
+    public struct MatchEvents
+    {
+        public List<MatchMassageType> EventTypes;
+        public List<string> desitionBodys;
+        
+    }
 
     
     public class TwoPlayerMatch
@@ -18,11 +25,267 @@ namespace soccer1.Models
         {
             preSituation = PreMatchSituation.NonExistance;
             matchNumber = -1;
+            playerOneEvents.desitionBodys = new List<string>();
+            playerOneEvents.EventTypes = new List<MatchMassageType>();
+            playerTwoEvents.desitionBodys = new List<string>();
+            playerTwoEvents.EventTypes = new List<MatchMassageType>();
+            WFShootStartTime = 0;
+            MatchEvents defultEvent = new MatchEvents();
+            defultEvent.EventTypes = new List<MatchMassageType>();
+            defultEvent.desitionBodys = new List<string>();
+            defultEvent.EventTypes.Add(MatchMassageType.NothingNew);
+            defultEvent.desitionBodys.Add("");
+            NothingNewEventString = new JavaScriptSerializer().Serialize(defultEvent);
+            betedMoney = 300;
+        }
+        
+        private Mutex mainMutex = new Mutex();
+        private Mutex eventMutex = new Mutex();
+
+
+
+        #region every turn action
+
+        public bool SubistitutionsHappened(string PlayerId, int TurnNumber, string jsonpart)
+        {
+            bool result = false;
+            if (TurnNumber != currentTurn) { return false; }
+            if (PlayerId == playerOneIdName)
+            {
+                AddPlayerEvent(playerTwoIdName, MatchMassageType.Substituti, jsonpart);
+            }
+            if (PlayerId == playerTwoIdName)
+            {
+                AddPlayerEvent(playerOneIdName, MatchMassageType.Substituti, jsonpart);
+            }
+            return result;
         }
 
-        private Mutex mainMutex = new Mutex();
-       
 
+
+        public bool ElixirUseHappened(string PlayerId, int TurnNumber, string jsonpart)
+        {
+            bool result = false;
+            if (TurnNumber != currentTurn) { return false; }
+            if (PlayerId == playerOneIdName)
+            {
+                AddPlayerEvent(playerTwoIdName, MatchMassageType.ElixirUsea, jsonpart);
+            }
+            if (PlayerId == playerTwoIdName)
+            {
+                AddPlayerEvent(playerOneIdName, MatchMassageType.ElixirUsea, jsonpart);
+            }
+            return result;
+        }
+
+
+        public bool ShootHappeded(string playerIDName, int TurnNumber, string shoot)
+        {
+            Log.AddMatchLog(matchNumber, "twoPlayerMatch.ShootHappeded.shooter:" + playerIDName);
+            if (TurnNumber != currentTurn) { Errors.AddSmallError("untiming shoot resived. out of turn"); return false; }
+            if (playerIDName != playerOneIdName && isPlayerOneTurn) { Log.AddPlayerLog(playerIDName, "ShootHappeded.out of turn shoot "); return false; }
+            if (playerIDName != playerTwoIdName && !isPlayerOneTurn) { Log.AddPlayerLog(playerIDName, "ShootHappeded.out of turn shoot "); return false; }
+            if (situation != MatchSituation.WFShoot) { Errors.AddSmallError("untiming shoot resived"); return false; }
+            mainMutex.WaitOne();
+            playerOnePawnsPositions = null;
+            playerTwoPawnsPositions = null;
+
+            lastShootTime = DateTime.Now;
+            situation = MatchSituation.WFStationeryPositions;
+            SendMassageToPlayers(MatchMassageType.ActTisShot, shoot);
+            mainMutex.ReleaseMutex();
+            return true;
+        }
+
+        public void GetStationeryPostion(string SenderId, int TurnNumber, string jsonpart)
+        {
+            Log.AddMatchLog(matchNumber, "twoPlayerMatch.GetStationeryPostion.SenderId:" + SenderId);
+            if (TurnNumber != currentTurn) { Errors.AddSmallError("untiming shoot resived. out of turn"); return ; }
+            if (IsgoalHappenInTurn) {
+                isUnSolvedStationeryPostion = false;
+                return;
+            }
+            if (situation != MatchSituation.WFStationeryPositions)
+            {
+                Errors.AddSmallError("GetStationeryPostion.untiming Stationery Positions resived");
+                return;
+            }
+            TimeofLastStationeryPosition = TimeFromStart();
+            isUnSolvedStationeryPostion = true;
+            mainMutex.WaitOne();
+            if (SenderId == playerOneIdName)
+            {
+                playerOnePawnsPositions = jsonpart;
+                Log.AddPlayerLog(playerOneIdName, " GetStationeryPostion.Stationery position resived");
+            }
+            if (SenderId == playerTwoIdName)
+            {
+                playerTwoPawnsPositions = jsonpart;
+                Log.AddPlayerLog(playerTwoIdName, " GetStationeryPostion.Stationery position resived");
+            }
+            if (playerOnePawnsPositions != null && playerTwoPawnsPositions != null)
+            {
+                if (isBothPositionsSimilar(playerOnePawnsPositions, playerTwoPawnsPositions))
+                {
+                    situation = MatchSituation.WFShoot;
+
+                    Log.AddMatchLog(matchNumber, " GetStationeryPostion.Stationery position Accepted");
+                    playerOnePawnsPositions = null;
+                    playerTwoPawnsPositions = null;
+                    isUnSolvedStationeryPostion = false;
+                    StartNextTurn();
+                    //SendMassageToPlayers(MatchMassageType.shotIsDown, "");
+                }
+                else
+                {
+                    Log.AddMatchLog(matchNumber, "GetStationeryPostion. Error Eroor different result of shoots");
+                    Errors.AddBigError("different result of shoots");
+                    situation = MatchSituation.WFShoot;
+                    //SendMassageToPlayers(MatchMassageType.shotIsDown, "");
+                }
+            }
+            else
+            {
+                //Log.AddMatchLog(matchNumber, " Error Eroor One null position");
+                //Errors.AddBigError("One null position");
+            }
+            mainMutex.ReleaseMutex();
+        }
+
+        public void GoalReport(string SenderId, int TurnNumber, int GoalClaim)
+        {
+            if (TurnNumber != currentTurn) { Errors.AddSmallError("untiming goal resived. out of turn"); return; }
+            Log.AddMatchLog(matchNumber, "twoPlayerMatch.GoalReport.SenderId:" + SenderId);
+            mainMutex.WaitOne();
+            if (situation != MatchSituation.WFStationeryPositions) { Errors.AddClientError("Goal claim out of time by " + SenderId.ToString()); }
+            isUnSolvedGoalClaim = true;
+            ThisTurnScorerID = null;
+            //situation = MatchSituation.WFGoalClaim;
+            if (SenderId == playerOneIdName) { playerOneGoalClaim = GoalClaim; }
+            if (SenderId == playerTwoIdName) { playerTwoGoalClaim = GoalClaim; }
+            if (playerOneGoalClaim == (-1 * playerTwoGoalClaim))
+            {
+                if (playerOneGoalClaim == 1)
+                {
+                    IsgoalHappenInTurn = true;
+                    playerOneScore++;
+                    Log.AddMatchLog(matchNumber, "twoPlayerMatch.GoalReport.playerOneScore:" + playerOneScore);
+                    ThisTurnScorerID = playerOneIdName;                    
+                    isPlayerOneTurn = false;
+                    playerOnePawnsPositions = null;
+                    playerTwoPawnsPositions = null;
+                    isUnSolvedGoalClaim = false;
+
+                }
+                if (playerOneGoalClaim == -1)
+                {
+                    IsgoalHappenInTurn = true;
+                    playerTwoScore++;
+                    Log.AddMatchLog(matchNumber, "twoPlayerMatch.GoalReport.playerTwoScore:" + playerTwoScore);
+                    ThisTurnScorerID = playerTwoIdName;                    
+                    isPlayerOneTurn = true;
+                    playerOnePawnsPositions = null;
+                    playerTwoPawnsPositions = null;
+                    isUnSolvedGoalClaim = false;
+
+                }
+                if (goalForWin <= playerOneScore)
+                {
+                    PlayerWin(true);
+                    mainMutex.ReleaseMutex();
+                    return;
+                }
+                if (goalForWin <= playerTwoScore)
+                {
+                    PlayerWin(false);
+                    mainMutex.ReleaseMutex();
+                    return;
+                }
+                if (ThisTurnScorerID == null)
+                {
+                    Errors.AddSmallError("different claim About Goal in Match nmumber: " + matchNumber.ToString());
+                    mainMutex.ReleaseMutex();
+                    return;
+                }
+                SendMassageToPlayers(MatchMassageType.PlayerGoal, ThisTurnScorerID);
+                StartNextTurn();
+            }
+            mainMutex.ReleaseMutex();
+        }
+
+        public string ReturnEvent(string playerIdName)
+        {
+            if(preSituation == PreMatchSituation.WithTwoPlayer) matchTimeControler();
+            eventMutex.WaitOne();
+            
+            string uu = "Error";
+            
+            if (playerIdName == playerOneIdName)
+            {
+                //uu = NothingNewEventString;
+                uu = new JavaScriptSerializer().Serialize(playerOneEvents);
+                playerOneEvents.EventTypes.Clear();
+                playerOneEvents.desitionBodys.Clear();
+                isUnreadEventForPlayerOne = false;
+                playerOneLastEventReadTime = TimeFromStart();
+            }
+
+            if (playerIdName == playerTwoIdName)
+            {
+                //uu = NothingNewEventString;
+                uu = new JavaScriptSerializer().Serialize(playerTwoEvents);
+                playerTwoEvents.EventTypes.Clear();
+                playerTwoEvents.desitionBodys.Clear();
+                isUnreadEventForPlayerTwo = false;
+                playerTwoLastEventReadTime = TimeFromStart();
+            }
+            eventMutex.ReleaseMutex();
+            if (!isUnreadEventForPlayerOne && !isUnreadEventForPlayerTwo && situation == MatchSituation.EndedPlay)
+            {
+                GoNonExistance();
+            }
+            return uu;
+        }
+
+
+
+        #endregion
+
+
+        #region Resiving funcitons
+
+        public void TimerIsUp(string PlayerId,int turn)
+        {
+            Log.AddMatchLog(matchNumber, "twoPlayerMatch.ItsMyTimeClaim.SenderId:" + PlayerId);
+            mainMutex.WaitOne();
+            if (lastTurnfinishWithTimerUp< turn)
+            {
+                lastTurnfinishWithTimerUp = turn;
+                TimeSpan deferentTime = DateTime.Now.Subtract(lastShootTime);
+                if(PlayerId== playerOneIdName)
+                {
+                    float timeFromLastEventRead = TimeFromStart()-playerTwoLastEventReadTime;
+                    if(Statistics.ConnectionTimeOut < timeFromLastEventRead)
+                    {
+                        PlayerWin(true);
+                        mainMutex.ReleaseMutex();
+                        return;
+                    }
+                }
+                else
+                {
+                    float timeFromLastEventRead = TimeFromStart() - playerOneLastEventReadTime;
+                    if (Statistics.ConnectionTimeOut < timeFromLastEventRead)
+                    {
+                        PlayerWin(false);
+                        mainMutex.ReleaseMutex();
+                        return;
+                    }
+                }
+                StartNextTurn();
+            }
+            mainMutex.ReleaseMutex();
+        }
         public void playerLost(string playerid)
         {
             Log.AddMatchLog(matchNumber,"twoPlayerMatch.playerlost.playerid:" + playerid+ "   matchID:");
@@ -38,17 +301,17 @@ namespace soccer1.Models
             }
             if(preSituation == PreMatchSituation.WithTwoPlayer && playerid == playerOneIdName)
             {
-                PlayerWin(2); mainMutex.ReleaseMutex();  return;
+                PlayerWin(false); mainMutex.ReleaseMutex();  return;
             }
             if (preSituation == PreMatchSituation.WithTwoPlayer && playerid == playerTwoIdName)
             {
-                PlayerWin(1); mainMutex.ReleaseMutex();  return;
+                PlayerWin(true); mainMutex.ReleaseMutex();  return;
             }
             mainMutex.ReleaseMutex();
 
         }
 
-        public void StartMatch(string StarterId, float StarterPower, int Matchnum, string SelectedLeage)
+        public void StartMatchWithOnePlayer(string StarterId, float StarterPower, int Matchnum, string SelectedLeage)
         {
             Log.AddMatchLog(matchNumber, "twoPlayerMatch.StartMatch.StarterId:" + StarterId);
 
@@ -79,154 +342,42 @@ namespace soccer1.Models
             situation = MatchSituation.WFShoot;
             preSituation = PreMatchSituation.WithTwoPlayer;
             lastShootTime = DateTime.Now;
+            currentTurn = 1;
             SendMassageToPlayers(MatchMassageType.GoToMatchi, matchNumber.ToString());
             Log.AddMatchLog(matchNumber, " match started. pl1: " + playerOneIdName.ToString() + " . pl2: " + playerTwoIdName.ToString());
+            startMatchTime = DateTime.Now;
+            WFShootStartTime = TimeFromStart();
             mainMutex.ReleaseMutex();
         }
 
-        public void ShootHappeded(ShootActionCode shot, string shoot)
-        {
-            Log.AddMatchLog(matchNumber, "twoPlayerMatch.ShootHappeded.shooter:" + shot.playerIDName);
-            mainMutex.WaitOne();
-            if (shot.playerIDName!= playerOneIdName && isPlayerOnTurn) { Log.AddPlayerLog(shot.playerIDName, "ShootHappeded.out of turn shoot "); return; }
-            if (shot.playerIDName != playerTwoIdName && !isPlayerOnTurn) { Log.AddPlayerLog(shot.playerIDName, "ShootHappeded.out of turn shoot "); return; }
-            if (situation != MatchSituation.WFShoot) { Errors.AddSmallError("untiming shoot resived"); return; }
 
-            playerOnePawnsPositions = null;
-            playerTwoPawnsPositions = null;
-            isPlayerOnTurn = !isPlayerOnTurn;
-            lastShootTime = DateTime.Now;
-            situation = MatchSituation.WFStationeryPositions;
-            SendMassageToPlayers(MatchMassageType.ActTisShot, shoot);
-            mainMutex.ReleaseMutex();
-        }
-
-        public void GetStationeryPostion(string SenderId , string jsonpart)
+        public void garbegColletor()
         {
-            Log.AddMatchLog(matchNumber, "twoPlayerMatch.GetStationeryPostion.SenderId:" + SenderId);
-            mainMutex.WaitOne();
-            if (situation != MatchSituation.WFStationeryPositions)
-            {
-                Errors.AddSmallError("GetStationeryPostion.untiming Stationery Positions resived");
-                return;
-            }
-            if(SenderId== playerOneIdName) {
-                playerOnePawnsPositions = jsonpart;
-                Log.AddPlayerLog(playerOneIdName, " GetStationeryPostion.Stationery position resived");
-            }
-            if(SenderId == playerTwoIdName) {
-                playerTwoPawnsPositions = jsonpart;
-                Log.AddPlayerLog(playerTwoIdName, " GetStationeryPostion.Stationery position resived");
-            }
-            if(playerOnePawnsPositions != null && playerTwoPawnsPositions != null)
-            {
-                if(isBothPositionsSimilar(playerOnePawnsPositions, playerTwoPawnsPositions))
+            if(preSituation == PreMatchSituation.NonExistance) { GoNonExistance(); return; }            
+            if ((float)DateTime.Now.Subtract(startMatchTime).TotalSeconds < Statistics.MaxMatchTimeInSeconds) { return; }
+            if (preSituation == PreMatchSituation.WithOnePlayer) { GoNonExistance(); return; }
+            if (situation == MatchSituation.EndedPlay) { GoNonExistance(); return; }
+            if (situation == MatchSituation.WFShoot || situation == MatchSituation.WFStationeryPositions) {
+                if (Statistics.ConnectionTimeOut < TimeFromStart() - playerTwoLastEventReadTime)
                 {
-                    situation = MatchSituation.WFShoot;
-                    Log.AddMatchLog(matchNumber, " GetStationeryPostion.Stationery position Accepted");
-                    playerOnePawnsPositions = null;
-                    playerTwoPawnsPositions = null;
-                    SendMassageToPlayers(MatchMassageType.shotIsDown, "");
-                }
-                else
-                {
-                    Log.AddMatchLog(matchNumber, "GetStationeryPostion. Error Eroor different result of shoots");
-                    Errors.AddBigError("different result of shoots");
-                    situation = MatchSituation.WFShoot;
-                    SendMassageToPlayers(MatchMassageType.shotIsDown, "");
-                }
-            }
-            else
-            {
-                //Log.AddMatchLog(matchNumber, " Error Eroor One null position");
-                //Errors.AddBigError("One null position");
-            }
-            mainMutex.ReleaseMutex();
-        }
-        
-        public void GoalReport(string SenderId, int GoalClaim)
-        {
-            Log.AddMatchLog(matchNumber, "twoPlayerMatch.GoalReport.SenderId:" + SenderId);
-            mainMutex.WaitOne();            
-            if(situation != MatchSituation.WFStationeryPositions) { Errors.AddClientError("Goal claim out of time by "+ SenderId.ToString()); }
-            string Scorer =null;
-            //situation = MatchSituation.WFGoalClaim;
-            if (SenderId == playerOneIdName) { playerOneGoalClaim = GoalClaim; }
-            if (SenderId == playerTwoIdName) { playerTwoGoalClaim = GoalClaim; }
-            if( playerOneGoalClaim == (-1* playerTwoGoalClaim) )
-            {
-                if (playerOneGoalClaim == 1)
-                {
-                    playerOneScore++;
-                    Log.AddMatchLog(matchNumber, "twoPlayerMatch.GoalReport.playerOneScore:" + playerOneScore);
-                    Scorer = playerOneIdName;
-                }
-                if (playerOneGoalClaim == -1)
-                {
-                    playerTwoScore++;
-                    Log.AddMatchLog(matchNumber, "twoPlayerMatch.GoalReport.playerTwoScore:" + playerTwoScore);
-                    Scorer = playerTwoIdName;
-                }
-                if (goalForWin <= playerOneScore) {
-                    PlayerWin(1);
+                    PlayerWin(true);
                     return;
                 }
-                if (goalForWin <= playerTwoScore)
+                if (Statistics.ConnectionTimeOut < TimeFromStart() - playerOneLastEventReadTime)
                 {
-                    PlayerWin(2);
+                    PlayerWin(false);
                     return;
                 }
-                if (Scorer == null) { Errors.AddSmallError("different claim About Goal in Match nmumber: "+ matchNumber.ToString()); return; }
-                SendMassageToPlayers(MatchMassageType.PlayerGoal, Scorer.ToString());
+                GoNonExistance();
             }
-            mainMutex.ReleaseMutex();
-        }        
-       
-        public void ItsMyTimeClaim(string SenderId)
-        {
-            Log.AddMatchLog(matchNumber, "twoPlayerMatch.ItsMyTimeClaim.SenderId:" + SenderId);
-            mainMutex.WaitOne();
-            if (isPlayerOnTurn && SenderId== playerOneIdName) { Errors.AddClientError("ItsMyTimeClaim on its turn");  return; }
-            if(!isPlayerOnTurn && SenderId == playerTwoIdName) { Errors.AddClientError("ItsMyTimeClaim on its turn"); return; }
-            TimeSpan deferentTime = DateTime.Now.Subtract(lastShootTime);
-            if (isPlayerOnTurn && PlayerOneShootTime < deferentTime.TotalSeconds)
-            {
-                playerTimeOut();
-                return;
-            }
-            if (!isPlayerOnTurn && PlayerOneShootTime < deferentTime.TotalSeconds)
-            {
-                playerTimeOut();
-                return;
-            }
-            mainMutex.ReleaseMutex();
-
         }
+        #endregion
 
-        public MatchMassage ReturnEvent(string playerIdName)
-        {
-            MatchMassage massage = new MatchMassage();
-            massage.type = MatchMassageType.Error;
-            massage.body = null;
-            if (playerIdName == playerOneIdName) {
-                massage.body = playerOneEvent;
-                massage.type = playerOneEventType;
-                playerOneEvent = null;
-                playerOneEventType = MatchMassageType.NothingNew;
-                return massage;
-            }
-            
-            if (playerIdName == playerTwoIdName)
-            {
-                massage.body = playerTwoEvent;
-                massage.type = playerTwoEventType;
-                playerTwoEvent = null;
-                playerTwoEventType = MatchMassageType.NothingNew;
-                return massage;
-            }
-            return massage;
-        }
 
+
+
+
+#region return value functions
 
         public PreMatchSituation GivePreSituation()
         {
@@ -288,76 +439,180 @@ namespace soccer1.Models
             return name;
         }
 
-        
-
-        //public bool isPlayersConnected()
-        //{
-        //    if(situation == MatchSituation.NonExistance) { return false; }
-        //    if(situation == MatchSituation.WithOnePlayer)
-        //        if (ConnectedPlayersList.IsConnected(playerOneId))
-        //        {
-        //            return true;
-        //        }
-        //        else
-        //        {
-        //            GoNonExistance();
-        //            return false;
-        //        }
-        //    if (situation == MatchSituation.WithOnePlayer)
-        //        if (ConnectedPlayersList.IsConnected(playerOneId))
-        //        {
-        //            return true;
-        //        }
-        //        else
-        //        {
-        //            GoNonExistance();
-        //            return false;
-        //        }
-
-        //}
-        //}
+        #endregion
 
 
-        /// <summary>
-        /// /////////private part
-        /// </summary>
 
-#region private Part
-        private void playerTimeOut()
+
+
+
+
+#region inner functions
+
+        void matchTimeControler() {
+
+            switch (situation)
+            {
+                case MatchSituation.WFShoot:
+                    if(Statistics.AcceptedWFShootTime < TimeFromStart()- WFShootStartTime)
+                    {
+                        checkPlayersConnectivity();
+                        StartNextTurn();
+                    }
+                    break;
+                case MatchSituation.WFStationeryPositions:
+                    if(playerOnePawnsPositions != null || playerTwoPawnsPositions != null)
+                    {
+                        if (Statistics.AcceptedTimeofStationeryPositionDifference < TimeFromStart() - TimeofLastStationeryPosition)
+                        {
+                            if(playerOneGoalClaim !=0 || playerTwoGoalClaim != 0) {
+                                AcceptGoalReport();
+                            }
+                            else
+                            {
+                                checkPlayersConnectivity();
+                                StartNextTurn();
+                            }
+                            
+                        }
+                    }
+                    break;
+            }
+
+
+
+        }
+
+        private void checkPlayersConnectivity()
+        {                        
+            if (Statistics.ConnectionTimeOut < TimeFromStart() - playerTwoLastEventReadTime)
+            {
+                PlayerWin(true);                
+                return;
+            }            
+            if (Statistics.ConnectionTimeOut < TimeFromStart() - playerOneLastEventReadTime)
+            {
+                PlayerWin(false);                
+                return;
+            }  
+        }
+
+        private void AcceptGoalReport()
         {
+           
+            
+            mainMutex.WaitOne();
+            if(playerOneGoalClaim !=0) {
+                playerTwoGoalClaim = -1 * playerOneGoalClaim;
+            }
+            else
+            {
+                playerOneGoalClaim = -1 * playerTwoGoalClaim;
+            }
+            if (playerOneGoalClaim == (-1 * playerTwoGoalClaim))
+            {
+                if (playerOneGoalClaim == 1)
+                {
+                    IsgoalHappenInTurn = true;
+                    playerOneScore++;
+                    Log.AddMatchLog(matchNumber, "twoPlayerMatch.GoalReport.playerOneScore:" + playerOneScore);
+                    ThisTurnScorerID = playerOneIdName;                    
+                    isPlayerOneTurn = false;
+                    playerOnePawnsPositions = null;
+                    playerTwoPawnsPositions = null;
+                    isUnSolvedGoalClaim = false;
+
+                }
+                if (playerOneGoalClaim == -1)
+                {
+                    IsgoalHappenInTurn = true;
+                    playerTwoScore++;
+                    Log.AddMatchLog(matchNumber, "twoPlayerMatch.GoalReport.playerTwoScore:" + playerTwoScore);
+                    ThisTurnScorerID = playerTwoIdName;                    
+                    isPlayerOneTurn = true;
+                    playerOnePawnsPositions = null;
+                    playerTwoPawnsPositions = null;
+                    isUnSolvedGoalClaim = false;
+
+                }
+                if (goalForWin <= playerOneScore)
+                {
+                    PlayerWin(true);
+                    mainMutex.ReleaseMutex();
+                    return;
+                }
+                if (goalForWin <= playerTwoScore)
+                {
+                    PlayerWin(false);
+                    mainMutex.ReleaseMutex();
+                    return;
+                }
+                if (ThisTurnScorerID == null)
+                {
+                    Errors.AddSmallError("different claim About Goal in Match nmumber: " + matchNumber.ToString());
+                    mainMutex.ReleaseMutex();
+                    return;
+                }
+                SendMassageToPlayers(MatchMassageType.PlayerGoal, ThisTurnScorerID);
+                StartNextTurn();
+            }
+            mainMutex.ReleaseMutex();
+        }
+
+        private void StartNextTurn()
+        {
+
+            if (isUnSolvedGoalClaim  ) { return; }
             playerOnePawnsPositions = null;
             playerTwoPawnsPositions = null;
-            isPlayerOnTurn = !isPlayerOnTurn;
+            playerOneGoalClaim = 0;
+            playerTwoGoalClaim = 0;
+            isPlayerOneTurn = !isPlayerOneTurn;
             lastShootTime = DateTime.Now;
-            SendMassageToPlayers(MatchMassageType.PlrTimeOut, "");
             situation = MatchSituation.WFShoot;
+            currentTurn++;
+            if (IsgoalHappenInTurn) if (ThisTurnScorerID == playerOneIdName)
+                {
+                    isPlayerOneTurn = false;
+                }
+                else
+                {
+                    isPlayerOneTurn = true;
+                }
+            IsgoalHappenInTurn = false;
+            playerOneGoalClaim = 0;
+            playerTwoGoalClaim = 0;
+            WFShootStartTime = TimeFromStart();
+            if (isPlayerOneTurn)
+            {
+                SendMassageToPlayers(MatchMassageType.ChangeTurn, playerOneIdName);
+            }
+            else
+            {
+                SendMassageToPlayers(MatchMassageType.ChangeTurn, playerTwoIdName);
+            }
         }
 
-        private int ChackForWinner()
+        private void PlayerWin(bool isPlayerOneWinner )
         {
-            if (goalForWin <= playerOneScore) { return 1; }
-            if (goalForWin <= playerTwoScore) { return 2; }
-            return 0;
-        }
-
-
-        private void PlayerWin(int winer)
-        {
-            Log.AddMatchLog(matchNumber, "twoPlayerMatch.PlyaerWin. player: "+ winer.ToString() + " wined");
-            if (winer == 1)
+           
+            if (isPlayerOneWinner)
             {
                 //ConnectedPlayersList.PlayerWined(playerOneId, betedMoney);
-                SendMassageToPlayers(MatchMassageType.Winnerisii, playerOneIdName.ToString());
-                GoNonExistance();
+                Log.AddMatchLog(matchNumber, "twoPlayerMatch.PlyaerWin. player: " + playerOneIdName + " wined");
+                SendMassageToPlayers(MatchMassageType.Winnerisii, playerOneIdName);
+                situation = MatchSituation.EndedPlay;
+                
             }
-            if (winer == 2)
+            else
             {
                 //ConnectedPlayersList.PlayerWined(playerTwoId, betedMoney);
-                SendMassageToPlayers(MatchMassageType.Winnerisii, playerTwoIdName.ToString());
-                GoNonExistance();
+                Log.AddMatchLog(matchNumber, "twoPlayerMatch.PlyaerWin. player: " + playerTwoIdName + " wined");
+                SendMassageToPlayers(MatchMassageType.Winnerisii, playerTwoIdName);
+                situation = MatchSituation.EndedPlay;
+
             }
-            Errors.AddBigError("Player three wined !");
-            GoNonExistance();
+           
         }
 
         private void SendMassageToPlayers(MatchMassageType type, string massage)
@@ -368,15 +623,19 @@ namespace soccer1.Models
         
         private void AddPlayerEvent(string Id, MatchMassageType massageType, string eventMassage)
         {
-            if(Id== playerOneIdName) {
-                playerOneEventType = massageType;
-                playerOneEvent = eventMassage;
+            eventMutex.WaitOne();
+            if (Id== playerOneIdName) {
+                playerOneEvents.EventTypes.Add(massageType);
+                playerOneEvents.desitionBodys.Add(eventMassage);
+                isUnreadEventForPlayerOne = true;
             }
             else
             {
-                playerTwoEventType = massageType;
-                playerTwoEvent = eventMassage;
+                playerTwoEvents.EventTypes.Add(massageType);
+                playerTwoEvents.desitionBodys.Add(eventMassage);
+                isUnreadEventForPlayerTwo = true;
             }
+            eventMutex.ReleaseMutex();
 
         }
 
@@ -386,7 +645,7 @@ namespace soccer1.Models
             matchNumber = -1;
             playerOneIdName = null;
             playerTwoIdName = null;
-            isPlayerOnTurn = true;
+            isPlayerOneTurn = true;
             playerOneGoalClaim = 0;
             playerTwoGoalClaim = 0;
             goalForWin = 2;
@@ -409,41 +668,69 @@ namespace soccer1.Models
 
         }
 
+        private float TimeFromStart()
+        {
+            return (float)DateTime.Now.Subtract(startMatchTime).TotalSeconds;
+        }
 
         #endregion
 
+
 #region private variables
 
-        private MatchMassageType playerOneEventType;
-        private MatchMassageType playerTwoEventType;
-        private string playerOneEvent;
-        private string playerTwoEvent;
+        //private MatchMassageType playerOneEventType;
+        //private MatchMassageType playerTwoEventType;
+        private MatchEvents playerOneEvents = new MatchEvents();
+        private MatchEvents playerTwoEvents = new MatchEvents();
+        //private string playerOneEvent;
+        //private string playerTwoEvent;
 
         private string playerOneIdName;
         //private string IdNameplayerOneId;
         //private string IdNameplayerTwoId;
         private float PlayerOnePower;
-        private int playerOneScore;
+        private int playerOneScore=0;
+        
         private int PlayerOneShootTime;
         private string playerTwoIdName;
         private float PlayerTwoPower;
-        private int playerTwoScore;
+        private int playerTwoScore=0;
         private int PlayerTwoShootTime;
         private string league ;
         private int betedMoney;
         private int matchNumber =-1;
-        private bool isPlayerOnTurn =true;
-        private int shootCounter = 0;
+        private bool isPlayerOneTurn =true;
+        private int currentTurn = 1;
         private DateTime CreationTime ;
+        private DateTime startMatchTime ;
+        
         private DateTime lastShootTime;
         private MatchSituation situation ;
-        private string playerOnePawnsPositions;
-        private string playerTwoPawnsPositions;
+        private string playerOnePawnsPositions=null;
+        private string playerTwoPawnsPositions = null;
+        private bool playerOneFinishConfirm=false;
+        private bool playerTwoFinishConfirm= false;
         private int playerOneGoalClaim = 0;
         private int playerTwoGoalClaim = 0;
         private int goalForWin=2;
         private PreMatchSituation preSituation = PreMatchSituation.NonExistance;
+        private bool isUnreadEventForPlayerOne=false;
+        private bool isUnreadEventForPlayerTwo = false;
+        private bool isUnSolvedGoalClaim = false;
+        private bool isUnSolvedStationeryPostion = false;
+        private bool IsgoalHappenInTurn = false;
+        private string ThisTurnScorerID = null;
+        private int lastTurnfinishWithTimerUp = 0;
+        private float playerOneLastEventReadTime=0;
+        private float playerTwoLastEventReadTime=0;
+        private float WFShootStartTime=0;
+        private float TimeofLastStationeryPosition;
+        string NothingNewEventString;
+
         #endregion
+
+
+
     }
 
 }

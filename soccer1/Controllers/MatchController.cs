@@ -16,24 +16,71 @@ namespace soccer1.Controllers
       
         // POST: Match/Create
         [HttpPost]
-        public void PlayerShootDesition(FormCollection collection)
+        public string PlayerShootDesition(FormCollection collection)
         {           
             string PlayerId = Request.Form["PlayerId"];
-            int matchId = Int32.Parse(Request.Form["MatchId"]);           
+            int matchId = Int32.Parse(Request.Form["MatchId"]);
+            int TurnNumber = Int32.Parse(Request.Form["TurnNumber"]);
             string jsonpart = collection["jsonCode"];
+            bool result = false;
             ShootActionCode shoot = new JavaScriptSerializer().Deserialize<ShootActionCode>(jsonpart);
             //Log.AddLog("shoot resived. shotter : " + shoot.playerIDName);
             if (/*ConnectedPlayersList.IsShootValid(shoot)*/ true)
             {
-                new MatchList().shootHapened(shoot, jsonpart);
+                result = new MatchList().shootHapened(matchId, PlayerId, TurnNumber, jsonpart);
             }
             else
             {
                // Errors.AddSmallError("an invalid shoot resived");
             }
-            
+            return result.ToString();
 
         }
+
+        [HttpPost]
+        public string PlayerSubistitutionsDesition(FormCollection collection)
+        {
+            string PlayerId = Request.Form["PlayerId"];
+            int matchId = Int32.Parse(Request.Form["MatchId"]);
+            string jsonpart = collection["jsonCode"];
+            int TurnNumber = Int32.Parse(Request.Form["TurnNumber"]);
+            bool result = false;
+            //Log.AddLog("shoot resived. shotter : " + shoot.playerIDName);
+            if (/*ConnectedPlayersList.IsShootValid(shoot)*/ true)
+            {
+                result= new MatchList().SubistitutionsHappened(matchId, PlayerId, TurnNumber, jsonpart);
+            }
+            else
+            {
+                // Errors.AddSmallError("an invalid shoot resived");
+            }
+            return result.ToString();
+
+        }
+
+
+
+        [HttpPost]
+        public string PlayerElixirUseDesition(FormCollection collection)
+        {
+            string PlayerId = Request.Form["PlayerId"];
+            int matchId = Int32.Parse(Request.Form["MatchId"]);
+            string jsonpart = collection["jsonCode"];
+            int TurnNumber = Int32.Parse(Request.Form["TurnNumber"]);
+            bool result = false;
+            //Log.AddLog("shoot resived. shotter : " + shoot.playerIDName);
+            if (/*ConnectedPlayersList.IsShootValid(shoot)*/ true)
+            {
+                result = new MatchList().ElixirUseHappened(matchId, PlayerId, TurnNumber, jsonpart);
+            }
+            else
+            {
+                // Errors.AddSmallError("an invalid shoot resived");
+            }
+            return result.ToString();
+
+        }
+
 
         [HttpPost]
         public void StopedPositions(FormCollection collection)
@@ -42,8 +89,9 @@ namespace soccer1.Controllers
             int matchId = Int32.Parse(Request.Form["MatchId"]);
             string PlayerId = Request.Form["PlayerId"];
             //if (!ConnectedPlayersList.IsConnectedByIdAndMatch(ConnectionId, PlayerId, matchId)) { return; }
-            string jsonpart = collection["jsonCode"];            
-            new MatchList().stopedPosition(matchId, PlayerId, jsonpart);            
+            string jsonpart = collection["jsonCode"];
+            int TurnNumber = Int32.Parse(Request.Form["TurnNumber"]);
+            new MatchList().stopedPosition(matchId, PlayerId, TurnNumber, jsonpart);            
         }
 
         [HttpPost]
@@ -56,9 +104,10 @@ namespace soccer1.Controllers
             //if (!ConnectedPlayersList.IsConnectedByIdAndMatch(ConnectionId, PlayerId, matchId)) { return; }
             // if player take a goal it willsend -1
             int Claim = Int32.Parse(Request.Form["GoalClaim"]);
+            int TurnNumber = Int32.Parse(Request.Form["TurnNumber"]);
             //ShootActionCode shoot = new JavaScriptSerializer().Deserialize<ShootActionCode>(jsonpart);
             //Log.AddLog("shoot resived. shotter : " + shoot.playerID);
-            new MatchList().GoalClaim(matchId, PlayerId, Claim);
+            new MatchList().GoalClaim(matchId, PlayerId, TurnNumber, Claim);
         }
 
         [HttpPost]
@@ -73,16 +122,7 @@ namespace soccer1.Controllers
             new MatchList().PlayerLeaveMatch(matchId, PlayerId);
         }
 
-        [HttpPost]
-        public void ItsMyTurn(FormCollection collection)
-        {
-            int ConnectionId = Int32.Parse(Request.Form["ConnectionId"]);
-            int matchId = Int32.Parse(Request.Form["MatchId"]);
-            string PlayerId = Request.Form["PlayerId"];
-            //if (!ConnectedPlayersList.IsConnectedByIdAndMatch(ConnectionId, PlayerId, matchId)) { return; }
-            
-            new MatchList().ItsMyTurn(matchId, PlayerId);
-        }
+       
 
         // GET: Menu/Details/5
         [HttpPost]
@@ -90,10 +130,20 @@ namespace soccer1.Controllers
         {
             int ConnectionId = Int32.Parse(Request.Form["ConnectionId"]);
             int matchId = Int32.Parse(Request.Form["MatchId"]);
-            string PlayerId = Request.Form["PlayerId"];
-            MatchMassage massage =new MatchList().ReturnEvent(PlayerId, matchId);
-            return massage.type.ToString() + massage.body;
+            string PlayerId = Request.Form["PlayerId"];            
+            return new MatchList().ReturnEvent(PlayerId, matchId);
         }
+
+        [HttpPost]
+        public void TimerIsUp(FormCollection collection)
+        {            
+            int matchId = Int32.Parse(Request.Form["MatchId"]);
+            int TurnNumber = Int32.Parse(Request.Form["TurnNumber"]);            
+            string PlayerId = Request.Form["PlayerId"];
+            new MatchList().TimerIsUp(PlayerId, matchId, TurnNumber);
+        }
+
+
 
 
     }

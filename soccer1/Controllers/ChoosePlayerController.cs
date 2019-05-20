@@ -41,6 +41,22 @@ namespace soccer1.Controllers
             }
             return "This Player Not Exist";
         }
+
+
+        [HttpPost]
+        public string OtherPlayerName(FormCollection collection)
+        {
+            string PlayerId = Request.Form["PlayerId"];
+            int matchId = Int32.Parse(Request.Form["MatchId"]);
+
+            string opponentId = new MatchList().ReturnOpponentOf(PlayerId, matchId);
+
+            DataDBContext dataBase = new DataDBContext();
+            PlayerForDatabase player = dataBase.playerInfoes.Find(opponentId);
+            return player.Name;
+        }
+
+
     }
     
 }

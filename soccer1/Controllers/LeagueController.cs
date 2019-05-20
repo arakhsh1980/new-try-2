@@ -22,8 +22,8 @@ namespace soccer1.Controllers
             int ConnectionId = Int32.Parse(Request.Form["ConnectionId"]);
             string PlayerId = Request.Form["PlayerId"];
             int matchId = Int32.Parse(Request.Form["MatchId"]);
-            MatchMassage massage = new MatchList().ReturnEvent(PlayerId, matchId);
-            return massage.type.ToString() + massage.body;
+            
+            return new MatchList().ReturnEvent(PlayerId, matchId); 
         }
 
 
