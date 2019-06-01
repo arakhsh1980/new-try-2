@@ -43,6 +43,7 @@ namespace soccer1.Controllers
                 AddNew.ReleaseMutex();
             }
             new MatchList().ClearMatchesOfPlayer(player.id);
+            new SymShootMatchesList().ClearMatchesOfPlayer(player.id);
             PlayerForSerial plsr = new Convertors().PForDatabaseToPForSerial(player); 
             Log.AddPlayerLog(plsr.id, "player"+ plsr.id.ToString() + " added by " + plsr.id + " ID");
             string uu = new JavaScriptSerializer().Serialize(plsr);

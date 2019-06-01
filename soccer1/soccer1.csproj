@@ -204,6 +204,7 @@
     <Compile Include="Controllers\LeagueController.cs" />
     <Compile Include="Controllers\ProfileController.cs" />
     <Compile Include="Controllers\SellAndBuyController.cs" />
+    <Compile Include="Controllers\symMatchController.cs" />
     <Compile Include="Controllers\ViewAppController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -224,12 +225,14 @@
     <Compile Include="Models\main blocks\Player.cs" />
     <Compile Include="Models\main blocks\PlayerForDatabase.cs" />
     <Compile Include="Models\main blocks\PlayerForSerial.cs" />
+    <Compile Include="Models\main blocks\symShootMatch.cs" />
     <Compile Include="Models\main blocks\Team.cs" />
     <Compile Include="Models\MatchList.cs" />
     <Compile Include="Models\main blocks\playerCennectionInfo.cs" />
     <Compile Include="Models\Errors.cs" />
     <Compile Include="Models\main blocks\ShootActionCode.cs" />
     <Compile Include="Models\main blocks\TwoPlayerMatch.cs" />
+    <Compile Include="Models\SymShootMatchesList.cs" />
     <Compile Include="Models\utilites\Statictics.cs" />
     <Compile Include="Models\utilites\Convertors.cs" />
     <Compile Include="Models\utilites\Utilities.cs" />
@@ -316,6 +319,7 @@
     <Folder Include="Views\Menu\" />
     <Folder Include="Views\Profile\" />
     <Folder Include="Views\SellAndBuy\" />
+    <Folder Include="Views\symMatch\" />
     <Folder Include="Views\ViewApp\" />
   </ItemGroup>
   <ItemGroup>

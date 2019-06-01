@@ -13,6 +13,7 @@ namespace soccer1.App_Start
             //ConnectedPlayersList.FillArrays();
             AssetManager.FillArrays();
             new MatchList().FillArrays();
+            new SymShootMatchesList().FillArrays();
         }
     }
 }

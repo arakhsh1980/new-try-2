@@ -22,8 +22,17 @@ namespace soccer1.Controllers
             int ConnectionId = Int32.Parse(Request.Form["ConnectionId"]);
             string PlayerId = Request.Form["PlayerId"];
             int matchId = Int32.Parse(Request.Form["MatchId"]);
+            string MatchType = Request.Form["MatchType"];
+            if(MatchType == "SymShoots")
+            {
+                return new SymShootMatchesList().ReturnEvent(PlayerId, matchId);
+            }
+            else
+            {
+                return new MatchList().ReturnEvent(PlayerId, matchId);
+            }
+
             
-            return new MatchList().ReturnEvent(PlayerId, matchId); 
         }
 
 
@@ -35,28 +44,52 @@ namespace soccer1.Controllers
             
             string  PlayerId = Request.Form["PlayerId"];
             string  SelectedLeage = Request.Form["SelectedLeage"];
+            string MatchType = Request.Form["MatchType"];
             DataDBContext dataBase = new DataDBContext();
             PlayerForDatabase player = dataBase.playerInfoes.Find(PlayerId);
             if (player != null)
             {
                 PlayerForConnectedPlayer pl = new PlayerForConnectedPlayer();
                 pl.reWriteAccordingTo(player);
-                new MatchList().ClearMatchesOfPlayer(player.id);
-                int bestmatch = new MatchList().FindSutableMatch(pl.PowerLevel, SelectedLeage);
-                string PlIdName = pl.id;
-                float PlPower = pl.PowerLevel;
-                int matchId;
-                // FindSutableMatch return -1 if dident find a sutable match
-                if (bestmatch == -1)
+                if (MatchType == "SymShoots")
                 {
-                    matchId= new MatchList().AddNewMatchWithPlayerOne(PlIdName, PlPower, SelectedLeage);
+                    new SymShootMatchesList().ClearMatchesOfPlayer(player.id);
+                    int bestmatch = new SymShootMatchesList().FindSutableMatch(pl.PowerLevel, SelectedLeage);
+                    string PlIdName = pl.id;
+                    float PlPower = pl.PowerLevel;
+                    int matchId;
+                    // FindSutableMatch return -1 if dident find a sutable match
+                    if (bestmatch == -1)
+                    {
+                        matchId = new SymShootMatchesList().AddNewMatchWithPlayerOne(PlIdName, PlPower, SelectedLeage);
 
-                    return "YouAreFisrtt"+ matchId;
+                        return "YouAreFisrtt" + matchId;
+                    }
+                    else
+                    {
+                        new SymShootMatchesList().AddSecondPlayerToMatch(bestmatch, PlIdName, PlPower);
+                        return "YouAreSecond" + bestmatch;
+                    }
                 }
                 else
                 {
-                    new MatchList().AddSecondPlayerToMatch(bestmatch, PlIdName, PlPower);
-                    return "YouAreSecond"+ bestmatch;
+                    new MatchList().ClearMatchesOfPlayer(player.id);
+                    int bestmatch = new MatchList().FindSutableMatch(pl.PowerLevel, SelectedLeage);
+                    string PlIdName = pl.id;
+                    float PlPower = pl.PowerLevel;
+                    int matchId;
+                    // FindSutableMatch return -1 if dident find a sutable match
+                    if (bestmatch == -1)
+                    {
+                        matchId = new MatchList().AddNewMatchWithPlayerOne(PlIdName, PlPower, SelectedLeage);
+
+                        return "YouAreFisrtt" + matchId;
+                    }
+                    else
+                    {
+                        new MatchList().AddSecondPlayerToMatch(bestmatch, PlIdName, PlPower);
+                        return "YouAreSecond" + bestmatch;
+                    }
                 }
             }
             return "you are connected";

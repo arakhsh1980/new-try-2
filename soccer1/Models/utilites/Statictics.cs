@@ -23,8 +23,8 @@ namespace soccer1.Models
     public static class Statistics
     {
         public const float MaxMatchTimeInSeconds=3000;
-        public const float AcceptedTimeofStationeryPositionDifference = 10;
-        public const float AcceptedWFShootTime = 20;
+        public const float AcceptedTimeofStationeryPositionDifference = 50;
+        public const float AcceptedWFShootTime = 40;
         public const int ConnectedPlayersMaxNumber = 10000;
         public const int ActiveMatchesMaxNumber = 5000;
         public const float ConnectionTimeOut = 10f;

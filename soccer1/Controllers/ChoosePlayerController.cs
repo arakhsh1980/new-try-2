@@ -20,8 +20,18 @@ namespace soccer1.Controllers
         {
             string PlayerId = Request.Form["PlayerId"];
             int matchId = Int32.Parse(Request.Form["MatchId"]);
+            string MatchType = Request.Form["MatchType"];
+            string opponentId;
+            if (MatchType == "SymShoots")
+            {
+                opponentId = new SymShootMatchesList().ReturnOpponentOf(PlayerId, matchId);
+            }
+            else
+            {
+                opponentId = new MatchList().ReturnOpponentOf(PlayerId, matchId);
+            }
 
-            string opponentId = new MatchList().ReturnOpponentOf(PlayerId, matchId);
+            
 
             DataDBContext dataBase = new DataDBContext();
             PlayerForDatabase player = dataBase.playerInfoes.Find(opponentId);
@@ -48,8 +58,18 @@ namespace soccer1.Controllers
         {
             string PlayerId = Request.Form["PlayerId"];
             int matchId = Int32.Parse(Request.Form["MatchId"]);
+            string MatchType = Request.Form["MatchType"];
+            string opponentId;
+            if (MatchType == "SymShoots")
+            {
+                opponentId = new SymShootMatchesList().ReturnOpponentOf(PlayerId, matchId);
+            }
+            else
+            {
+                opponentId = new MatchList().ReturnOpponentOf(PlayerId, matchId);
+            }
 
-            string opponentId = new MatchList().ReturnOpponentOf(PlayerId, matchId);
+            
 
             DataDBContext dataBase = new DataDBContext();
             PlayerForDatabase player = dataBase.playerInfoes.Find(opponentId);
