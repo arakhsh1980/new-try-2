@@ -17,8 +17,9 @@ namespace soccer1.Models.main_blocks
         public string IdName { get; set; }
         public int index { get; set; }
         public string ShowName { get; set; }
-        public string redForSale { get; set; }
-        public string blueForSale { get; set; }
+        public string tired1 { get; set; }
+        public string tired2 { get; set; }
+        public string tired3 { get; set; }
         public string ForMatch { get; set; }
         public string abilityShower { get; set; }
         public Property price { get; set; }

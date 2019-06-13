@@ -206,6 +206,7 @@
     <Compile Include="Controllers\SellAndBuyController.cs" />
     <Compile Include="Controllers\symMatchController.cs" />
     <Compile Include="Controllers\ViewAppController.cs" />
+    <Compile Include="Controllers\WaitingForOtherPlayerController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -321,6 +322,7 @@
     <Folder Include="Views\SellAndBuy\" />
     <Folder Include="Views\symMatch\" />
     <Folder Include="Views\ViewApp\" />
+    <Folder Include="Views\WaitingForOtherPlayer\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />

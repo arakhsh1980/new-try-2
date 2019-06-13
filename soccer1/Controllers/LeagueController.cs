@@ -67,7 +67,7 @@ namespace soccer1.Controllers
                     }
                     else
                     {
-                        new SymShootMatchesList().AddSecondPlayerToMatch(bestmatch, PlIdName, PlPower);
+                        new SymShootMatchesList().AddSecondPlayerAndWaitForFisrtRespond(bestmatch, PlIdName, PlPower);
                         return "YouAreSecond" + bestmatch;
                     }
                 }

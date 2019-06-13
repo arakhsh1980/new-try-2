@@ -6,13 +6,13 @@ using System.Threading;
 
 namespace soccer1.Models
 {
-    public enum MatchSituation { WFShoot, WFStationeryPositions,   EndedPlay };
+    public enum MatchSituation { WFFirstAcceptance, WFShoot, WFStationeryPositions,   EndedPlay };
 
-    public enum PreMatchSituation { NonExistance, WithOnePlayer, WithTwoPlayer };
+    public enum PreMatchSituation { NonExistance, WithOnePlayer, WithTwoPlayer, WFFirstAcceptance };
 
     public enum AssetType { Pawn, Elixir, Formation, none };
 
-    public enum MatchMassageType { Error, NothingNew, WatForOthr, GoToMatchi, ActTisShot, Winnerisii, Disconcted, PlayerGoal, PlrTimeOut, Substituti, ElixirUsea, ChangeTurn }
+    public enum MatchMassageType { Error, NothingNew, DoYouPlayy, WatForOthr, GoToMatchi, ActTisShot, Winnerisii, Disconcted, PlayerGoal, PlrTimeOut, Substituti, ElixirUsea, ChangeTurn }
 
     public struct MatchMassage
     {

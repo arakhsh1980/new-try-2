@@ -268,7 +268,7 @@ namespace soccer1.Models.main_blocks
             return uu;
         }
 
-
+       
 
         #endregion
 
@@ -332,6 +332,34 @@ namespace soccer1.Models.main_blocks
 
         }
 
+        public string PlayerOneNotAcceptedToPlay(string playerId)
+        {
+            if(playerOneIdName != playerId) { return false.ToString(); }
+            Log.AddMatchLog(matchNumber, "twoPlayerMatch.StartMatch.StarterId:" + playerTwoIdName);
+
+            mainMutex.WaitOne();
+            playerOneIdName = playerTwoIdName;
+            PlayerOnePower = PlayerTwoPower;
+            // PlayerOneShootTime = ConnectedPlayersList.connectedPlayers[StarterId].ShootTime;
+            playerOnePawnsPositions = null;
+            playerTwoPawnsPositions = null;
+            CreationTime = DateTime.Now;
+            preSituation = PreMatchSituation.WithOnePlayer;
+            AddPlayerEvent(playerTwoIdName, MatchMassageType.WatForOthr, "");
+            mainMutex.ReleaseMutex();
+            return true.ToString();
+        }
+        public string PlayerOnePlayAccepted(string playerId, int GatheredMoney)
+        {
+            if (playerOneIdName != playerId) { return false.ToString(); }
+            Log.AddMatchLog(matchNumber, "twoPlayerMatch.StartMatch.StarterId:" + playerTwoIdName);
+            GatheredMoneyForWaiting = GatheredMoney;
+            StartMatch();           
+            return true.ToString();
+        }
+
+        
+
         public void StartMatchWithOnePlayer(string StarterId, float StarterPower, int Matchnum, string SelectedLeage)
         {
             Log.AddMatchLog(matchNumber, "twoPlayerMatch.StartMatch.StarterId:" + StarterId);
@@ -346,16 +374,15 @@ namespace soccer1.Models.main_blocks
             league = SelectedLeage;
             CreationTime = DateTime.Now;
             preSituation = PreMatchSituation.WithOnePlayer;
-            AddPlayerEvent(StarterId, MatchMassageType.WatForOthr, "");
+            //AddPlayerEvent(StarterId, MatchMassageType.WatForOthr, "");
             mainMutex.ReleaseMutex();
         }
 
-        public void AddSecondPlayerToMatch(string seconrPlayerID, float power)
+        public void StartMatch()
         {
-            Log.AddMatchLog(matchNumber, "twoPlayerMatch.AddSecondPlayerToMatch.seconrPlayerID:" + seconrPlayerID);
+            Log.AddMatchLog(matchNumber, "startMatch" );
             mainMutex.WaitOne();
-            playerTwoIdName = seconrPlayerID;
-            PlayerTwoPower = power;
+           
             //PlayerTwoShootTime = ConnectedPlayersList.connectedPlayers[connectionId].ShootTime;
 
             //ConnectedPlayersList.SetPlayerMatch(playerOneId, matchNumber);
@@ -371,6 +398,22 @@ namespace soccer1.Models.main_blocks
             mainMutex.ReleaseMutex();
         }
 
+
+        public void AddSecondPlayerAndWaitForFisrtRespond(string seconrPlayerID, float power)
+        {
+            Log.AddMatchLog(matchNumber, "twoPlayerMatch.AddSecondPlayerAndWaitForFisrtRespond.seconrPlayerID:" + seconrPlayerID);
+            mainMutex.WaitOne();
+            playerTwoIdName = seconrPlayerID;
+            PlayerTwoPower = power;
+            //PlayerTwoShootTime = ConnectedPlayersList.connectedPlayers[connectionId].ShootTime;
+
+            //ConnectedPlayersList.SetPlayerMatch(playerOneId, matchNumber);
+            //ConnectedPlayersList.SetPlayerMatch(playerTwoId, matchNumber);
+            situation = MatchSituation.WFFirstAcceptance;
+            preSituation = PreMatchSituation.WFFirstAcceptance;
+            AddPlayerEvent(playerOneIdName, MatchMassageType.DoYouPlayy, matchNumber.ToString());            
+            mainMutex.ReleaseMutex();
+        }
 
         public void garbegColletor()
         {
@@ -754,6 +797,7 @@ namespace soccer1.Models.main_blocks
         private float playerTwoLastEventReadTime = 0;
         private float WFShootStartTime = 0;
         private float TimeofLastStationeryPosition;
+        private int GatheredMoneyForWaiting;
         string NothingNewEventString;
 
         #endregion

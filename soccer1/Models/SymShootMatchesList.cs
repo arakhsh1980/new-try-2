@@ -65,6 +65,22 @@ namespace soccer1.Models
             return result;
         }
 
+
+        public string NotAcceptedToPlay(string playerId, int matchId)
+        {
+            return matchList[matchId].PlayerOneNotAcceptedToPlay(playerId);
+            
+        }
+
+        public string PlayAccepted(string playerId, int matchId, int GatheredMoney)
+        {
+            return matchList[matchId].PlayerOnePlayAccepted(playerId, GatheredMoney);
+
+           
+        }
+
+        
+
         //cliam will be 1 or -1
         public void GoalClaim(int matchId, string nameId, int TurnNumber, int Claim)
         {
@@ -117,13 +133,19 @@ namespace soccer1.Models
             Errors.AddBigError("this player is not in its clamed match");
             return "Erroer";
         }
-        public void AddSecondPlayerToMatch(int matchNumber, string playerNameId, float playerPower)
+        public void AddSecondPlayerAndWaitForFisrtRespond(int matchNumber, string playerNameId, float playerPower)
         {
-            matchList[matchNumber].AddSecondPlayerToMatch(playerNameId, playerPower);
+            matchList[matchNumber].AddSecondPlayerAndWaitForFisrtRespond(playerNameId, playerPower);
 
             //ConnectedPlayersList.SetPlayerMatch(playerConnId, matchNumber);
         }
 
+        public void StartMatch(int matchNumber)
+        {
+            matchList[matchNumber].StartMatch();
+
+            //ConnectedPlayersList.SetPlayerMatch(playerConnId, matchNumber);
+        }
 
         public void ClearMatchesOfPlayer(string nameId)
         {

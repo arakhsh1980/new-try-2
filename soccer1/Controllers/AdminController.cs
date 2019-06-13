@@ -25,7 +25,9 @@ namespace soccer1.Controllers
             Pawn pawn = new Pawn();
             pawn.abilityShower= Request.Form["abilityShower"];
             pawn.ForMatch = Request.Form["ForMatch"];
-            pawn.blueForSale = Request.Form["blueForSale"];
+            pawn.tired1 = Request.Form["Tired1"];
+            pawn.tired2 = Request.Form["Tired2"];
+            pawn.tired3 = Request.Form["Tired3"];
             pawn.IdName = Request.Form["IdName"];
             //Log.AddLog("AddPawnStarted" + pawn.IdName);
             PawnAbility pa = new PawnAbility();
@@ -39,10 +41,8 @@ namespace soccer1.Controllers
             price.fan = Int32.Parse(Request.Form["price.fan"]);
             price.level = Int32.Parse(Request.Form["price.level"]);
             price.SoccerSpetial = Int32.Parse(Request.Form["price.SoccerSpetial"]);
-            pawn.price = price;
-            pawn.redForSale= Request.Form["redForSale"];
-            pawn.ShowName = Request.Form["redForSale"];
-            
+            pawn.price = price;            
+            pawn.ShowName = Request.Form["redForSale"];            
             new AssetManager().AddPawnToAssets(pawn);
             AddPawnmutex.ReleaseMutex();            
             return "Pawn Loaded"+ pawn.IdName;            
