@@ -88,7 +88,24 @@ namespace soccer1.Models.main_blocks
                 return false;
             }
         }
-        
+
+        public bool BuyOffer(Property buyedMaterial, Property price)
+        {
+            Utilities utilities = new Utilities();
+            if (utilities.CheckIfFirstPropertyIsBigger(PlayerProperty, price))
+            {
+                SubtractProperty(price);
+                AddProperty(buyedMaterial);              
+                SaveChanges();
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+
         public bool SubtractProperty(Property prop)
         {
             Utilities utilities = new Utilities();
@@ -104,6 +121,15 @@ namespace soccer1.Models.main_blocks
                 Errors.AddClientError("Not Enogh property");
                 return false;
             }
+        }
+
+
+        public void AddProperty(Property prop)
+        {
+            PlayerProperty.coin += prop.coin;
+            PlayerProperty.SoccerSpetial += prop.SoccerSpetial;
+            PlayerProperty.fan += prop.fan;
+            PlayerProperty.level += prop.level;
         }
 
         public bool ChangeTeam(TeamForConnectedPlayers newTeammm)

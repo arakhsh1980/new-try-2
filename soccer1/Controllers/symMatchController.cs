@@ -13,6 +13,18 @@ namespace soccer1.Controllers
 {
     public class symMatchController : Controller
     {
+
+        
+
+        [HttpPost]
+        public string PlayerLeftTheMatch(FormCollection collection)
+        {
+            string PlayerId = Request.Form["PlayerId"];
+            int matchId = Int32.Parse(Request.Form["MatchId"]);      
+            new SymShootMatchesList().PlayerLeaveMatch(matchId, PlayerId);
+            return true.ToString();
+        }
+
         // POST: Match/Create
         [HttpPost]
         public string PlayerShootDesition(FormCollection collection)

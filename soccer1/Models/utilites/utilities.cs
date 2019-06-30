@@ -79,6 +79,36 @@ namespace soccer1.Models.utilites
         }
 
 
+        public AssetType ReturnOfferByName(string typeName)
+        {
+            AssetType type = AssetType.none;
+            switch (typeName)
+            {
+                case "Pawn":
+                    type = AssetType.Pawn;
+                    break;
+                case "Elixir":
+                    type = AssetType.Elixir;
+                    break;
+                case "Formation":
+                    type = AssetType.Formation;
+                    break;
+            }
+            if (type == AssetType.none) { Errors.AddSmallError("AssetType not found"); }
+            return type;
+        }
+
+
+        public Property SubtracProperty(Property currentProp , Property subbedProp)
+        {
+            Property newPro = new Property();
+            newPro = currentProp;
+            newPro.coin -= subbedProp.coin;
+            newPro.fan -= subbedProp.fan;
+            newPro.level -= subbedProp.level;
+            newPro.SoccerSpetial -= subbedProp.SoccerSpetial;
+            return newPro;
+        }
 
     }
 }

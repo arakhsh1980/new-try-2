@@ -6,6 +6,8 @@ using soccer1.Models;
 using soccer1.Models.main_blocks;
 using System.Threading;
 using System.Web.Script.Serialization;
+using soccer1.Models.DataBase;
+using System.Data.Entity;
 
 
 namespace soccer1.Models.main_blocks
@@ -29,7 +31,10 @@ namespace soccer1.Models.main_blocks
             defultEvent.EventTypes.Add(MatchMassageType.NothingNew);
             defultEvent.desitionBodys.Add("");
             NothingNewEventString = new JavaScriptSerializer().Serialize(defultEvent);
-            betedMoney = 300;
+            betedMoney.coin = 300;
+            betedMoney.level = 0;
+            betedMoney.fan = 0;
+            betedMoney.SoccerSpetial = 0;
             playerOneShoot = null;
             playerTwoShoot = null;
             playerOneGoalClaim = 0;
@@ -38,6 +43,7 @@ namespace soccer1.Models.main_blocks
 
         private Mutex mainMutex = new Mutex();
         private Mutex eventMutex = new Mutex();
+        private Mutex TimeControlerMutex = new Mutex();
 
 
 
@@ -91,12 +97,15 @@ namespace soccer1.Models.main_blocks
             if (playerIDName == playerOneIdName && playerOneShoot==null)
             {
                 playerOneShoot = shoot;
+                AddPlayerEvent(playerOneIdName, MatchMassageType.AddPawnXpe, NominatedXperiance.simpleShootXp.ToString());
+                
                 Log.AddPlayerLog(playerOneIdName, " ShootHappeded resived");
                 result = true;
             }
             if (playerIDName == playerTwoIdName && playerTwoShoot == null)
             {
                 playerTwoShoot = shoot;
+                AddPlayerEvent(playerTwoIdName, MatchMassageType.AddPawnXpe, NominatedXperiance.simpleShootXp.ToString());
                 Log.AddPlayerLog(playerTwoIdName, " ShootHappeded resived");
                 result = true;
             }
@@ -113,7 +122,7 @@ namespace soccer1.Models.main_blocks
             }
            
             mainMutex.ReleaseMutex();
-
+            checkPlayersConnectivity();
             return result;
         }
 
@@ -189,6 +198,7 @@ namespace soccer1.Models.main_blocks
                 if (playerOneGoalClaim == 1)
                 {
                     IsgoalHappenInTurn = true;
+                    AddPlayerEvent(playerOneIdName, MatchMassageType.AddPawnXpe, NominatedXperiance.GoalXp.ToString());
                     playerOneScore++;
                     Log.AddMatchLog(matchNumber, "twoPlayerMatch.GoalReport.playerOneScore:" + playerOneScore);
                     ThisTurnScorerID = playerOneIdName;
@@ -201,6 +211,7 @@ namespace soccer1.Models.main_blocks
                 if (playerOneGoalClaim == -1)
                 {
                     IsgoalHappenInTurn = true;
+                    AddPlayerEvent(playerOneIdName, MatchMassageType.AddPawnXpe, NominatedXperiance.GoalXp.ToString());
                     playerTwoScore++;
                     Log.AddMatchLog(matchNumber, "twoPlayerMatch.GoalReport.playerTwoScore:" + playerTwoScore);
                     ThisTurnScorerID = playerTwoIdName;
@@ -236,7 +247,7 @@ namespace soccer1.Models.main_blocks
 
         public string ReturnEvent(string playerIdName)
         {
-            if (preSituation == PreMatchSituation.WithTwoPlayer) matchTimeControler();
+            if (preSituation == PreMatchSituation.WithTwoPlayer) checkPlayersConnectivity();
             eventMutex.WaitOne();
 
             string uu = "Error";
@@ -349,6 +360,38 @@ namespace soccer1.Models.main_blocks
             mainMutex.ReleaseMutex();
             return true.ToString();
         }
+
+        public string CanceledThePlayRequest(string playerId)
+        {
+            if (preSituation == PreMatchSituation.NonExistance) { return true.ToString(); }
+            if (playerId != playerOneIdName && playerId != playerTwoIdName) { return true.ToString();  }
+            mainMutex.WaitOne();
+            if (preSituation == PreMatchSituation.WithOnePlayer && playerId == playerOneIdName)
+            {
+                GoNonExistance();
+                //ConnectedPlayersList.connectionInfos[playerOneId].ActiveMatchId = -1;
+                mainMutex.ReleaseMutex();
+                return true.ToString(); 
+            }
+            if (preSituation == PreMatchSituation.WFFirstAcceptance && playerId == playerOneIdName)
+            {
+                PlayerOneNotAcceptedToPlay(playerId);
+                GoNonExistance();
+                //ConnectedPlayersList.connectionInfos[playerOneId].ActiveMatchId = -1;
+                mainMutex.ReleaseMutex();
+                return true.ToString();
+            }
+            if (preSituation == PreMatchSituation.WFFirstAcceptance && playerId == playerTwoIdName)
+            {   
+                preSituation = PreMatchSituation.WithOnePlayer;
+                AddPlayerEvent(playerOneIdName, MatchMassageType.pl2Cancled, matchNumber.ToString());
+                mainMutex.ReleaseMutex();
+                return true.ToString();
+            }
+            mainMutex.ReleaseMutex();
+            return true.ToString();   
+        }
+        
         public string PlayerOnePlayAccepted(string playerId, int GatheredMoney)
         {
             if (playerOneIdName != playerId) { return false.ToString(); }
@@ -358,9 +401,17 @@ namespace soccer1.Models.main_blocks
             return true.ToString();
         }
 
+
+        public string PlayerOneGoingHomeAndWaiting(string playerId)
+        {
+            if (playerOneIdName != playerId) { return false.ToString(); }
+            preSituation = PreMatchSituation.WFSecondPlayer;
+            return true.ToString();
+        }
+
         
 
-        public void StartMatchWithOnePlayer(string StarterId, float StarterPower, int Matchnum, string SelectedLeage)
+        public void InitiatMatchWithOnePlayer(string StarterId, float StarterPower, int Matchnum, string SelectedLeage)
         {
             Log.AddMatchLog(matchNumber, "twoPlayerMatch.StartMatch.StarterId:" + StarterId);
 
@@ -382,7 +433,22 @@ namespace soccer1.Models.main_blocks
         {
             Log.AddMatchLog(matchNumber, "startMatch" );
             mainMutex.WaitOne();
-           
+            DataDBContext dataBase = new DataDBContext();
+            PlayerForDatabase player1 = dataBase.playerInfoes.Find(playerOneIdName);
+            PlayerForDatabase player2 = dataBase.playerInfoes.Find(playerTwoIdName);
+            if (player1 == null || player2 == null) { GoNonExistance(); return; }
+            PlayerForConnectedPlayer pl1 = new PlayerForConnectedPlayer();
+            PlayerForConnectedPlayer pl2 = new PlayerForConnectedPlayer();
+            pl1.reWriteAccordingTo(player1);
+            pl2.reWriteAccordingTo(player2);
+            pl1.SubtractProperty(betedMoney);
+            pl2.SubtractProperty(betedMoney);
+            player1.changePlayer(pl1.returnDataBaseVersion());
+            dataBase.Entry(player1).State = EntityState.Modified;
+            player2.changePlayer(pl2.returnDataBaseVersion());
+            dataBase.Entry(player2).State = EntityState.Modified;
+            dataBase.SaveChanges();
+
             //PlayerTwoShootTime = ConnectedPlayersList.connectedPlayers[connectionId].ShootTime;
 
             //ConnectedPlayersList.SetPlayerMatch(playerOneId, matchNumber);
@@ -391,6 +457,8 @@ namespace soccer1.Models.main_blocks
             preSituation = PreMatchSituation.WithTwoPlayer;
             lastShootTime = DateTime.Now;
             currentTurn = 1;
+            string betedMoneyStr = new JavaScriptSerializer().Serialize(betedMoney);
+            SendMassageToPlayers(MatchMassageType.SubBetdMon, betedMoneyStr);
             SendMassageToPlayers(MatchMassageType.GoToMatchi, matchNumber.ToString());
             Log.AddMatchLog(matchNumber, " match started. pl1: " + playerOneIdName.ToString() + " . pl2: " + playerTwoIdName.ToString());
             startMatchTime = DateTime.Now;
@@ -398,6 +466,14 @@ namespace soccer1.Models.main_blocks
             mainMutex.ReleaseMutex();
         }
 
+
+        public void AddSecondPlayerStartImideatly(string secondPlayerID, float power)
+        {
+            Log.AddMatchLog(matchNumber, "twoPlayerMatch.AddSecondPlayerStartImideatly.seconrPlayerID:" + secondPlayerID);            
+            playerTwoIdName = secondPlayerID;
+            PlayerTwoPower = power;
+            StartMatch();
+        }
 
         public void AddSecondPlayerAndWaitForFisrtRespond(string seconrPlayerID, float power)
         {
@@ -438,7 +514,7 @@ namespace soccer1.Models.main_blocks
         }
         #endregion
 
-
+        
 
 
 
@@ -514,9 +590,12 @@ namespace soccer1.Models.main_blocks
 
         #region inner functions
 
+
+
+        /*
         void matchTimeControler()
         {
-
+            TimeControlerMutex.WaitOne();
             switch (situation)
             {
                 case MatchSituation.WFShoot:
@@ -545,23 +624,27 @@ namespace soccer1.Models.main_blocks
                     }
                     break;
             }
-
+            TimeControlerMutex.ReleaseMutex();
 
 
         }
-
+        */
         private void checkPlayersConnectivity()
         {
+            TimeControlerMutex.WaitOne();
             if (Statistics.ConnectionTimeOut < TimeFromStart() - playerTwoLastEventReadTime)
-            {
+            {               
                 PlayerWin(true);
+                TimeControlerMutex.ReleaseMutex();
                 return;
             }
             if (Statistics.ConnectionTimeOut < TimeFromStart() - playerOneLastEventReadTime)
-            {
+            {                
                 PlayerWin(false);
+                TimeControlerMutex.ReleaseMutex();
                 return;
             }
+            TimeControlerMutex.ReleaseMutex();
         }
 
         private void AcceptGoalReport()
@@ -666,6 +749,8 @@ namespace soccer1.Models.main_blocks
 
             if (isPlayerOneWinner)
             {
+                AddPlayerEvent(playerOneIdName, MatchMassageType.AddTeamXpe, NominatedXperiance.WinnerTeamXp.ToString());
+                AddPlayerEvent(playerTwoIdName, MatchMassageType.AddTeamXpe, NominatedXperiance.LosserTeamXp.ToString());
                 //ConnectedPlayersList.PlayerWined(playerOneId, betedMoney);
                 Log.AddMatchLog(matchNumber, "twoPlayerMatch.PlyaerWin. player: " + playerOneIdName + " wined");
                 SendMassageToPlayers(MatchMassageType.Winnerisii, playerOneIdName);
@@ -674,6 +759,8 @@ namespace soccer1.Models.main_blocks
             }
             else
             {
+                AddPlayerEvent(playerOneIdName, MatchMassageType.AddTeamXpe, NominatedXperiance.LosserTeamXp.ToString());
+                AddPlayerEvent(playerTwoIdName, MatchMassageType.AddTeamXpe, NominatedXperiance.WinnerTeamXp.ToString());
                 //ConnectedPlayersList.PlayerWined(playerTwoId, betedMoney);
                 Log.AddMatchLog(matchNumber, "twoPlayerMatch.PlyaerWin. player: " + playerTwoIdName + " wined");
                 SendMassageToPlayers(MatchMassageType.Winnerisii, playerTwoIdName);
@@ -742,6 +829,9 @@ namespace soccer1.Models.main_blocks
             return (float)DateTime.Now.Subtract(startMatchTime).TotalSeconds;
         }
 
+
+       
+
         #endregion
 
 
@@ -766,7 +856,7 @@ namespace soccer1.Models.main_blocks
         private int playerTwoScore = 0;
         private int PlayerTwoShootTime;
         private string league;
-        private int betedMoney;
+        private Property betedMoney;
         private int matchNumber = -1;
         private bool isPlayerOneTurn = true;
         private int currentTurn = 1;

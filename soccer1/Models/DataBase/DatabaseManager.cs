@@ -155,6 +155,25 @@ namespace soccer1.Models
         }
 
 
+        public static void AddOfferToDataBase(Offer ff)
+        {
+            DataDBContext dataBase = new DataDBContext();
+            Offer pp = dataBase.allOffers.Find(ff.IdName);
+            if (pp == null)
+            {
+                dataBase.allOffers.Add(ff);
+                dataBase.SaveChanges();
+            }
+            else
+            {
+                dataBase.allOffers.Remove(pp);
+                dataBase.SaveChanges();
+                dataBase.allOffers.Add(ff);
+                dataBase.SaveChanges();
+            }
+        }
+
+
         public static void AddElixirToDataBase(Elixir el)
         {
             DataDBContext dataBase = new DataDBContext();

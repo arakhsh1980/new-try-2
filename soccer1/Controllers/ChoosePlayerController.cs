@@ -92,7 +92,7 @@ namespace soccer1.Controllers
                 pl.reWriteAccordingTo(player);
                 if (MatchType == "SymShoots")
                 {
-                    new SymShootMatchesList().ClearMatchesOfPlayer(player.id);
+                    new SymShootMatchesList().ClearMatchesOfPlayer(PlayerId);
                     int bestmatch = new SymShootMatchesList().FindSutableMatch(pl.PowerLevel, SelectedLeage);
                     string PlIdName = pl.id;
                     float PlPower = pl.PowerLevel;
@@ -105,8 +105,8 @@ namespace soccer1.Controllers
                         return "YouAreFisrtt" + matchId;
                     }
                     else
-                    {
-                        new SymShootMatchesList().AddSecondPlayerAndWaitForFisrtRespond(bestmatch, PlIdName, PlPower);
+                    {                        
+                        new SymShootMatchesList().AddSecondPlayer(bestmatch, PlIdName, PlPower);
                         return "YouAreSecond" + bestmatch;
                     }
                 }
@@ -134,6 +134,23 @@ namespace soccer1.Controllers
             return "you are connected";
         }
 
+        [HttpPost]
+        public string CancelPlay(FormCollection collection)
+        {
+
+            string PlayerId = Request.Form["PlayerId"];            
+            int matchId = Int32.Parse(Request.Form["MatchId"]);
+            string MatchType = Request.Form["MatchType"];
+            if (MatchType == "SymShoots")
+            {
+                return new SymShootMatchesList().CanceledThePlayRequest(PlayerId, matchId);
+            }
+            else
+            {
+                return null;
+                //return new MatchList().NotAcceptedToPlay(PlayerId, matchId);
+            }            
+        }
 
         [HttpPost]
         public string PlayAccepted(FormCollection collection)
@@ -175,6 +192,23 @@ namespace soccer1.Controllers
             }
 
 
+        }
+
+        [HttpPost]
+        public string GoingHomeAndWaiting(FormCollection collection)
+        {
+            int ConnectionId = Int32.Parse(Request.Form["ConnectionId"]);
+            string PlayerId = Request.Form["PlayerId"];
+            int matchId = Int32.Parse(Request.Form["MatchId"]);
+            string MatchType = Request.Form["MatchType"];
+            if (MatchType == "SymShoots")
+            {
+                return new SymShootMatchesList().GoingHomeAndWaiting(PlayerId, matchId);
+            }
+            else
+            {
+                return new MatchList().ReturnEvent(PlayerId, matchId);
+            }
         }
 
     }

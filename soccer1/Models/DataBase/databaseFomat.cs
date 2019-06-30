@@ -22,9 +22,11 @@ namespace soccer1.Models.DataBase
 
         public DbSet<Formation> allFormations { get; set; }
 
+        public DbSet<Offer> allOffers { get; set; }
 
-    
 
 
-}
+
+
+    }
 }

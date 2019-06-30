@@ -14,8 +14,10 @@ namespace soccer1.Controllers
     {
         public static Mutex AddPawnmutex = new Mutex();
         public static Mutex AddElixirmutex = new Mutex();
-        public static Mutex AddFormationmutex = new Mutex();       
+        public static Mutex AddFormationmutex = new Mutex();
+        public static Mutex AddOffermutex = new Mutex();
 
+        
         [HttpPost]
         public string AddPawn(FormCollection collection)
         {
@@ -101,6 +103,29 @@ namespace soccer1.Controllers
             new AssetManager().AddFormationToAssets(formation);
             AddFormationmutex.ReleaseMutex();
             return "Formation Loaded" + formation.IdName;
+        }
+
+
+        [HttpPost]
+        public string AddOffer(FormCollection collection)
+        {
+            AddOffermutex.WaitOne();
+            //AssetManager.assentsLoaded.WaitOne();
+            Offer newOffer = new Offer();            
+            newOffer.BuyedmoneyAmount = Int32.Parse(Request.Form["BuyedmoneyAmount"]);
+            newOffer.BuyedmoneyType = Int32.Parse(Request.Form["BuyedmoneyType"]);
+            newOffer.IdName = Request.Form["IdName"];
+            newOffer.realDollerPrice = Int32.Parse(Request.Form["realDollerPrice"]);
+            Property price = new Property();
+            price.coin = Int32.Parse(Request.Form["price.coin"]);
+            price.fan = Int32.Parse(Request.Form["price.fan"]);
+            price.level = Int32.Parse(Request.Form["price.level"]);
+            price.SoccerSpetial = Int32.Parse(Request.Form["price.SoccerSpetial"]);
+            newOffer.price = price;
+
+            new AssetManager().AddOfferToAssets(newOffer);
+            AddOffermutex.ReleaseMutex();
+            return "Formation Loaded" + newOffer.IdName;
         }
 
     }

@@ -23,7 +23,6 @@ namespace soccer1.Models.main_blocks
     }
     public class Formation
     {
-        
       
     [Key]
         public string IdName { get; set; }
@@ -34,7 +33,20 @@ namespace soccer1.Models.main_blocks
         public Property price { get; set; }
         public string discription { get; set; }
     }
-   
+
+    public class Offer
+    {
+
+        [Key]
+        public string IdName { get; set; }
+
+        public int index { get; set; }
+        public Property price { get; set; }
+        public int realDollerPrice { get; set; }
+        public int BuyedmoneyType  { get; set; }
+        public int BuyedmoneyAmount { get; set; }
+    }
+
     public struct PawnStartPosition
     {
         [Range(GameConstants.formationMinX, GameConstants.formationMaxX)]

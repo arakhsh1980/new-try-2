@@ -9,11 +9,12 @@ namespace soccer1.Models.main_blocks
     public struct PlayerForSerial
     {
 
-        public string id { get; set; }
+        public string id;
 
-        public int Fan { get; set; }
+        public int Fan;
 
         public string Name;
+
         public int Money;
 
         public int CoonId;
@@ -26,9 +27,15 @@ namespace soccer1.Models.main_blocks
 
         public string[] OutOfTeamPawns;
 
+        public int[] OutOfTeamPawnsRequiredXp;
+
         public string[] OutOfTeamElixirs;
 
         public TeamForSerialize Team;
+
+        public int[] PlayingPawnsRequiredXp;
+
+        public int[] PawnsinBenchRequiredXp;
     }
 
     /*

@@ -44,6 +44,38 @@ namespace soccer1.Controllers
             return result.ToString();
         }
 
+
+        [HttpPost]
+        public string BuyOffer(FormCollection collection)
+        {
+            string PlayerId = Request.Form["PlayerId"];
+            string OfferIdName = Request.Form["IdName"];
+            
+            bool result = false;
+
+            DataDBContext dataBase = new DataDBContext();
+            PlayerForDatabase player = dataBase.playerInfoes.Find(PlayerId);
+            if (player != null)
+            {
+                //AssetType assetType = new Utilities().ReturnAssetTypeByName(AssetTypestring);
+                Property AssetPrice = new AssetManager().ReturnOfferPrice(OfferIdName);
+                Property BuyingMaterial = new AssetManager().ReturnOfferBuyingMaterial(OfferIdName);
+                
+                PlayerForConnectedPlayer pl = new PlayerForConnectedPlayer();
+                pl.reWriteAccordingTo(player);
+                result = pl.BuyOffer(BuyingMaterial , AssetPrice);
+                if (result)
+                {
+                    player.changePlayer(pl.returnDataBaseVersion());
+                    dataBase.Entry(player).State = EntityState.Modified;
+                    dataBase.SaveChanges();
+                }
+                //Log.AddLog("Error : reusult:" + result.ToString());
+                return result.ToString();
+            }
+            return result.ToString();
+        }
+
         /*
 
         [HttpPost]

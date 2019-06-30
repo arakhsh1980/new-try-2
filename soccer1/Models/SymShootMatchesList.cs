@@ -14,9 +14,15 @@ namespace soccer1.Models
 
 
         private static symShootMatch[] matchList = new symShootMatch[1000];
-
+        private static string waitingPlayerId;
 
         #region Massages Form Client
+        public void NewWaitingPlayer(string PlayerId)
+        {
+            waitingPlayerId = PlayerId;
+        }
+       
+
 
         public void TimerIsUp(string PlayerId, int MatchId, int turn)
         {
@@ -72,11 +78,21 @@ namespace soccer1.Models
             
         }
 
+        public string CanceledThePlayRequest(string playerId, int matchId)
+        {
+            return matchList[matchId].CanceledThePlayRequest(playerId);
+        }
+
         public string PlayAccepted(string playerId, int matchId, int GatheredMoney)
         {
             return matchList[matchId].PlayerOnePlayAccepted(playerId, GatheredMoney);
 
            
+        }
+
+        public string GoingHomeAndWaiting(string playerId, int matchId)
+        {
+            return matchList[matchId].PlayerOneGoingHomeAndWaiting(playerId);
         }
 
         
@@ -99,7 +115,7 @@ namespace soccer1.Models
             for (int i = (matchList.Length - 1); 0 <= i; i--)
             {
                 matchList[i].CheckYourSelf();
-                if (matchList[i].GivePreSituation() == PreMatchSituation.WithOnePlayer && matchList[i].GivLeague() == SelectedLeage)
+                if ((matchList[i].GivePreSituation() == PreMatchSituation.WithOnePlayer || matchList[i].GivePreSituation() == PreMatchSituation.WFSecondPlayer) && matchList[i].GivLeague() == SelectedLeage)
                 {
                     if (Math.Abs(matchList[i].GivePlayerOnePower() - PlayerPowerLevel) < bestpowerDiference)
                     {
@@ -133,11 +149,16 @@ namespace soccer1.Models
             Errors.AddBigError("this player is not in its clamed match");
             return "Erroer";
         }
-        public void AddSecondPlayerAndWaitForFisrtRespond(int matchNumber, string playerNameId, float playerPower)
+        public void AddSecondPlayer(int matchNumber, string playerNameId, float playerPower)
         {
-            matchList[matchNumber].AddSecondPlayerAndWaitForFisrtRespond(playerNameId, playerPower);
-
-            //ConnectedPlayersList.SetPlayerMatch(playerConnId, matchNumber);
+            if( matchList[matchNumber].GivePreSituation() == PreMatchSituation.WithOnePlayer)
+            {
+                matchList[matchNumber].AddSecondPlayerStartImideatly(playerNameId, playerPower);
+            }
+            else
+            {
+                matchList[matchNumber].AddSecondPlayerAndWaitForFisrtRespond(playerNameId, playerPower);
+            }
         }
 
         public void StartMatch(int matchNumber)
@@ -188,7 +209,7 @@ namespace soccer1.Models
             else
             {
                 matchList[bestMatch] = new symShootMatch();
-                matchList[bestMatch].StartMatchWithOnePlayer(playerIdName, playerPower, bestMatch, SelectedLeage);
+                matchList[bestMatch].InitiatMatchWithOnePlayer(playerIdName, playerPower, bestMatch, SelectedLeage);
 
 
                 //Log.AddMatchLog(bestMatch, "added with player" + playerIdName + " as first player");
@@ -208,6 +229,7 @@ namespace soccer1.Models
             {
                 matchList[i] = new symShootMatch();
             }
+            lastCheckMatchListForTimeOut = DateTime.Now;
         }
 
         public void PlayerLeaveMatch(int matchId, string NameId)
@@ -221,7 +243,21 @@ namespace soccer1.Models
             return matchList[matchId].ReturnConnectionTime();
         }
 
-
-
+        private static Mutex CheckMatchListMutex = new Mutex();
+        public static void CheckMatchListForTimeOut()
+        {
+            CheckMatchListMutex.WaitOne();
+            float timeFromLast =  (float)DateTime.Now.Subtract(lastCheckMatchListForTimeOut).TotalSeconds;
+            if (MatchListTimeIntervals < timeFromLast)
+            {
+                for (int i = 0; i < matchList.Length; i++)
+                {
+                    matchList[i].garbegColletor();
+                }
+            }
+            CheckMatchListMutex.ReleaseMutex();
+        }
+        static DateTime lastCheckMatchListForTimeOut;
+        const float MatchListTimeIntervals = 60.0f;
     }
 }

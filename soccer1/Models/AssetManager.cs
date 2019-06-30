@@ -19,15 +19,19 @@ namespace soccer1.Models
         private static Pawn[] Pawnlist = new Pawn[arraylengh];
         private static Elixir[] Elixirlist = new Elixir[arraylengh];
         private static Formation[] Formationlist = new Formation[arraylengh];
+        private static Offer[] Offerlist = new Offer[arraylengh];
         private static int pawnsConter = 0;
         private static int ElixirConter = 0;
         private static int FormationConter = 0;
+        private static int OfferConter = 0;
         //give pawnname add return pawnindex
         public static Mutex assentsLoaded = new Mutex();
         //public static AutoResetEvent assentsLoaded = new AutoResetEvent(false);
         private static Mutex AddPawnmutex = new Mutex();
         public static Mutex AddElixirmutex = new Mutex();
         public static Mutex AddFormationmutex = new Mutex();
+        public static Mutex AddOffermutex = new Mutex();
+        
         public int ReturnAssetIndex(AssetType type, string IdNamePawn)
         {
             int IndexOfAsset=-1;
@@ -176,7 +180,81 @@ namespace soccer1.Models
             return ReturnAssetPrice(type, ReturnAssetIndex(type, IdName));
         }
 
-        public  void AddPawnToAssets(Pawn p)
+
+        public Property ReturnOfferPrice(string IdName)
+        {
+
+            Property thisprop = new Property();
+            thisprop.coin = int.MaxValue;
+            thisprop.fan = int.MaxValue;
+            int index=-1;
+            for (int i = 0; i < Offerlist.Length; i++) if (Offerlist[i] != null)
+                {
+                    if (Offerlist[i].IdName == IdName) { index = i; }
+                }                      
+            if (arraylengh <= index || index < 0)
+            {
+                Errors.AddBigError(" ReturnAssetPrice.index out of reng1");
+                return thisprop;                
+            }          
+            if (OfferConter < index)
+            {
+                Errors.AddBigError(" ReturnAssetPrice. index out of reng2");
+                return thisprop;
+            }
+            Property cashprop = new Property();
+            cashprop = Offerlist[index].price;
+            thisprop.coin = cashprop.coin;
+            thisprop.fan = cashprop.fan;
+            thisprop.level = cashprop.level;
+            thisprop.SoccerSpetial = cashprop.SoccerSpetial;
+            return thisprop;
+        }
+
+        public Property ReturnOfferBuyingMaterial(string IdName)
+        {
+
+            Property thisprop = new Property();
+            thisprop.coin =0;
+            thisprop.fan = 0;
+            thisprop.level = 0;
+            thisprop.SoccerSpetial = 0;
+            int index = -1;
+            for (int i = 0; i < Offerlist.Length; i++) if (Offerlist[i] != null)
+                {
+                    if (Offerlist[i].IdName == IdName) { index = i; }
+                }
+            if (arraylengh <= index || index < 0)
+            {
+                Errors.AddBigError(" ReturnAssetPrice.index out of reng1");
+                return thisprop;
+            }
+            if (OfferConter < index)
+            {
+                Errors.AddBigError(" ReturnAssetPrice. index out of reng2");
+                return thisprop;
+            }           
+            switch (Offerlist[index].BuyedmoneyType)
+            {
+                case 0:
+                    thisprop.coin += Offerlist[index].BuyedmoneyAmount;
+                    break;
+                case 1:
+                    thisprop.fan += Offerlist[index].BuyedmoneyAmount;
+                    break;
+                case 2:
+                    thisprop.SoccerSpetial += Offerlist[index].BuyedmoneyAmount;
+                    break;
+                case 3:
+                    thisprop.level += Offerlist[index].BuyedmoneyAmount;
+                    break;
+            }            
+            return thisprop;
+        }
+
+
+
+        public void AddPawnToAssets(Pawn p)
         {
             AddPawnmutex.WaitOne();
             if (Pawnlist.Length <= pawnsConter) { Errors.AddBigError("AddPawnToAssets. Pawnlist.Length <= pawnsConter"); return; }
@@ -222,8 +300,32 @@ namespace soccer1.Models
             }
             AddFormationmutex.ReleaseMutex();
         }
-        
-        public  void AddElixirToAssets(Elixir el)
+
+        public void AddOfferToAssets(Offer offer)
+        {
+            AddOffermutex.WaitOne();
+            if (Offerlist.Length <= OfferConter) { Errors.AddBigError("Offerlist.Length <= OfferConter"); return; }
+            int indexinarray = -1;
+            for (int i = 0; i <= OfferConter; i++) if (Offerlist[i].IdName == offer.IdName) { indexinarray = i; }
+            if (indexinarray == -1)
+            {
+                offer.index = OfferConter;
+                Offerlist[OfferConter] = offer;
+                OfferConter++;
+                DatabaseManager.AddOfferToDataBase(offer);
+            }
+            else
+            {
+                offer.index = indexinarray;
+                Offerlist[indexinarray] = offer;
+                DatabaseManager.AddOfferToDataBase(offer);
+            }
+            AddOffermutex.ReleaseMutex();
+        }
+
+
+
+        public void AddElixirToAssets(Elixir el)
         {
             AddElixirmutex.WaitOne();
             if (Elixirlist.Length <= ElixirConter) { Errors.AddBigError("Elixirlist.Length <= ElixirConter"); return; }
@@ -256,6 +358,7 @@ namespace soccer1.Models
                 Pawnlist[i] = new Pawn();
                 Elixirlist[i] = new Elixir();
                 Formationlist[i] = new Formation();
+                Offerlist[i] = new Offer();
             }
             LoadAssets();
 

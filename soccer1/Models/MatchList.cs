@@ -82,7 +82,7 @@ namespace soccer1.Models
             for (int i = (matchList.Length - 1); 0 <= i; i--)
             {
                 matchList[i].CheckYourSelf();
-                if (matchList[i].GivePreSituation() == PreMatchSituation.WithOnePlayer && matchList[i].GivLeague() == SelectedLeage)
+                if ((matchList[i].GivePreSituation() == PreMatchSituation.WithOnePlayer || matchList[i].GivePreSituation() == PreMatchSituation.WFSecondPlayer) && matchList[i].GivLeague() == SelectedLeage)
                 {
                     if (Math.Abs(matchList[i].GivePlayerOnePower() - PlayerPowerLevel) < bestpowerDiference)
                     {
