@@ -39,7 +39,7 @@ namespace soccer1.Models.main_blocks
         public string PlayeingPawns { get; set; }
 
         public string pawnsInBench { get; set; }
-
+        
         public string UsableFormations { get; set; }
 
         public string otherElixirs { get; set; }

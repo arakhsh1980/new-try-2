@@ -48,12 +48,13 @@ namespace soccer1.Models.utilites
         public TeamForConnectedPlayers returnDefultTeam()
         {
             TeamForConnectedPlayers team = new TeamForConnectedPlayers();
-            int defultPawnIndex = new AssetManager().ReturnAssetIndex(AssetType.Pawn , "Defult");            
-            int defultElixirIndex = new AssetManager().ReturnAssetIndex(AssetType.Elixir, "Defult");            
-            int defultFormationIndex = new AssetManager().ReturnAssetIndex(AssetType.Formation, "Defult");            
+            //int defultPawnIndex = new AssetManager().ReturnAssetIndex(AssetType.Pawn ,0); 
+            int defultPawnIndex = 10;
+            int defultElixirIndex = new AssetManager().ReturnAssetIndex(AssetType.Elixir, 0);            
+            int defultFormationIndex = new AssetManager().ReturnAssetIndex(AssetType.Formation, 0);            
             team.CurrentFormation = defultFormationIndex;
-            for (int i = 0; i < team.PlayeingPawns.Length; i++) { team.PlayeingPawns[i] = defultPawnIndex; }
-            for (int i = 0; i < team.pawnsInBench.Length; i++) { team.pawnsInBench[i] = defultPawnIndex; }
+            for (int i = 0; i < team.PlayeingPawns.Length; i++) { team.PlayeingPawns[i] = defultPawnIndex+(10000*i); }
+            for (int i = 0; i < team.pawnsInBench.Length; i++) { team.pawnsInBench[i] = defultPawnIndex+(10000*(i+ team.PlayeingPawns.Length)); }
             for (int i = 0; i < team.UsableFormations.Length; i++) { team.UsableFormations[i] = -1; }
             for (int i = 0; i < team.ElixirInBench.Length; i++) { team.ElixirInBench[i] = defultElixirIndex; }
             return team;

@@ -25,12 +25,14 @@ namespace soccer1.Controllers
             
             //AssetManager.assentsLoaded.WaitOne();
             Pawn pawn = new Pawn();
-            pawn.abilityShower= Request.Form["abilityShower"];
+            //pawn.abilityShower= Request.Form["abilityShower"];
             pawn.ForMatch = Request.Form["ForMatch"];
             pawn.tired1 = Request.Form["Tired1"];
             pawn.tired2 = Request.Form["Tired2"];
             pawn.tired3 = Request.Form["Tired3"];
-            pawn.IdName = Request.Form["IdName"];
+            pawn.IdNum = Int32.Parse(Request.Form["IdNum"]);
+            pawn.key = pawn.IdNum.ToString();
+            pawn.ShowName = Request.Form["showName"];
             //Log.AddLog("AddPawnStarted" + pawn.IdName);
             PawnAbility pa = new PawnAbility();
             pa.aiming = Int32.Parse(Request.Form["mainAbility.aiming"]);
@@ -44,10 +46,10 @@ namespace soccer1.Controllers
             price.level = Int32.Parse(Request.Form["price.level"]);
             price.SoccerSpetial = Int32.Parse(Request.Form["price.SoccerSpetial"]);
             pawn.price = price;            
-            pawn.ShowName = Request.Form["redForSale"];            
+            //pawn.ShowName = Request.Form["redForSale"];            
             new AssetManager().AddPawnToAssets(pawn);
             AddPawnmutex.ReleaseMutex();            
-            return "Pawn Loaded"+ pawn.IdName;            
+            return "Pawn Loaded"+ pawn.IdNum;            
         }
 
         [HttpPost]
@@ -57,7 +59,8 @@ namespace soccer1.Controllers
             //AssetManager.assentsLoaded.WaitOne();
             Elixir elixir = new Elixir();
             elixir.forSale = Request.Form["forSale"];            
-            elixir.IdName = Request.Form["IdName"];
+            elixir.IdNum = Int32.Parse(Request.Form["IdNum"]);
+            elixir.key = elixir.IdNum.ToString();
             elixir.showName = Request.Form["showName"];
             //Log.AddLog("AddElixirStarted" + elixir.IdName);
             SpetialPower sp = new SpetialPower();
@@ -74,7 +77,7 @@ namespace soccer1.Controllers
             elixir.price = price;
             new AssetManager().AddElixirToAssets(elixir);
             AddElixirmutex.ReleaseMutex();           
-            return "Elixir Loaded" + elixir.IdName;
+            return "Elixir Loaded" + elixir.IdNum;
         }
 
         [HttpPost]
@@ -84,7 +87,8 @@ namespace soccer1.Controllers
             //AssetManager.assentsLoaded.WaitOne();
             Formation formation = new Formation();
             formation.discription = Request.Form["discription"];
-            formation.IdName = Request.Form["IdName"];
+            formation.IdNum = Int32.Parse(Request.Form["IdNum"]);
+            formation.key = formation.IdNum.ToString();
             formation.showName = Request.Form["showName"];
                        
             Property price = new Property();
@@ -102,7 +106,7 @@ namespace soccer1.Controllers
 
             new AssetManager().AddFormationToAssets(formation);
             AddFormationmutex.ReleaseMutex();
-            return "Formation Loaded" + formation.IdName;
+            return "Formation Loaded" + formation.IdNum;
         }
 
 

@@ -25,9 +25,8 @@ namespace soccer1.Models.main_blocks
     {
       
     [Key]
-        public string IdName { get; set; }
-
-        public int index { get; set; }
+        public string key { get; set; }
+        public int IdNum { get; set; }
         public string showName { get; set; }
         public PawnStartPosition[] positions { get; set; }
         public Property price { get; set; }

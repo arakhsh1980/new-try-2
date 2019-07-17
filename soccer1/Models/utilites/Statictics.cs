@@ -3,16 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Threading;
+using System.Web.Mvc;
+using soccer1.Models;
+using soccer1.Models.utilites;
+using soccer1.Models.main_blocks;
+using soccer1.Models.DataBase;
 
 namespace soccer1.Models
 {
     public enum MatchSituation { WFFirstAcceptance, WFShoot, WFStationeryPositions,   EndedPlay };
 
-    public enum PreMatchSituation { NonExistance, WithOnePlayer, WithTwoPlayer, WFFirstAcceptance, WFSecondPlayer };
+    public enum PreMatchSituation { NonExistance, WithOnePlayer, WithTwoPlayer, WFFirstAcceptance, WFSecondPlayer, EndedPlay };
 
     public enum AssetType { Pawn, Elixir, Formation, none };
 
-    public enum MatchMassageType { Error, NothingNew, DoYouPlayy, WatForOthr, GoToMatchi, ActTisShot, Winnerisii, Disconcted, PlayerGoal, PlrTimeOut, Substituti, ElixirUsea, ChangeTurn, AddPawnXpe, AddTeamXpe, SubBetdMon, pl2Cancled }
+    public enum MatchMassageType { Error, NothingNew, DoYouPlayy, WatForOthr, GoToMatchi, ActTisShot, Winnerisii, Disconcted, PlayerGoal, PlrTimeOut, Substituti, ElixirUsea, ChangeTurn, SubBetdMon, pl2Cancled, gaindedXps }
 
     public struct MatchMassage
     {
@@ -44,11 +49,33 @@ namespace soccer1.Models
 
     public static class NominatedXperiance
     {
-        public const float simpleShootXp = 1;
-        public const float GoalXp = 1;
-        public const float WinnerTeamXp = 1;
-        public const float LosserTeamXp = 1;
+        public const int simpleShootXp = 1;
+        public const int GoalXp = 6;
+        public const int GoalScorerTeamXp = 2;
+        public const int WinnerTeamXp = 2;
+        public const int LosserTeamXp = 1;
     }
 
+   
+    public class LeaugeManager
+    {
+        public Property LeaugEnterencePice(string LeagName)
+        {
+            Property BettedMoney = new Property();
+            BettedMoney.coin = 0;
+            BettedMoney.fan = 0;
+            BettedMoney.level = 0;
+            BettedMoney.SoccerSpetial = 0;
+            switch (LeagName)
+            {
+                case "Silver":
+                    BettedMoney.coin = 200;
+                    break;
+                default:
+                    break;
 
+            }
+            return BettedMoney;
+        }
+    }
 }

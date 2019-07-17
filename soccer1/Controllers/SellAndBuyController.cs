@@ -20,19 +20,34 @@ namespace soccer1.Controllers
         public string BuyAsset(FormCollection collection)
         {            
             string PlayerId = Request.Form["PlayerId"];
-            string assetId = Request.Form["IdName"];
+            int assetId =Int32.Parse( Request.Form["IdName"]);
             string AssetTypestring = Request.Form["AssetType"];
-            bool result = false;            
-           
+            bool result = false;
+            //int IdCode =-1;
+            int PlayerIndex=-1;
+
             DataDBContext dataBase = new DataDBContext();
             PlayerForDatabase player = dataBase.playerInfoes.Find(PlayerId);
             if(player != null)
             {
                 AssetType assetType = new Utilities().ReturnAssetTypeByName(AssetTypestring);
+                if(assetType == AssetType.Pawn)
+                {                    
+                    PlayerIndex = int.Parse(Request.Form["PlayerIndex"]);
+                }
+                else
+                {
+
+                }
                 Property AssetPrice = new AssetManager().ReturnAssetPrice(assetType,assetId);
                 PlayerForConnectedPlayer pl = new PlayerForConnectedPlayer();
                 pl.reWriteAccordingTo(player);
-                result =pl.BuyAsset(assetType, assetId, AssetPrice);
+                if(assetType == AssetType.Pawn) {
+                    result = pl.BuyPawnAsset(assetId, PlayerIndex, AssetPrice );
+                } else
+                {
+                    result = pl.BuyAsset(assetType, assetId, AssetPrice);
+                }
                 if (result) {
                     player.changePlayer(pl.returnDataBaseVersion());
                     dataBase.Entry(player).State = EntityState.Modified;

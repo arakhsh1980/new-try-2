@@ -32,13 +32,16 @@ namespace soccer1.Controllers
             string PlayerId = Request.Form["PlayerId"];
             int matchId = Int32.Parse(Request.Form["MatchId"]);
             int TurnNumber = Int32.Parse(Request.Form["TurnNumber"]);
+            int PawnAssignIndex = Int32.Parse(Request.Form["PawnAssignIndex"]);
             string jsonpart = collection["jsonCode"];
+
+
             bool result = false;
             ShootActionCode shoot = new JavaScriptSerializer().Deserialize<ShootActionCode>(jsonpart);
             //Log.AddLog("shoot resived. shotter : " + shoot.playerIDName);
             if (/*ConnectedPlayersList.IsShootValid(shoot)*/ true)
             {
-                result = new SymShootMatchesList().shootHapened(matchId, PlayerId, TurnNumber, jsonpart);
+                result = new SymShootMatchesList().shootHapened(matchId, PlayerId, TurnNumber, jsonpart, PawnAssignIndex);
             }
             else
             {

@@ -36,6 +36,8 @@ namespace soccer1.Models.main_blocks
             PlayerProperty.SoccerSpetial = Statistics.StartingSS;
         }
 
+        
+
         public string id { get; set; }
 
         public static Mutex mainMutex = new Mutex();
@@ -60,7 +62,30 @@ namespace soccer1.Models.main_blocks
 
         #region public functions
 
-        public bool BuyAsset(AssetType assetType, string AssetIdName, Property price)
+        public void GainMatchXp(GainedXp gainedXp)
+        {    
+            
+            team.AddXpToTeam(gainedXp.xpVAl[gainedXp.xpVAl.Length - 1]);
+            for (int i = 0; i < gainedXp.AssingedIndex.Length; i++)
+            {
+                if (0 < gainedXp.AssingedIndex[i])
+                {
+                    team.AddXpToPawn(gainedXp.AssingedIndex[i], gainedXp.xpVAl[i]);
+                }
+            }
+            
+            
+        }
+
+       
+
+        
+
+
+      
+
+
+        public bool BuyAsset(AssetType assetType, int AssetIdNum, Property price)
         {
             Utilities utilities = new Utilities();
             if (utilities.CheckIfFirstPropertyIsBigger(PlayerProperty, price)) {
@@ -70,14 +95,14 @@ namespace soccer1.Models.main_blocks
                 {
 
                     case AssetType.Pawn:
-                        pawnOutOfTeam.Add(new AssetManager().ReturnAssetIndex(AssetType.Pawn, AssetIdName));
+                        pawnOutOfTeam.Add(new AssetManager().ReturnAssetIndex(AssetType.Pawn, AssetIdNum));
                      
                         break;
                     case AssetType.Elixir:
-                        elixirOutOfTeam.Add(new AssetManager().ReturnAssetIndex(AssetType.Elixir, AssetIdName));
+                        elixirOutOfTeam.Add(new AssetManager().ReturnAssetIndex(AssetType.Elixir, AssetIdNum));
                         break;
                     case AssetType.Formation:
-                       team.AddToUsableFormations(new AssetManager().ReturnAssetIndex(AssetType.Formation, AssetIdName));
+                       team.AddToUsableFormations(new AssetManager().ReturnAssetIndex(AssetType.Formation, AssetIdNum));
                         break;
 
                 }
@@ -85,6 +110,33 @@ namespace soccer1.Models.main_blocks
                 return true;
             }
             else{
+                return false;
+            }
+        }
+
+        public bool BuyPawnAsset(int idNum, int playerindex, Property price )
+        {
+            if(idNum<0 || playerindex < 0)
+            {
+                Errors.AddBigError("player.BuyPawnAsset");
+                return false;
+            }
+            Utilities utilities = new Utilities();
+            if (utilities.CheckIfFirstPropertyIsBigger(PlayerProperty, price))
+            {
+                SubtractProperty(price);
+                // Pawn newPawn = new AssetManager().ReturnAssetIndex(AssetType.Pawn, idCode);
+                PawnOfPlayerData newPawn = new PawnOfPlayerData();
+                newPawn.pawnType = idNum;
+                newPawn.playerPawnIndex = playerindex;
+                newPawn.requiredXpForNextLevel = new AssetManager().ReturnrequiredXpForNextLevel(idNum);
+                int NewPawnCode =new Convertors().PawnOfPlayerDataToPawnCode(newPawn);
+                pawnOutOfTeam.Add(NewPawnCode);                
+                SaveChanges();
+                return true;
+            }
+            else
+            {
                 return false;
             }
         }
@@ -108,6 +160,7 @@ namespace soccer1.Models.main_blocks
 
         public bool SubtractProperty(Property prop)
         {
+            Log.AddPlayerLog(id, "SubtractProperty : coin :" + prop.coin.ToString());
             Utilities utilities = new Utilities();
             if (utilities.CheckIfFirstPropertyIsBigger(PlayerProperty, prop))
             {
@@ -126,6 +179,7 @@ namespace soccer1.Models.main_blocks
 
         public void AddProperty(Property prop)
         {
+            Log.AddPlayerLog(id, "AddProperty : coin :" + prop.coin.ToString());
             PlayerProperty.coin += prop.coin;
             PlayerProperty.SoccerSpetial += prop.SoccerSpetial;
             PlayerProperty.fan += prop.fan;
@@ -222,14 +276,14 @@ namespace soccer1.Models.main_blocks
             plsr.SoccerSpetial = PlayerProperty.SoccerSpetial;
             
             plsr.Team = convertor.TeamToTeamForSerialize(team);
-            string[] pawnsarray = new string[pawnOutOfTeam.Count];
+            int[] pawnsarray = new int[pawnOutOfTeam.Count];
             int pawncounter = 0;
             foreach (int i in pawnOutOfTeam)
             {
                 pawnsarray[pawncounter]= new AssetManager().ReturnAssetName(AssetType.Pawn, i);
                 pawncounter++;
             }
-            string[] elixirsarray = new string[elixirOutOfTeam.Count];
+            int[] elixirsarray = new int[elixirOutOfTeam.Count];
             int elixirCounter = 0;
             foreach (int i in elixirOutOfTeam)
             {
@@ -262,6 +316,42 @@ namespace soccer1.Models.main_blocks
         }
         #endregion
 
+        public bool UpgradePawnto(int pawnCode, int newPawnType) {
+            
+            PawnOfPlayerData pp = new PawnOfPlayerData();
+            pp = new Convertors().PawnCodeToPawnOfPlayerData(pawnCode);
+            pp.pawnType = newPawnType;
+            pp.requiredXpForNextLevel = new AssetManager().ReturnrequiredXpForNextLevel(newPawnType);
+            int newPawnCode = new Convertors().PawnOfPlayerDataToPawnCode(pp);
+            bool isFinded = false;
+            bool isREmovedPastFromPawnOutOfTeam = false;
+
+            isREmovedPastFromPawnOutOfTeam = pawnOutOfTeam.Remove( pawnCode);
+            if (isREmovedPastFromPawnOutOfTeam)
+            {
+                pawnOutOfTeam.Add(newPawnCode); return true;
+            }
+            for (int i = 0; i < team.PlayeingPawns.Length; i++)
+            {
+                if (team.PlayeingPawns[i] == pawnCode)
+                {
+                    team.PlayeingPawns[i] = newPawnCode;
+                    return true;
+                }
+            }
+            for (int i = 0; i < team.pawnsInBench.Length; i++)
+            {
+                if (team.pawnsInBench[i] == pawnCode)
+                {
+                    team.pawnsInBench[i] = newPawnCode;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+
+
         public  void reWriteAccordingTo(PlayerForDatabase pl)
         {
            
@@ -276,24 +366,24 @@ namespace soccer1.Models.main_blocks
             team.CurrentFormation = pl.CurrentFormation;
             //convert of Playerfordatabase Class to Player Class 
             //convert string to int
-            int[] pawnBuffer = convertor.SrtingTointArray(pl.otherPawns);
+            int[] pawnBuffer = convertor.StringToIntArray(pl.otherPawns);
             pawnOutOfTeam.Clear();
             for (int i = 0; i < pawnBuffer.Length; i++) if (0 < pawnBuffer[i])
                 {
                     pawnOutOfTeam.Add(pawnBuffer[i]);
                 }
-            int[] ElixirBuffer = convertor.SrtingTointArray(pl.otherElixirs);
+            int[] ElixirBuffer = convertor.StringToIntArray(pl.otherElixirs);
             elixirOutOfTeam.Clear();
             for (int i = 0; i < ElixirBuffer.Length; i++) if (0 < ElixirBuffer[i])
                 {
                     elixirOutOfTeam.Add(ElixirBuffer[i]);
                 }
 
-            team.PlayeingPawns = convertor.SrtingTointArray(pl.PlayeingPawns);
-            team.pawnsInBench = convertor.SrtingTointArray(pl.pawnsInBench);
-            team.UsableFormations = convertor.SrtingTointArray(pl.UsableFormations);
+            team.PlayeingPawns = convertor.StringToIntArray(pl.PlayeingPawns);
+            team.pawnsInBench = convertor.StringToIntArray(pl.pawnsInBench);
+            team.UsableFormations = convertor.StringToIntArray(pl.UsableFormations);
             
-            team.ElixirInBench = convertor.SrtingTointArray(pl.ElixirInBench);
+            team.ElixirInBench = convertor.StringToIntArray(pl.ElixirInBench);
         }
 
 

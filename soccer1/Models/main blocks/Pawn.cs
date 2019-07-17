@@ -13,25 +13,36 @@ namespace soccer1.Models.main_blocks
     public class Pawn
     {
       
-    [Key]
-        public string IdName { get; set; }
-        public int index { get; set; }
+    [Key]        
+        public string key { get; set; }
+        public int IdNum { get; set; }
+        public int UpgradeFrom { get; set; }
+
+        public int RequiredXpForUpgrade { get; set; }
+
         public string ShowName { get; set; }
         public string tired1 { get; set; }
         public string tired2 { get; set; }
         public string tired3 { get; set; }
         public string ForMatch { get; set; }
-        public string abilityShower { get; set; }
+        //public string abilityShower { get; set; }
         public Property price { get; set; }
         public PawnAbility mainAbility { get; set; }
     
 }
 
+    public class PawnOfPlayerData
+    {
+        
+        public int pawnType;
+        public int playerPawnIndex;
+        public int requiredXpForNextLevel;
+    }
 
     public class PawnForDataBase
     {
         [Key]
-        public string IdName { get; set; }
+        public int IdNum { get; set; }
         public int index { get; set; }
         public string ShowName { get; set; }
         public string redForSale { get; set; }
@@ -55,8 +66,25 @@ namespace soccer1.Models.main_blocks
     }
     public struct Property
 {
+        public void SetZiro()
+        {
+            level = 0;
+            fan = 0;
+            coin = 0;
+            SoccerSpetial = 0;
+        }
 
-    public int level { get; set; }
+        public void DeepCopey(Property pp)
+        {
+            level = pp.level;
+            fan = pp.fan;
+            coin = pp.coin;
+            SoccerSpetial = pp.SoccerSpetial;
+        }
+
+
+
+        public int level { get; set; }
         public int fan { get; set; }
         public int coin { get; set; }
         public int SoccerSpetial { get; set; }

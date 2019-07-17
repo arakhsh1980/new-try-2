@@ -21,6 +21,7 @@ namespace soccer1.Controllers
             string PlayerId = Request.Form["PlayerId"];
             int matchId = Int32.Parse(Request.Form["MatchId"]);
             int TurnNumber = Int32.Parse(Request.Form["TurnNumber"]);
+            int pawnAssingedIndex = Int32.Parse(Request.Form["pawnAssingedIndex"]);
             string jsonpart = collection["jsonCode"];
             bool result = false;
             ShootActionCode shoot = new JavaScriptSerializer().Deserialize<ShootActionCode>(jsonpart);

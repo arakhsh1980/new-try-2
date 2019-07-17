@@ -14,6 +14,7 @@ namespace soccer1.Models
         public int MatchID;
         public string playerIDName;
         public int pawnNumber;
+        public int PawnAssinedId;
         public float XDirection ;
         public float YDirection ;
         public float rotationPower ;

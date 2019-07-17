@@ -9,6 +9,7 @@ using System.Web.Script.Serialization;
 
 namespace soccer1.Models
 {
+    
     public class SymShootMatchesList
     {
 
@@ -41,9 +42,9 @@ namespace soccer1.Models
         }
 
 
-        public bool shootHapened(int matchNumber, string PlayeriD, int TurnNumber, string jsonpart)
+        public bool shootHapened(int matchNumber, string PlayeriD, int TurnNumber, string jsonpart, int PawnAssignIndex)
         {
-            return matchList[matchNumber].ShootHappeded(PlayeriD, TurnNumber, jsonpart);
+            return matchList[matchNumber].ShootHappeded(PlayeriD, TurnNumber, jsonpart, PawnAssignIndex);
         }
 
         public void stopedPosition(int matchId, string nameId, int TurnNumber, string jsonpart)
@@ -117,12 +118,15 @@ namespace soccer1.Models
                 matchList[i].CheckYourSelf();
                 if ((matchList[i].GivePreSituation() == PreMatchSituation.WithOnePlayer || matchList[i].GivePreSituation() == PreMatchSituation.WFSecondPlayer) && matchList[i].GivLeague() == SelectedLeage)
                 {
-                    if (Math.Abs(matchList[i].GivePlayerOnePower() - PlayerPowerLevel) < bestpowerDiference)
+                    matchList[i].garbegColletor();
+                    if ((matchList[i].GivePreSituation() == PreMatchSituation.WithOnePlayer || matchList[i].GivePreSituation() == PreMatchSituation.WFSecondPlayer))
                     {
-                        bestMatch = i;
-                        bestpowerDiference = Math.Abs(matchList[i].GivePlayerOnePower() - PlayerPowerLevel);
+                        if (Math.Abs(matchList[i].GivePlayerOnePower() - PlayerPowerLevel) < bestpowerDiference)
+                        {
+                            bestMatch = i;
+                            bestpowerDiference = Math.Abs(matchList[i].GivePlayerOnePower() - PlayerPowerLevel);
+                        }
                     }
-
                 }
             }
             if (bestpowerDiference < Statistics.maxAcceptedPowerDiference)

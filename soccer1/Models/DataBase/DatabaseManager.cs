@@ -119,7 +119,7 @@ namespace soccer1.Models
         {
             DataDBContext dataBase = new DataDBContext();
 
-            Pawn pp = dataBase.allPawns.Find(p.IdName);
+            Pawn pp = dataBase.allPawns.Find(p.key);
             if (pp == null)
             {
                 dataBase.allPawns.Add(p);
@@ -139,7 +139,8 @@ namespace soccer1.Models
         public static void AddFormationToDataBase(Formation ff)
         {
             DataDBContext dataBase = new DataDBContext();
-            Formation pp = dataBase.allFormations.Find(ff.IdName);
+            //dataBase.
+            Formation pp = dataBase.allFormations.Find(ff.key);
             if (pp == null)
             {
                 dataBase.allFormations.Add(ff);
@@ -177,7 +178,7 @@ namespace soccer1.Models
         public static void AddElixirToDataBase(Elixir el)
         {
             DataDBContext dataBase = new DataDBContext();
-            Elixir elold = dataBase.allElixires.Find(el.IdName);
+            Elixir elold = dataBase.allElixires.Find(el.key);
             if (elold == null)
             {
                 dataBase.allElixires.Add(el);

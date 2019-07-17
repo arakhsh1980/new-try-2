@@ -73,7 +73,15 @@ namespace soccer1.Controllers
 
             DataDBContext dataBase = new DataDBContext();
             PlayerForDatabase player = dataBase.playerInfoes.Find(opponentId);
-            return player.Name;
+            if(player != null)
+            {
+                return player.Name;
+            }
+            else
+            {
+                return "FalseId";
+            }
+            
         }
 
         // POST: if first player return true.
@@ -84,6 +92,7 @@ namespace soccer1.Controllers
             string PlayerId = Request.Form["PlayerId"];
             string SelectedLeage = Request.Form["SelectedLeage"];
             string MatchType = Request.Form["MatchType"];
+            
             DataDBContext dataBase = new DataDBContext();
             PlayerForDatabase player = dataBase.playerInfoes.Find(PlayerId);
             if (player != null)

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using soccer1.Models.utilites;
 
 namespace soccer1.Models.main_blocks
 {
@@ -29,7 +30,11 @@ namespace soccer1.Models.main_blocks
 
         public int[] PlayeingPawns { get; set; }
 
+        public int[] PlayeingPawnsRequiredXp { get; set; }
+
         public int[] pawnsInBench { get; set; }
+
+        public int[] pawnsInBenchRequiredXp { get; set; }
 
         public int[] UsableFormations { get; set; }
 
@@ -41,21 +46,82 @@ namespace soccer1.Models.main_blocks
             UsableFormations[UsableFormationsCounter] = formationIndex;
             UsableFormationsCounter++;
         }
+
+        public void AddXpToPawn(int pawnAssinedIndex, int xpVal)
+        {
+            for (int i = 0; i < PlayeingPawns.Length; i++)
+            {
+                PawnOfPlayerData pawnn = new Convertors().PawnCodeToPawnOfPlayerData(PlayeingPawns[i]);
+                if(pawnn.playerPawnIndex == pawnAssinedIndex)
+                {
+                    if (pawnn.requiredXpForNextLevel < xpVal) { pawnn.requiredXpForNextLevel = 0; }
+                    else
+                    {
+                        pawnn.requiredXpForNextLevel -= xpVal;
+                    }
+                    PlayeingPawns[i] =  new Convertors().PawnOfPlayerDataToPawnCode(pawnn);
+                    Log.AddLog("AddXpToPawn"+ pawnAssinedIndex.ToString());
+                }
+            }
+            for (int i = 0; i < pawnsInBench.Length; i++)
+            {
+                PawnOfPlayerData pawnn = new Convertors().PawnCodeToPawnOfPlayerData(pawnsInBench[i]);
+                if (pawnn.playerPawnIndex == pawnAssinedIndex)
+                {
+                    if (pawnn.requiredXpForNextLevel < xpVal) { pawnn.requiredXpForNextLevel = 0; }
+                    else
+                    {
+                        pawnn.requiredXpForNextLevel -= xpVal;
+                    }
+                    pawnsInBench[i] = new Convertors().PawnOfPlayerDataToPawnCode(pawnn);
+                }
+            }
+        }
+
+        public void AddXpToTeam( int xpVal)
+        {
+            for (int i = 0; i < PlayeingPawns.Length; i++)
+            {
+                PawnOfPlayerData pawnn = new Convertors().PawnCodeToPawnOfPlayerData(PlayeingPawns[i]);
+                
+                {
+                    if (pawnn.requiredXpForNextLevel < xpVal) { pawnn.requiredXpForNextLevel = 0; }
+                    else
+                    {
+                        pawnn.requiredXpForNextLevel -= xpVal;
+                    }
+                    PlayeingPawns[i] = new Convertors().PawnOfPlayerDataToPawnCode(pawnn);
+                }
+            }
+            for (int i = 0; i < pawnsInBench.Length; i++)
+            {
+                PawnOfPlayerData pawnn = new Convertors().PawnCodeToPawnOfPlayerData(pawnsInBench[i]);
+                
+                {
+                    if (pawnn.requiredXpForNextLevel < xpVal) { pawnn.requiredXpForNextLevel = 0; }
+                    else
+                    {
+                        pawnn.requiredXpForNextLevel -= xpVal;
+                    }
+                    pawnsInBench[i] = new Convertors().PawnOfPlayerDataToPawnCode(pawnn);
+                }
+            }
+        }
     }
 
     [Serializable]
     public struct TeamForSerialize
     {
 
-        public string CurrentFormation;
+        public int CurrentFormation;
 
-        public string[] PlayeingPawns;
+        public int[] PlayeingPawns;
 
-        public string[] pawnsInBench;
+        public int[] pawnsInBench;
 
-        public string[] UsableFormations;
+        public int[] UsableFormations;
 
-        public string[] ElixirInBench;
+        public int[] ElixirInBench;
     }
 
     [Serializable]

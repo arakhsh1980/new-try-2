@@ -25,11 +25,11 @@ namespace soccer1.Models.main_blocks
 
         public int SoccerSpetial;
 
-        public string[] OutOfTeamPawns;
+        public int[] OutOfTeamPawns;
 
         public int[] OutOfTeamPawnsRequiredXp;
 
-        public string[] OutOfTeamElixirs;
+        public int[] OutOfTeamElixirs;
 
         public TeamForSerialize Team;
 
