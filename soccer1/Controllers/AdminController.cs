@@ -45,6 +45,10 @@ namespace soccer1.Controllers
             price.fan = Int32.Parse(Request.Form["price.fan"]);
             price.level = Int32.Parse(Request.Form["price.level"]);
             price.SoccerSpetial = Int32.Parse(Request.Form["price.SoccerSpetial"]);
+            pawn.RequiredXpForUpgrade = Int32.Parse(Request.Form["requiredXpForUpgrade"]);
+            pawn.UpgradeFrom = Int32.Parse(Request.Form["updrageFrom"]);
+
+            
             pawn.price = price;            
             //pawn.ShowName = Request.Form["redForSale"];            
             new AssetManager().AddPawnToAssets(pawn);

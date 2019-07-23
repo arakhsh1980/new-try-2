@@ -86,7 +86,7 @@ namespace soccer1.Models.main_blocks
             bool result = false;
             if (TurnNumber != currentTurn) { return false; }
             if (PlayerId == playerOneIdName)
-            {
+            {               
                 AddPlayerEvent(playerTwoIdName, MatchMassageType.ElixirUsea, jsonpart);
             }
             if (PlayerId == playerTwoIdName)
@@ -97,7 +97,7 @@ namespace soccer1.Models.main_blocks
         }
 
         
-        public bool ShootHappeded(string playerIDName, int TurnNumber, string shoot, int PawnAssignIndex)
+        public bool ShootHappeded(string playerIDName, int TurnNumber, string shoot)
         {
             WFShootStartTime = TimeFromStart();
             bool result = false;
@@ -112,7 +112,7 @@ namespace soccer1.Models.main_blocks
             if (playerIDName == playerOneIdName && playerOneShoot==null)
             {
                 playerOneShoot = shoot;
-                pl1PawnShooterAssingedIndex = PawnAssignIndex;
+                //pl1PawnShooterAssingedIndex = PawnAssignIndex;
                 AddXpToShooter(true, NominatedXperiance.simpleShootXp);
                 
                 
@@ -122,7 +122,7 @@ namespace soccer1.Models.main_blocks
             if (playerIDName == playerTwoIdName && playerTwoShoot == null)
             {
                 playerTwoShoot = shoot;
-                pl2PawnShooterAssingedIndex = PawnAssignIndex;
+                //pl2PawnShooterAssingedIndex = PawnAssignIndex;
                 AddXpToShooter(false, NominatedXperiance.simpleShootXp);                
                 Log.AddPlayerLog(playerTwoIdName, " ShootHappeded resived");
                 result = true;
@@ -702,7 +702,10 @@ namespace soccer1.Models.main_blocks
             int placeInArray = -1;
             if(isplayerOne)// is player on?
             {
-                for(int i =0; i< pl1GainedXp.AssingedIndex.Length; i++) if (pl1GainedXp.AssingedIndex[i] == pl1PawnShooterAssingedIndex)
+                if (pl1PawnShooterAssingedIndex < 0) { return; }
+                
+                
+                for (int i =0; i< pl1GainedXp.AssingedIndex.Length; i++) if (pl1GainedXp.AssingedIndex[i] == pl1PawnShooterAssingedIndex)
                     {
                         placeInArray = i;
                     }
@@ -720,6 +723,7 @@ namespace soccer1.Models.main_blocks
             }
             else
             {
+                if (pl2PawnShooterAssingedIndex < 0) { return; }
                 for (int i = 0; i < pl2GainedXp.AssingedIndex.Length; i++) if (pl2GainedXp.AssingedIndex[i] == pl2PawnShooterAssingedIndex)
                     {
                         placeInArray = i;
@@ -843,6 +847,8 @@ namespace soccer1.Models.main_blocks
             playerOneGoalClaim = 0;
             playerTwoGoalClaim = 0;
             WFShootStartTime = TimeFromStart();
+            pl1PawnShooterAssingedIndex = -1;
+            pl2PawnShooterAssingedIndex = -1;
             if (isPlayerOneTurn)
             {
                 SendMassageToPlayers(MatchMassageType.ChangeTurn, playerOneIdName);
@@ -1065,8 +1071,8 @@ namespace soccer1.Models.main_blocks
         private int GatheredMoneyForWaiting;
         string NothingNewEventString;
         
-        int pl1PawnShooterAssingedIndex;
-        int pl2PawnShooterAssingedIndex;
+        int pl1PawnShooterAssingedIndex=-1;
+        int pl2PawnShooterAssingedIndex=-1;
 
         GainedXp pl1GainedXp = new GainedXp();
         GainedXp pl2GainedXp = new GainedXp();

@@ -350,7 +350,18 @@ namespace soccer1.Models.main_blocks
             return false;
         }
 
-
+        public bool ElixirUse(int ElixirType)
+        {
+            bool result = false;
+            int elixirPlace = -1;
+            for (int i=0; i < team.ElixirInBench.Length; i++)if(team.ElixirInBench[i]== ElixirType) { elixirPlace = i; }
+            if (-1 < elixirPlace)
+            {
+                team.ElixirInBench[elixirPlace] = -1;
+                result = true;
+            }
+            return result;
+        }
 
         public  void reWriteAccordingTo(PlayerForDatabase pl)
         {

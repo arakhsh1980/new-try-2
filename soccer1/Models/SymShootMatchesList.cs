@@ -42,9 +42,9 @@ namespace soccer1.Models
         }
 
 
-        public bool shootHapened(int matchNumber, string PlayeriD, int TurnNumber, string jsonpart, int PawnAssignIndex)
+        public bool shootHapened(int matchNumber, string PlayeriD, int TurnNumber, string jsonpart)
         {
-            return matchList[matchNumber].ShootHappeded(PlayeriD, TurnNumber, jsonpart, PawnAssignIndex);
+            return matchList[matchNumber].ShootHappeded(PlayeriD, TurnNumber, jsonpart);
         }
 
         public void stopedPosition(int matchId, string nameId, int TurnNumber, string jsonpart)

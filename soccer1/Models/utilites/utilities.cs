@@ -56,7 +56,8 @@ namespace soccer1.Models.utilites
             for (int i = 0; i < team.PlayeingPawns.Length; i++) { team.PlayeingPawns[i] = defultPawnIndex+(10000*i); }
             for (int i = 0; i < team.pawnsInBench.Length; i++) { team.pawnsInBench[i] = defultPawnIndex+(10000*(i+ team.PlayeingPawns.Length)); }
             for (int i = 0; i < team.UsableFormations.Length; i++) { team.UsableFormations[i] = -1; }
-            for (int i = 0; i < team.ElixirInBench.Length; i++) { team.ElixirInBench[i] = defultElixirIndex; }
+            for (int i = 0; i < team.ElixirInBench.Length; i++) { team.ElixirInBench[i] = -1; }
+            team.ElixirInBench[0] = defultElixirIndex;
             return team;
         }
 
