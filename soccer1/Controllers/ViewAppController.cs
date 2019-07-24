@@ -23,6 +23,12 @@ namespace soccer1.Controllers
             }            
         }
 
-       
+        public string ViewActiveMatches()
+        {
+            string result = new SymShootMatchesList().ReturnActiveMatches();
+            return result; 
+        }
+
+
     }
 }

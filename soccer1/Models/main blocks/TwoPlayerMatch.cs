@@ -385,6 +385,7 @@ namespace soccer1.Models
 
         public PreMatchSituation GivePreSituation()
         {
+            
             mainMutex.WaitOne();
             PreMatchSituation x;
             x = preSituation;

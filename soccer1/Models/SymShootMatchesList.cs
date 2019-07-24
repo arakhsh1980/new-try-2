@@ -14,7 +14,7 @@ namespace soccer1.Models
     {
 
 
-        private static symShootMatch[] matchList = new symShootMatch[1000];
+        private static symShootMatch[] matchList = new symShootMatch[10];
         private static string waitingPlayerId;
 
         #region Massages Form Client
@@ -225,6 +225,20 @@ namespace soccer1.Models
             //ConnectedPlayersList.SetPlayerMatch(playerIdName, bestMatch);            
         }
 
+        public string ReturnActiveMatches()
+        {
+            string result = "";
+            for (int i = 0; i < matchList.Length; i++)
+            {
+                
+                if (matchList[i].GivePreSituation() != PreMatchSituation.NonExistance)
+                {
+                    // if(matchList[i].GivePreSituation() == PreMatchSituation.WithOnePlayer || matchList[i].GivePreSituation() == PreMatchSituation.WFSecondPlayer)
+                    result = result + ".    matchNumber " + i.ToString() + " with player " + matchList[i].ReturnFirstPlayerByIdName() + matchList[i].GivePreSituation().ToString();
+                }
+            }
+            return result;
+        }
 
         // this function will be called ones at start of server
         public void FillArrays()

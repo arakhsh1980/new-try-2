@@ -12,7 +12,7 @@ namespace soccer1.Models
     {
 
         
-        private static TwoPlayerMatch[] matchList = new TwoPlayerMatch[1000];
+        private static TwoPlayerMatch[] matchList = new TwoPlayerMatch[10];
 
 
 #region Massages Form Client
@@ -123,6 +123,20 @@ namespace soccer1.Models
             //ConnectedPlayersList.SetPlayerMatch(playerConnId, matchNumber);
         }
 
+        public string ReturnActiveMatches()
+        {
+            string result = "";
+            for(int i =0; i< matchList.Length; i++)
+            {
+                result = result + ".    matchNumber " + i.ToString() + " with player " + matchList[i].ReturnFirstPlayerByIdName() + matchList[i].GivePreSituation().ToString();
+                if (matchList[i].GivePreSituation() != PreMatchSituation.NonExistance)
+                {
+                   // if(matchList[i].GivePreSituation() == PreMatchSituation.WithOnePlayer || matchList[i].GivePreSituation() == PreMatchSituation.WFSecondPlayer)
+                    
+                }
+            }
+            return result;
+        }
 
         public void ClearMatchesOfPlayer(string nameId)
         {
