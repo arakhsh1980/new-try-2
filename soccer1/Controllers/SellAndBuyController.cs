@@ -15,7 +15,7 @@ namespace soccer1.Controllers
     public class SellAndBuyController : Controller
     {
         // GET: SellAndBuy
-
+        private DataDBContext dataBase = new DataDBContext();
         [HttpPost]
         public string BuyAsset(FormCollection collection)
         {            
@@ -26,7 +26,7 @@ namespace soccer1.Controllers
             //int IdCode =-1;
             int PlayerIndex=-1;
 
-            DataDBContext dataBase = new DataDBContext();
+            
             PlayerForDatabase player = dataBase.playerInfoes.Find(PlayerId);
             if(player != null)
             {
@@ -48,11 +48,14 @@ namespace soccer1.Controllers
                 {
                     result = pl.BuyAsset(assetType, assetId, AssetPrice);
                 }
+                /*
                 if (result) {
                     player.changePlayer(pl.returnDataBaseVersion());
                     dataBase.Entry(player).State = EntityState.Modified;
                     dataBase.SaveChanges();
                 }
+                */
+                
                 //Log.AddLog("Error : reusult:" + result.ToString());
                 return result.ToString();
             }
@@ -68,7 +71,7 @@ namespace soccer1.Controllers
             
             bool result = false;
 
-            DataDBContext dataBase = new DataDBContext();
+            
             PlayerForDatabase player = dataBase.playerInfoes.Find(PlayerId);
             if (player != null)
             {
@@ -79,12 +82,15 @@ namespace soccer1.Controllers
                 PlayerForConnectedPlayer pl = new PlayerForConnectedPlayer();
                 pl.reWriteAccordingTo(player);
                 result = pl.BuyOffer(BuyingMaterial , AssetPrice);
+                /*
                 if (result)
                 {
                     player.changePlayer(pl.returnDataBaseVersion());
                     dataBase.Entry(player).State = EntityState.Modified;
                     dataBase.SaveChanges();
                 }
+                */
+
                 //Log.AddLog("Error : reusult:" + result.ToString());
                 return result.ToString();
             }

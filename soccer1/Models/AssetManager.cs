@@ -31,7 +31,7 @@ namespace soccer1.Models
         public static Mutex AddElixirmutex = new Mutex();
         public static Mutex AddFormationmutex = new Mutex();
         public static Mutex AddOffermutex = new Mutex();
-
+        private DataDBContext dataBase = new DataDBContext();
 
         public int ReturnrequiredXpForNextLevel(int idNum) {
             return Pawnlist[idNum].RequiredXpForUpgrade;
@@ -356,13 +356,13 @@ namespace soccer1.Models
                 offer.index = OfferConter;
                 Offerlist[OfferConter] = offer;
                 OfferConter++;
-                DatabaseManager.AddOfferToDataBase(offer);
+                new DatabaseManager().AddOfferToDataBase(offer);
             }
             else
             {
                 offer.index = indexinarray;
                 Offerlist[indexinarray] = offer;
-                DatabaseManager.AddOfferToDataBase(offer);
+                new DatabaseManager().AddOfferToDataBase(offer);
             }
             AddOffermutex.ReleaseMutex();
         }
@@ -375,7 +375,7 @@ namespace soccer1.Models
             
             p.key = p.IdNum.ToString();
             Pawnlist[p.IdNum] = p;
-            DatabaseManager.AddPawnToDataBase(p);
+            new DatabaseManager().AddPawnToDataBase(p);
             AddPawnmutex.ReleaseMutex();
         }
 
@@ -386,7 +386,7 @@ namespace soccer1.Models
             
             ff.key = ff.IdNum.ToString();
             Formationlist[ff.IdNum] = ff;
-            DatabaseManager.AddFormationToDataBase(ff);
+            new DatabaseManager().AddFormationToDataBase(ff);
             AddFormationmutex.ReleaseMutex();
         }
 
@@ -400,11 +400,11 @@ namespace soccer1.Models
             
             el.key = el.IdNum.ToString();
             Elixirlist[el.IdNum] = el;
-            DatabaseManager.AddElixirToDataBase(el);
+            new DatabaseManager().AddElixirToDataBase(el);
             AddElixirmutex.ReleaseMutex();
         }
         
-        public static void FillArrays()
+        public void FillArrays()
         {
             AddElixirmutex.WaitOne();
             AddFormationmutex.WaitOne();
@@ -417,18 +417,10 @@ namespace soccer1.Models
                 //Formationlist[i] = new Formation();
                 Offerlist[i] = new Offer();
             }
-            LoadAssets();
-
-        }
-
-        
-        public static void LoadAssets()
-        {
-            
             assentsLoaded.WaitOne();
-            DataDBContext dataBase = new DataDBContext();
+
             Formation[] formations = dataBase.allFormations.ToArray();
-            for(int i =0; i< formations.Length; i++)
+            for (int i = 0; i < formations.Length; i++)
             {
                 Formationlist[formations[i].IdNum] = formations[i];
             }
@@ -449,7 +441,11 @@ namespace soccer1.Models
             AddFormationmutex.ReleaseMutex();
             AddPawnmutex.ReleaseMutex();
             assentsLoaded.ReleaseMutex();
+
         }
+
+        
+        
 
         /*
         public static string ReturnPawnName(int pawnId)

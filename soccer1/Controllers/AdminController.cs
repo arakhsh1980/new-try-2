@@ -7,6 +7,13 @@ using soccer1.Models;
 using System.Web.Script.Serialization;
 using soccer1.Models.main_blocks;
 using System.Threading;
+using System.Data.Entity;
+using soccer1.Models.main_blocks;
+using System.ComponentModel.DataAnnotations;
+using soccer1.Models.utilites;
+using soccer1.Models.DataBase;
+using System.Web.Script.Serialization;
+using System.Threading;
 
 namespace soccer1.Controllers
 {
@@ -16,8 +23,8 @@ namespace soccer1.Controllers
         public static Mutex AddElixirmutex = new Mutex();
         public static Mutex AddFormationmutex = new Mutex();
         public static Mutex AddOffermutex = new Mutex();
+        private DataDBContext dataBase = new DataDBContext();
 
-        
         [HttpPost]
         public string AddPawn(FormCollection collection)
         {
@@ -135,6 +142,32 @@ namespace soccer1.Controllers
             AddOffermutex.ReleaseMutex();
             return "Formation Loaded" + newOffer.IdName;
         }
+
+
+
+
+        [HttpPost]
+        public string UpdateGamePreference(FormCollection collection)
+        {
+            string GamePrefranceString = Request.Form["GamePrefranceString"];
+            Statistics.BasePrefrance = GamePrefranceString;
+            return true.ToString();
+        }
+
+        [HttpPost]
+        public string ResetAllPlayersInfos(FormCollection collection)
+        {
+            
+            foreach(PlayerForDatabase p in dataBase.playerInfoes)
+            {
+                dataBase.playerInfoes.Remove(p);
+            }
+            dataBase.SaveChanges();
+            return true.ToString();
+        }
+
+
+
 
     }
 }

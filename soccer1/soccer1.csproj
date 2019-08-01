@@ -200,7 +200,6 @@
     <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\ChoosePlayerController.cs" />
     <Compile Include="Controllers\LoadingController.cs" />
-    <Compile Include="Controllers\MatchController.cs" />
     <Compile Include="Controllers\LeagueController.cs" />
     <Compile Include="Controllers\ProfileController.cs" />
     <Compile Include="Controllers\SellAndBuyController.cs" />
@@ -228,7 +227,6 @@
     <Compile Include="Models\main blocks\PlayerForSerial.cs" />
     <Compile Include="Models\main blocks\symShootMatch.cs" />
     <Compile Include="Models\main blocks\Team.cs" />
-    <Compile Include="Models\MatchList.cs" />
     <Compile Include="Models\main blocks\playerCennectionInfo.cs" />
     <Compile Include="Models\Errors.cs" />
     <Compile Include="Models\main blocks\ShootActionCode.cs" />

@@ -15,10 +15,10 @@ namespace soccer1.Models
     public class DatabaseManager
     {
 
-        
-       
-        
-        
+
+
+
+
 
         //load a player and add it to array
         /*
@@ -115,9 +115,11 @@ namespace soccer1.Models
         }
         */
 
-        public static void AddPawnToDataBase(Pawn p)
+        private DataDBContext dataBase = new DataDBContext();
+
+        public void AddPawnToDataBase(Pawn p)
         {
-            DataDBContext dataBase = new DataDBContext();
+            
 
             Pawn pp = dataBase.allPawns.Find(p.key);
             if (pp == null)
@@ -134,11 +136,11 @@ namespace soccer1.Models
             }
         }
 
+        
 
-
-        public static void AddFormationToDataBase(Formation ff)
+        public void AddFormationToDataBase(Formation ff)
         {
-            DataDBContext dataBase = new DataDBContext();
+            
             //dataBase.
             Formation pp = dataBase.allFormations.Find(ff.key);
             if (pp == null)
@@ -156,9 +158,9 @@ namespace soccer1.Models
         }
 
 
-        public static void AddOfferToDataBase(Offer ff)
+        public void AddOfferToDataBase(Offer ff)
         {
-            DataDBContext dataBase = new DataDBContext();
+            
             Offer pp = dataBase.allOffers.Find(ff.IdName);
             if (pp == null)
             {
@@ -175,9 +177,9 @@ namespace soccer1.Models
         }
 
 
-        public static void AddElixirToDataBase(Elixir el)
+        public void AddElixirToDataBase(Elixir el)
         {
-            DataDBContext dataBase = new DataDBContext();
+           
             Elixir elold = dataBase.allElixires.Find(el.key);
             if (elold == null)
             {

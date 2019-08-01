@@ -19,6 +19,7 @@ namespace soccer1.Controllers
 {
     public class ProfileController : Controller
     {
+        private DataDBContext dataBase = new DataDBContext();
         // GET: ProfileConnection
         [HttpPost]
         public string UpdateProfile(FormCollection collection)
@@ -28,19 +29,21 @@ namespace soccer1.Controllers
             string Team1 = collection["Team"];
             TeamForSerialize teamfs = new JavaScriptSerializer().Deserialize<TeamForSerialize>(Team1);                
             TeamForConnectedPlayers playerteam = new Convertors().TeamForSerializeToTeam(teamfs);
-            DataDBContext dataBase = new DataDBContext();
+            
             PlayerForDatabase player = dataBase.playerInfoes.Find(PlayerId);
             if (player != null)
             {
                 PlayerForConnectedPlayer pl = new PlayerForConnectedPlayer();
                 pl.reWriteAccordingTo(player);
                 interactionResult= pl.ChangeTeam(playerteam);
+                /*
                 if (interactionResult)
                 {
                     player.changePlayer(pl.returnDataBaseVersion());
                     dataBase.Entry(player).State = EntityState.Modified;
                     dataBase.SaveChanges();
                 } 
+                */
             }
             return interactionResult.ToString();
         }
@@ -52,19 +55,20 @@ namespace soccer1.Controllers
             int newPawnType = Int32.Parse(Request.Form["newPawnType"]);
             string PlayerId = Request.Form["PlayerId"];
             bool interactionResult = false;
-            DataDBContext dataBase = new DataDBContext();
             PlayerForDatabase player = dataBase.playerInfoes.Find(PlayerId);
             if (player != null)
             {
                 PlayerForConnectedPlayer pl = new PlayerForConnectedPlayer();
                 pl.reWriteAccordingTo(player);
                 interactionResult = pl.UpgradePawnto(pawnCode, newPawnType);
+                /*
                 if (interactionResult)
                 {
                     player.changePlayer(pl.returnDataBaseVersion());
                     dataBase.Entry(player).State = EntityState.Modified;
                     dataBase.SaveChanges();
                 }
+                */
             }
             return interactionResult.ToString();
         }

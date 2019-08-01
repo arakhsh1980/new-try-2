@@ -23,14 +23,14 @@ namespace soccer1.Controllers
 {
     public class LoadingController : Controller
     {
-
+        private DataDBContext dataBase = new DataDBContext();
         private static Mutex AddNew = new Mutex();
         // POST: Loading/LoadPlayerData
         [HttpPost]
         public string LoadPlayerData(FormCollection collection)
         {            
             string id = Request.Form["PlayerId"];
-            DataDBContext dataBase = new DataDBContext();
+            
             PlayerForDatabase player = dataBase.playerInfoes.Find(id);
             if(player== null) {
                 AddNew.WaitOne();
@@ -42,9 +42,10 @@ namespace soccer1.Controllers
                 dataBase.SaveChanges();
                 AddNew.ReleaseMutex();
             }
-            new MatchList().ClearMatchesOfPlayer(player.id);
+            //new MatchList().ClearMatchesOfPlayer(player.id);
             new SymShootMatchesList().ClearMatchesOfPlayer(player.id);
-            PlayerForSerial plsr = new Convertors().PForDatabaseToPForSerial(player); 
+            PlayerForSerial plsr = new Convertors().PForDatabaseToPForSerial(player);
+            dataBase.SaveChanges();
             Log.AddPlayerLog(plsr.id, "player"+ plsr.id.ToString() + " added by " + plsr.id + " ID");
             string uu = new JavaScriptSerializer().Serialize(plsr);
             return uu;  

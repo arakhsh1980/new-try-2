@@ -11,8 +11,7 @@ namespace soccer1.App_Start
         public static void StartAll()
         {
             //ConnectedPlayersList.FillArrays();
-            AssetManager.FillArrays();
-            new MatchList().FillArrays();
+            new AssetManager().FillArrays();
             new SymShootMatchesList().FillArrays();
         }
     }

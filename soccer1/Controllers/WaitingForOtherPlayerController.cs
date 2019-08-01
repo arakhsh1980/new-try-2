@@ -25,7 +25,8 @@ namespace soccer1.Controllers
             }
             else
             {
-                return new MatchList().ReturnEvent(PlayerId, matchId);
+                return new SymShootMatchesList().ReturnEvent(PlayerId, matchId);
+                // return new MatchList().ReturnEvent(PlayerId, matchId);
             }
 
 

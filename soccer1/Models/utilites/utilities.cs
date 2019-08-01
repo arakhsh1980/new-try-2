@@ -26,6 +26,7 @@ namespace soccer1.Models.utilites
             PlayerForDatabase player = new PlayerForDatabase();            
             TeamForConnectedPlayers team =returnDefultTeam();
             List<int> pawnOutOfTeam = new List<int>();
+            pawnOutOfTeam.Add(10);
             List<int> elixirOutOfTeam = new List<int>();
             player.CurrentFormation = team.CurrentFormation;
             player.ElixirInBench = new Convertors().IntArrayToSrting(team.ElixirInBench);
@@ -33,8 +34,8 @@ namespace soccer1.Models.utilites
             player.level = 1;
             player.Money = Statistics.StartingCoin;
             player.Name = "Defult";
-            player.otherElixirs = new Convertors().IntArrayToSrting(new Convertors().outOfTeamPawnToIntArray(elixirOutOfTeam));
-            player.otherPawns = new Convertors().IntArrayToSrting(new Convertors().outOfTeamPawnToIntArray(pawnOutOfTeam));
+            player.otherElixirs = new Convertors().IntArrayToSrting(new Convertors().listIntToIntArray(elixirOutOfTeam));
+            player.otherPawns = new Convertors().IntArrayToSrting(new Convertors().listIntToIntArray(pawnOutOfTeam));
             player.pawnsInBench = new Convertors().IntArrayToSrting(team.pawnsInBench);
             player.PlayeingPawns = new Convertors().IntArrayToSrting(team.PlayeingPawns);
             player.PowerLevel = 1;

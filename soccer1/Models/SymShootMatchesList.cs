@@ -14,7 +14,7 @@ namespace soccer1.Models
     {
 
 
-        private static symShootMatch[] matchList = new symShootMatch[10];
+        private static symShootMatch[] matchList = new symShootMatch[100];
         private static string waitingPlayerId;
 
         #region Massages Form Client
@@ -79,9 +79,9 @@ namespace soccer1.Models
             
         }
 
-        public string CanceledThePlayRequest(string playerId, int matchId)
+        public void CanceledThePlayRequest(string playerId, int matchId)
         {
-            return matchList[matchId].CanceledThePlayRequest(playerId);
+            matchList[matchId].playerLostOrCenceled(playerId);
         }
 
         public string PlayAccepted(string playerId, int matchId, int GatheredMoney)
@@ -114,12 +114,11 @@ namespace soccer1.Models
             int bestMatch = -1;
 
             for (int i = (matchList.Length - 1); 0 <= i; i--)
-            {
-                matchList[i].CheckYourSelf();
-                if ((matchList[i].GivePreSituation() == PreMatchSituation.WithOnePlayer || matchList[i].GivePreSituation() == PreMatchSituation.WFSecondPlayer) && matchList[i].GivLeague() == SelectedLeage)
-                {
-                    matchList[i].garbegColletor();
-                    if ((matchList[i].GivePreSituation() == PreMatchSituation.WithOnePlayer || matchList[i].GivePreSituation() == PreMatchSituation.WFSecondPlayer))
+            {                
+                if (( matchList[i].GivePreSituation() == PreMatchSituation.WFSecondPlayer || matchList[i].GivePreSituation() == PreMatchSituation.WFSecondPlayerAtHome) && matchList[i].GivLeague() == SelectedLeage)
+                {                    
+                    matchList[i].IsPreSituationStillValid();
+                    if ( matchList[i].GivePreSituation() == PreMatchSituation.WFSecondPlayer || matchList[i].GivePreSituation() == PreMatchSituation.WFSecondPlayerAtHome)
                     {
                         if (Math.Abs(matchList[i].GivePlayerOnePower() - PlayerPowerLevel) < bestpowerDiference)
                         {
@@ -155,28 +154,26 @@ namespace soccer1.Models
         }
         public void AddSecondPlayer(int matchNumber, string playerNameId, float playerPower)
         {
-            if( matchList[matchNumber].GivePreSituation() == PreMatchSituation.WithOnePlayer)
+            if( matchList[matchNumber].GivePreSituation() == PreMatchSituation.WFSecondPlayer)
             {
                 matchList[matchNumber].AddSecondPlayerStartImideatly(playerNameId, playerPower);
             }
             else
             {
-                matchList[matchNumber].AddSecondPlayerAndWaitForFisrtRespond(playerNameId, playerPower);
+                if (matchList[matchNumber].GivePreSituation() == PreMatchSituation.WFSecondPlayerAtHome)
+                {
+                    matchList[matchNumber].AddSecondPlayerAndWaitForFisrtRespond(playerNameId, playerPower);
+                }
             }
         }
 
-        public void StartMatch(int matchNumber)
-        {
-            matchList[matchNumber].StartMatch();
-
-            //ConnectedPlayersList.SetPlayerMatch(playerConnId, matchNumber);
-        }
+      
 
         public void ClearMatchesOfPlayer(string nameId)
         {
             for (int i = 0; i < matchList.Length; i++)
             {
-                matchList[i].playerLost(nameId);
+                matchList[i].playerLostOrCenceled(nameId);
             }
         }
 
@@ -188,7 +185,7 @@ namespace soccer1.Models
                 return;
             }
             //Log.AddMatchLog(matchId, " player " + PlayerNameId + " Of Match Lost");
-            matchList[matchId].playerLost(PlayerNameId);
+            matchList[matchId].playerLostOrCenceled(PlayerNameId);
         }
 
 
@@ -206,12 +203,25 @@ namespace soccer1.Models
             }
             if (bestMatch == -1)
             {
-                Errors.AddBigError(" find no empty match to add player one");
-                addMatch.ReleaseMutex();
-                return -1;
+                Log.AddLog("matchList is full. try to free some");
+                for (int k =0; k < matchList.Length; k++)
+                {
+                    matchList[k].IsPreSituationStillValid();
+                }
+                for (int i = (matchList.Length - 1); 0 <= i; i--)
+                {
+                    if (matchList[i].GivePreSituation() == PreMatchSituation.NonExistance)
+                    {
+                        bestMatch = i;
+                    }
+                }if(bestMatch == -1)
+                {
+                    Errors.AddBigError(" find no empty match to add player one");
+                    addMatch.ReleaseMutex();
+                    return -1;
+                } 
             }
-            else
-            {
+            
                 matchList[bestMatch] = new symShootMatch();
                 matchList[bestMatch].InitiatMatchWithOnePlayer(playerIdName, playerPower, bestMatch, SelectedLeage);
 
@@ -219,8 +229,6 @@ namespace soccer1.Models
                 //Log.AddMatchLog(bestMatch, "added with player" + playerIdName + " as first player");
                 addMatch.ReleaseMutex();
                 return bestMatch;
-
-            }
 
             //ConnectedPlayersList.SetPlayerMatch(playerIdName, bestMatch);            
         }
@@ -252,7 +260,7 @@ namespace soccer1.Models
 
         public void PlayerLeaveMatch(int matchId, string NameId)
         {
-            matchList[matchId].playerLost(NameId);
+            matchList[matchId].playerLostOrCenceled(NameId);
         }
 
 
@@ -270,7 +278,7 @@ namespace soccer1.Models
             {
                 for (int i = 0; i < matchList.Length; i++)
                 {
-                    matchList[i].garbegColletor();
+                    matchList[i].IsPreSituationStillValid();
                 }
             }
             CheckMatchListMutex.ReleaseMutex();

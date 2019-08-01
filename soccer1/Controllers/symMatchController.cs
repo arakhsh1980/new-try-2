@@ -29,8 +29,8 @@ namespace soccer1.Controllers
 {
     public class symMatchController : Controller
     {
+        private DataDBContext dataBase = new DataDBContext();
 
-        
 
         [HttpPost]
         public string PlayerLeftTheMatch(FormCollection collection)
@@ -100,13 +100,13 @@ namespace soccer1.Controllers
             int ElixirType = Int32.Parse(Request.Form["ElixirType"]);
             bool result = false;
             bool useResult = false;
-            DataDBContext dataBase = new DataDBContext();
             PlayerForDatabase player = dataBase.playerInfoes.Find(PlayerId);
             if (player != null)
             {
                 PlayerForConnectedPlayer pl = new PlayerForConnectedPlayer();
                 pl.reWriteAccordingTo(player);
                 useResult = pl.ElixirUse(ElixirType);
+                /*
                 if (useResult)
                 {
                     player.changePlayer(pl.returnDataBaseVersion());
@@ -114,6 +114,7 @@ namespace soccer1.Controllers
                     dataBase.SaveChanges();
                     result = new SymShootMatchesList().ElixirUseHappened(matchId, PlayerId, TurnNumber, jsonpart);
                 }
+                */
             }
             return result.ToString();
 

@@ -36,11 +36,13 @@ namespace soccer1.Models.main_blocks
             PlayerProperty.SoccerSpetial = Statistics.StartingSS;
         }
 
-        
+        private DataDBContext dataBase = new DataDBContext();
 
         public string id { get; set; }
 
         public static Mutex mainMutex = new Mutex();
+
+        public static Mutex SaveChengesMutex = new Mutex();
 
         private string Name { get; set; }
 
@@ -63,7 +65,7 @@ namespace soccer1.Models.main_blocks
         #region public functions
 
         public void GainMatchXp(GainedXp gainedXp)
-        {    
+        {
             
             team.AddXpToTeam(gainedXp.xpVAl[gainedXp.xpVAl.Length - 1]);
             for (int i = 0; i < gainedXp.AssingedIndex.Length; i++)
@@ -73,6 +75,7 @@ namespace soccer1.Models.main_blocks
                     team.AddXpToPawn(gainedXp.AssingedIndex[i], gainedXp.xpVAl[i]);
                 }
             }
+            SaveChanges();
             
             
         }
@@ -91,6 +94,7 @@ namespace soccer1.Models.main_blocks
             if (utilities.CheckIfFirstPropertyIsBigger(PlayerProperty, price)) {
                 SubtractProperty(price);
                 //Log.AddLog("Error : assetType of asset:" + assetType);
+                int newEntity = AssetIdNum;
                 switch (assetType)
                 {
 
@@ -99,7 +103,11 @@ namespace soccer1.Models.main_blocks
                      
                         break;
                     case AssetType.Elixir:
-                        elixirOutOfTeam.Add(new AssetManager().ReturnAssetIndex(AssetType.Elixir, AssetIdNum));
+                        int tset = elixirOutOfTeam.Count;
+                        newEntity = new AssetManager().ReturnAssetIndex(AssetType.Elixir, AssetIdNum);
+                        
+
+                        elixirOutOfTeam.Add(newEntity);
                         break;
                     case AssetType.Formation:
                        team.AddToUsableFormations(new AssetManager().ReturnAssetIndex(AssetType.Formation, AssetIdNum));
@@ -167,6 +175,7 @@ namespace soccer1.Models.main_blocks
                 PlayerProperty.coin -= prop.coin;
                 PlayerProperty.SoccerSpetial -= prop.SoccerSpetial;
                 PlayerProperty.fan -= prop.fan;
+                SaveChanges();
                 return true;
             }
             else
@@ -184,6 +193,7 @@ namespace soccer1.Models.main_blocks
             PlayerProperty.SoccerSpetial += prop.SoccerSpetial;
             PlayerProperty.fan += prop.fan;
             PlayerProperty.level += prop.level;
+            SaveChanges();
         }
 
         public bool ChangeTeam(TeamForConnectedPlayers newTeammm)
@@ -263,6 +273,7 @@ namespace soccer1.Models.main_blocks
             }
         }
 
+        /*
         public PlayerForSerial ReturnPlayrSerial()
         {
             PlayerForSerial plsr = new PlayerForSerial();
@@ -291,29 +302,13 @@ namespace soccer1.Models.main_blocks
                 elixirCounter++;
             }
 
-            /*
-
-            int[] pawnBuffer = new int[Statistics.MaxPawnOutOfTeam];
-            for(int i=0; i< pawnBuffer.Length; i++) { pawnBuffer[i] = -1; }
-            int[] elixirBuffer = new int[Statistics.MaxElixirOutOfTeam];
-            for (int i = 0; i < elixirBuffer.Length; i++) { elixirBuffer[i] = -1; }
             
-            
-            foreach(int i in pawnOutOfTeam)
-            {
-                pawnBuffer[pawncounter] = i;
-                pawncounter++;
-            }
-            foreach (int i in elixirOutOfTeam)
-            {
-                elixirBuffer[elixirCounter] = i;
-                elixirCounter++;
-            }
-            */
             plsr.OutOfTeamPawns = pawnsarray; 
             plsr.OutOfTeamElixirs = elixirsarray; 
             return plsr;
         }
+    */
+        
         #endregion
 
         public bool UpgradePawnto(int pawnCode, int newPawnType) {
@@ -329,21 +324,36 @@ namespace soccer1.Models.main_blocks
             isREmovedPastFromPawnOutOfTeam = pawnOutOfTeam.Remove( pawnCode);
             if (isREmovedPastFromPawnOutOfTeam)
             {
-                pawnOutOfTeam.Add(newPawnCode); return true;
+                pawnOutOfTeam.Add(newPawnCode);
+                SaveChanges();
+                return true;
             }
             for (int i = 0; i < team.PlayeingPawns.Length; i++)
             {
+                int isFindedPlace = -1;
                 if (team.PlayeingPawns[i] == pawnCode)
                 {
-                    team.PlayeingPawns[i] = newPawnCode;
+                    isFindedPlace = i;                   
+                }
+                if (-1 < isFindedPlace)
+                {
+                    team.PlayeingPawns[isFindedPlace] = newPawnCode;
+                    SaveChanges();
                     return true;
                 }
             }
             for (int i = 0; i < team.pawnsInBench.Length; i++)
             {
+                int isFindedPlace = -1;
                 if (team.pawnsInBench[i] == pawnCode)
                 {
+                    isFindedPlace = i;
+                    
+                }
+                if (-1 < isFindedPlace)
+                {
                     team.pawnsInBench[i] = newPawnCode;
+                    SaveChanges();
                     return true;
                 }
             }
@@ -358,14 +368,16 @@ namespace soccer1.Models.main_blocks
             if (-1 < elixirPlace)
             {
                 team.ElixirInBench[elixirPlace] = -1;
+                SaveChanges();
                 result = true;
             }
+
             return result;
         }
 
         public  void reWriteAccordingTo(PlayerForDatabase pl)
         {
-           
+            mainMutex.WaitOne();
             id = pl.id;
             PlayerProperty.fan = pl.Fan;
             Name = pl.Name;
@@ -379,13 +391,13 @@ namespace soccer1.Models.main_blocks
             //convert string to int
             int[] pawnBuffer = convertor.StringToIntArray(pl.otherPawns);
             pawnOutOfTeam.Clear();
-            for (int i = 0; i < pawnBuffer.Length; i++) if (0 < pawnBuffer[i])
+            for (int i = 0; i < pawnBuffer.Length; i++) if (0 <= pawnBuffer[i])
                 {
                     pawnOutOfTeam.Add(pawnBuffer[i]);
                 }
             int[] ElixirBuffer = convertor.StringToIntArray(pl.otherElixirs);
             elixirOutOfTeam.Clear();
-            for (int i = 0; i < ElixirBuffer.Length; i++) if (0 < ElixirBuffer[i])
+            for (int i = 0; i < ElixirBuffer.Length; i++) if (0 <= ElixirBuffer[i])
                 {
                     elixirOutOfTeam.Add(ElixirBuffer[i]);
                 }
@@ -395,11 +407,14 @@ namespace soccer1.Models.main_blocks
             team.UsableFormations = convertor.StringToIntArray(pl.UsableFormations);
             
             team.ElixirInBench = convertor.StringToIntArray(pl.ElixirInBench);
+            mainMutex.ReleaseMutex();
         }
 
 
-        public PlayerForDatabase returnDataBaseVersion()
+        
+        private PlayerForDatabase returnDataBaseVersion()
         {
+            mainMutex.WaitOne();
             PlayerForDatabase plsrs = new PlayerForDatabase();
             plsrs.CurrentFormation =team.CurrentFormation;
             plsrs.ElixirInBench = convertor.IntArrayToSrting(team.ElixirInBench);
@@ -408,20 +423,20 @@ namespace soccer1.Models.main_blocks
             plsrs.level = PlayerProperty.level;
             plsrs.Money = PlayerProperty.coin;
             plsrs.Name = Name;
-            plsrs.otherElixirs = convertor.IntArrayToSrting(convertor.outOfTeamPawnToIntArray(elixirOutOfTeam));
-            plsrs.otherPawns = convertor.IntArrayToSrting(convertor.outOfTeamPawnToIntArray(pawnOutOfTeam));
+            plsrs.otherElixirs = convertor.IntArrayToSrting(convertor.listIntToIntArray(elixirOutOfTeam));
+            plsrs.otherPawns = convertor.IntArrayToSrting(convertor.listIntToIntArray(pawnOutOfTeam));
             plsrs.pawnsInBench = convertor.IntArrayToSrting(team.pawnsInBench);
             plsrs.PlayeingPawns = convertor.IntArrayToSrting(team.PlayeingPawns);
             plsrs.PowerLevel = PowerLevel;
             plsrs.SoccerSpetial = PlayerProperty.SoccerSpetial;
             plsrs.UsableFormations = convertor.IntArrayToSrting(team.UsableFormations);
+            mainMutex.ReleaseMutex();
             return plsrs;
         }
-
+        
         public void SaveChanges()
         {
             mainMutex.WaitOne();
-            DataDBContext dataBase = new DataDBContext();
             PlayerForDatabase thisPlayerAtServer =dataBase.playerInfoes.Find(id);
             thisPlayerAtServer.CurrentFormation = team.CurrentFormation;
             thisPlayerAtServer.ElixirInBench = convertor.IntArrayToSrting(team.ElixirInBench);
@@ -430,8 +445,8 @@ namespace soccer1.Models.main_blocks
             thisPlayerAtServer.level = PlayerProperty.level;
             thisPlayerAtServer.Money = PlayerProperty.coin;
             thisPlayerAtServer.Name = Name;
-            thisPlayerAtServer.otherElixirs = convertor.IntArrayToSrting(convertor.outOfTeamPawnToIntArray(elixirOutOfTeam));
-            thisPlayerAtServer.otherPawns = convertor.IntArrayToSrting(convertor.outOfTeamPawnToIntArray(pawnOutOfTeam));
+            thisPlayerAtServer.otherElixirs = convertor.IntArrayToSrting(convertor.listIntToIntArray(elixirOutOfTeam));
+            thisPlayerAtServer.otherPawns = convertor.IntArrayToSrting(convertor.listIntToIntArray(pawnOutOfTeam));
             thisPlayerAtServer.pawnsInBench = convertor.IntArrayToSrting(team.pawnsInBench);
             thisPlayerAtServer.PlayeingPawns = convertor.IntArrayToSrting(team.PlayeingPawns);
             thisPlayerAtServer.PowerLevel = PowerLevel;
@@ -445,7 +460,6 @@ namespace soccer1.Models.main_blocks
         public void AddTodDataBase()
         {
             mainMutex.WaitOne();
-            DataDBContext dataBase = new DataDBContext();
             PlayerForDatabase playerInfo = returnDataBaseVersion();
             dataBase.playerInfoes.Add(playerInfo);
             dataBase.SaveChanges();

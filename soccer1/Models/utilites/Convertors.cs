@@ -194,7 +194,7 @@ namespace soccer1.Models.utilites
             return uu;
         }
 
-        public   int[] outOfTeamPawnToIntArray(List<int> list)
+        public   int[] listIntToIntArray(List<int> list)
         {
             int[] buffer = new int[Statistics.MaxPawnOutOfTeam];
             for(int i =0; i< buffer.Length; i++)

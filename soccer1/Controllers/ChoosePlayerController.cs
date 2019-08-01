@@ -7,6 +7,7 @@ using soccer1.Models;
 using soccer1.Models.utilites;
 using soccer1.Models.main_blocks;
 using soccer1.Models.DataBase;
+using System.Web.Script.Serialization;
 
 namespace soccer1.Controllers
 {
@@ -15,6 +16,7 @@ namespace soccer1.Controllers
 
     public class ChoosePlayerController : Controller
     {
+        private DataDBContext dataBase = new DataDBContext();
         [HttpPost]
         public string OtherPlayerTeam(FormCollection collection)
         {
@@ -28,12 +30,12 @@ namespace soccer1.Controllers
             }
             else
             {
-                opponentId = new MatchList().ReturnOpponentOf(PlayerId, matchId);
+                opponentId = new SymShootMatchesList().ReturnOpponentOf(PlayerId, matchId);
+                //opponentId = new MatchList().ReturnOpponentOf(PlayerId, matchId);
             }
 
             
 
-            DataDBContext dataBase = new DataDBContext();
             PlayerForDatabase player = dataBase.playerInfoes.Find(opponentId);
 
             if (player != null)
@@ -66,12 +68,11 @@ namespace soccer1.Controllers
             }
             else
             {
-                opponentId = new MatchList().ReturnOpponentOf(PlayerId, matchId);
+                opponentId = new SymShootMatchesList().ReturnOpponentOf(PlayerId, matchId);
+                //opponentId = new MatchList().ReturnOpponentOf(PlayerId, matchId);
             }
 
             
-
-            DataDBContext dataBase = new DataDBContext();
             PlayerForDatabase player = dataBase.playerInfoes.Find(opponentId);
             if(player != null)
             {
@@ -93,7 +94,6 @@ namespace soccer1.Controllers
             string SelectedLeage = Request.Form["SelectedLeage"];
             string MatchType = Request.Form["MatchType"];
             
-            DataDBContext dataBase = new DataDBContext();
             PlayerForDatabase player = dataBase.playerInfoes.Find(PlayerId);
             if (player != null)
             {
@@ -121,6 +121,7 @@ namespace soccer1.Controllers
                 }
                 else
                 {
+                    /*
                     new MatchList().ClearMatchesOfPlayer(player.id);
                     int bestmatch = new MatchList().FindSutableMatch(pl.PowerLevel, SelectedLeage);
                     string PlIdName = pl.id;
@@ -138,6 +139,7 @@ namespace soccer1.Controllers
                         new MatchList().AddSecondPlayerToMatch(bestmatch, PlIdName, PlPower);
                         return "YouAreSecond" + bestmatch;
                     }
+                    */
                 }
             }
             return "you are connected";
@@ -152,11 +154,12 @@ namespace soccer1.Controllers
             string MatchType = Request.Form["MatchType"];
             if (MatchType == "SymShoots")
             {
-                return new SymShootMatchesList().CanceledThePlayRequest(PlayerId, matchId);
+                new SymShootMatchesList().CanceledThePlayRequest(PlayerId, matchId);
+                return true.ToString();
             }
             else
             {
-                return null;
+                return true.ToString();
                 //return new MatchList().NotAcceptedToPlay(PlayerId, matchId);
             }            
         }
@@ -197,7 +200,8 @@ namespace soccer1.Controllers
             }
             else
             {
-                return new MatchList().ReturnEvent(PlayerId, matchId);
+                return new SymShootMatchesList().ReturnEvent(PlayerId, matchId);
+                // return new MatchList().ReturnEvent(PlayerId, matchId);
             }
 
 
@@ -216,9 +220,18 @@ namespace soccer1.Controllers
             }
             else
             {
-                return new MatchList().ReturnEvent(PlayerId, matchId);
+                return new SymShootMatchesList().GoingHomeAndWaiting(PlayerId, matchId);
+                //return new MatchList().ReturnEvent(PlayerId, matchId);
             }
         }
+
+
+        [HttpPost]
+        public string ReturnGamePreference(FormCollection collection)
+        {            
+            return Statistics.BasePrefrance;
+        }
+
 
     }
 

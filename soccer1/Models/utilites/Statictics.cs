@@ -13,7 +13,7 @@ namespace soccer1.Models
 {
     public enum MatchSituation { WFFirstAcceptance, WFShoot, WFStationeryPositions,   EndedPlay };
 
-    public enum PreMatchSituation { NonExistance, WithOnePlayer, WithTwoPlayer, WFFirstAcceptance, WFSecondPlayer, EndedPlay };
+    public enum PreMatchSituation { NonExistance, WFSecondPlayer, WFSecondPlayerAtHome, TwoPlayerInPlay, WFFirstAcceptance,  EndedPlay };
 
     public enum AssetType { Pawn, Elixir, Formation, none };
 
@@ -44,8 +44,11 @@ namespace soccer1.Models
         public const int StartingCoin = 2000;
         public const int StartingSS = 10;
         public const float maxAcceptedPowerDiference = 10;
-        //public static Mutex LoadDataBaseMutex = new Mutex();
-    }
+        public const float timeForFisrtRespondOnWFFirstAcceptance = 10;
+        public static string BasePrefrance ="";
+       
+    //public static Mutex LoadDataBaseMutex = new Mutex();
+}
 
     public static class NominatedXperiance
     {
@@ -56,7 +59,6 @@ namespace soccer1.Models
         public const int LosserTeamXp = 1;
     }
 
-   
     public class LeaugeManager
     {
         public Property LeaugEnterencePice(string LeagName)

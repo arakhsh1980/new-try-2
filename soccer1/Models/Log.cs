@@ -57,7 +57,7 @@ namespace soccer1.Models
             NewMassage.MassageLog = LogBody;
             NewMassage.LogTime = "";
             //NewMassage.LogTime = DateTime.Now.ToString();
-            NewMassage.MatchCreationTime = MatchList.ReturnMatchConnectionTime(MatchId).ToString();
+           // NewMassage.MatchCreationTime = MatchList.ReturnMatchConnectionTime(MatchId).ToString();
             AddStringLog(" match id "+ MatchId.ToString() + ". ", LogBody);
             //logDataBase.GameLog3.Add(NewMassage);
             //logDataBase.SaveChanges();
