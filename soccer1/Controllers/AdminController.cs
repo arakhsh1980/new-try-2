@@ -28,6 +28,7 @@ namespace soccer1.Controllers
         [HttpPost]
         public string AddPawn(FormCollection collection)
         {
+            new AssetManager().LoadDataFromServerifitsFirstTime();
             AddPawnmutex.WaitOne();
             
             //AssetManager.assentsLoaded.WaitOne();
@@ -66,6 +67,7 @@ namespace soccer1.Controllers
         [HttpPost]
         public string AddElixir(FormCollection collection)
         {
+            new AssetManager().LoadDataFromServerifitsFirstTime();
             AddElixirmutex.WaitOne();
             //AssetManager.assentsLoaded.WaitOne();
             Elixir elixir = new Elixir();
@@ -94,6 +96,7 @@ namespace soccer1.Controllers
         [HttpPost]
         public string AddFormation(FormCollection collection)
         {
+            new AssetManager().LoadDataFromServerifitsFirstTime();
             AddFormationmutex.WaitOne();
             //AssetManager.assentsLoaded.WaitOne();
             Formation formation = new Formation();
@@ -124,6 +127,7 @@ namespace soccer1.Controllers
         [HttpPost]
         public string AddOffer(FormCollection collection)
         {
+            new AssetManager().LoadDataFromServerifitsFirstTime();
             AddOffermutex.WaitOne();
             //AssetManager.assentsLoaded.WaitOne();
             Offer newOffer = new Offer();            

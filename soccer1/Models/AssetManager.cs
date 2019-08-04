@@ -32,12 +32,19 @@ namespace soccer1.Models
         public static Mutex AddFormationmutex = new Mutex();
         public static Mutex AddOffermutex = new Mutex();
         private DataDBContext dataBase = new DataDBContext();
-
+        private bool isDataBaseLoaded = false;
         public int ReturnrequiredXpForNextLevel(int idNum) {
             return Pawnlist[idNum].RequiredXpForUpgrade;
         }
 
-
+        public void LoadDataFromServerifitsFirstTime()
+        {
+            if (!isDataBaseLoaded)
+            {
+                FillArrays();
+                new SymShootMatchesList().FillArrays();
+            }
+        }
 
 
         public int ReturnAssetIndex(AssetType type, int IdNum)
@@ -409,7 +416,7 @@ namespace soccer1.Models
             AddElixirmutex.WaitOne();
             AddFormationmutex.WaitOne();
             AddPawnmutex.WaitOne();
-
+            assentsLoaded.WaitOne();
             for (int i=0; i< arraylengh; i++)
             {
                 //Pawnlist[i] = new Pawn();
@@ -417,8 +424,6 @@ namespace soccer1.Models
                 //Formationlist[i] = new Formation();
                 Offerlist[i] = new Offer();
             }
-            assentsLoaded.WaitOne();
-
             Formation[] formations = dataBase.allFormations.ToArray();
             for (int i = 0; i < formations.Length; i++)
             {

@@ -30,7 +30,7 @@ namespace soccer1.Controllers
         public string LoadPlayerData(FormCollection collection)
         {            
             string id = Request.Form["PlayerId"];
-            
+            new AssetManager().LoadDataFromServerifitsFirstTime();
             PlayerForDatabase player = dataBase.playerInfoes.Find(id);
             if(player== null) {
                 AddNew.WaitOne();

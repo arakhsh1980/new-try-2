@@ -173,7 +173,7 @@ namespace soccer1.Models
         {
             for (int i = 0; i < matchList.Length; i++)
             {
-                matchList[i].playerLostOrCenceled(nameId);
+               if(matchList[i] != null) matchList[i].playerLostOrCenceled(nameId);
             }
         }
 
