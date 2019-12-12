@@ -14,23 +14,61 @@ namespace soccer1.Models.utilites
 {
     public class Convertors
     {
-        public PawnOfPlayerData PawnCodeToPawnOfPlayerData(int p)
+        const short pCMX = 260;
+        public PawnOfPlayerData PawnCodeToPawnOfPlayerData(long p)
         {
             if (p < 0) { Errors.AddBigError("Convertors.PawnCodeToPawnOfPlayerData. error in pawn code"); }
-            PawnOfPlayerData pp = new PawnOfPlayerData();
-            pp.pawnType= (int)Math.Floor((p * 1.0f) / 1000000.0f);
-            pp.playerPawnIndex = (int)Math.Floor((p * 1.0f) / 10000.0f) - (pp.pawnType * 100);
-            pp.requiredXpForNextLevel = p - pp.playerPawnIndex * 10000 - pp.pawnType * 1000000;
+            PawnOfPlayerData pp = new PawnOfPlayerData();            
+            long code =  p;
+            // code += 9000000000000000000;
+            //long code = cod;
+            long factor = (long)1000 * pCMX * pCMX * pCMX * pCMX * pCMX * 100;
+            pp.playerPawnIndex = (int)(code / factor);
+            code = code % factor;
+            factor = (long)1000 * pCMX * pCMX * pCMX * pCMX * 100;
+            int shooterCode = (int)(code / factor);
+            pp.parts[4] = shooterCode;
+            code = code % factor;
+            factor = (long)1000 * pCMX * pCMX * pCMX * 100;
+            int shildCode = (int)(code / factor);
+            pp.parts[3] = shildCode;
+            code = code % factor;
+            factor = (long)1000 * pCMX * pCMX * 100;
+            int EnginCode = (int)(code / factor);
+            pp.parts[2] = EnginCode;
+            code = code % factor;
+            factor = (long)1000 * pCMX * 100;
+            int battryCode = (int)(code / factor);
+            pp.parts[1] = battryCode;
+            code = code % factor;
+            factor = (long)1000 * 100;
+            int aimerCode = (int)(code / factor);
+            pp.parts[0] = aimerCode;
+            code = code % factor;
+            factor = (long)1000;
+            pp.baceTypeIndex = (short)(code / factor);
+            code = code % factor;
+            pp.requiredXpForNextLevel = (int)(code);
             return pp;
         }
 
-        public int PawnOfPlayerDataToPawnCode(PawnOfPlayerData pp)
+        public long PawnOfPlayerDataToPawnCode(PawnOfPlayerData pp)
         {
-            if(pp.pawnType<0 || 99<pp.pawnType || pp.playerPawnIndex < 0 || 99 < pp.playerPawnIndex || pp.requiredXpForNextLevel < 0 || 9999 < pp.requiredXpForNextLevel)
+            if (11 < pp.playerPawnIndex)
             {
-                Errors.AddBigError("Convertors.PawnOfPlayerDataToPawnCode. error in pawn code");                
+                //Debug.Log("erooor . decoding will show wrong results");
             }
-            return pp.requiredXpForNextLevel + pp.playerPawnIndex * 10000 + pp.pawnType * 1000000;
+            long code = 0;
+            // code += -9000000000000000000;
+            code += (long)pp.requiredXpForNextLevel;
+            code += (long)pp.baceTypeIndex * 1000;
+            code += (long)pp.parts[0] * 1000*100;
+            code += (long)pp.parts[1] * 1000 * 100 * pCMX;
+            code += (long)pp.parts[2] * 1000 * 100 * pCMX * pCMX;
+            code += (long)pp.parts[3] * 1000 * 100 * pCMX * pCMX * pCMX;
+            code += (long)pp.parts[4] * 1000 * 100 * pCMX * pCMX * pCMX * pCMX;
+            code += (long)pp.playerPawnIndex * 1000 * 100 * pCMX * pCMX * pCMX * pCMX * pCMX;
+            return code;            
         }
 
         public int GetTypePartOfPawn(int p) {
@@ -85,25 +123,27 @@ namespace soccer1.Models.utilites
         public  TeamForSerialize TeamToTeamForSerialize(TeamForConnectedPlayers team)
         {
             TeamForSerialize slteam = new TeamForSerialize();
-            slteam.CurrentFormation = new AssetManager().ReturnAssetName(AssetType.Formation,  team.CurrentFormation);
+            slteam.StartFomation = new AssetManager().ReturnAssetName(AssetType.Formation,  team.StartFomation);
+            slteam.AttackFormation = new AssetManager().ReturnAssetName(AssetType.Formation, team.AttackFormation);
+            slteam.DefienceForation = new AssetManager().ReturnAssetName(AssetType.Formation, team.DefienceForation);
             slteam.ElixirInBench = new int[team.ElixirInBench.Length];
             for (int i=0; i< team.ElixirInBench.Length; i++) { slteam.ElixirInBench[i] = new AssetManager().ReturnAssetName(AssetType.Elixir, team.ElixirInBench[i]); }
 
-            slteam.pawnsInBench = new int[team.pawnsInBench.Length];
-            for (int i = 0; i < team.pawnsInBench.Length; i++) { slteam.pawnsInBench[i] = new AssetManager().ReturnAssetName(AssetType.Pawn, team.pawnsInBench[i]); }
+            slteam.pawnsInBench = new long[team.pawnsInBench.Length];
+            for (int i = 0; i < team.pawnsInBench.Length; i++) { slteam.pawnsInBench[i] =  team.pawnsInBench[i]; }
 
-            slteam.PlayeingPawns = new int[team.PlayeingPawns.Length];
-            for (int i = 0; i < team.PlayeingPawns.Length; i++) { slteam.PlayeingPawns[i] = new AssetManager().ReturnAssetName(AssetType.Pawn, team.PlayeingPawns[i]); }
+            slteam.PlayeingPawns = new long[team.PlayeingPawns.Length];
+            for (int i = 0; i < team.PlayeingPawns.Length; i++) { slteam.PlayeingPawns[i] = team.PlayeingPawns[i]; }
 
             
-            int counter = 0;
-            for (int i = 0; i < team.UsableFormations.Length; i++) if (0 < team.UsableFormations[i]) { counter++; }
-            slteam.UsableFormations = new int[counter];
-            int counter2 = 0;
-            for (int i = 0; i < team.UsableFormations.Length; i++) if (0 < team.UsableFormations[i]) {
-                    slteam.UsableFormations[counter2] = new AssetManager().ReturnAssetName(AssetType.Formation, team.UsableFormations[i]);
-                    counter2++;
-                }
+            //int counter = 0;
+            //for (int i = 0; i < team.UsableFormations.Length; i++) if (0 < team.UsableFormations[i]) { counter++; }
+            //slteam.UsableFormations = new int[counter];
+            //int counter2 = 0;
+            //for (int i = 0; i < team.UsableFormations.Length; i++) if (0 < team.UsableFormations[i]) {
+            //        slteam.UsableFormations[counter2] = new AssetManager().ReturnAssetName(AssetType.Formation, team.UsableFormations[i]);
+            //        counter2++;
+            //    }
         
             return slteam;
         }
@@ -128,24 +168,29 @@ namespace soccer1.Models.utilites
         {
             PlayerForSerial serialplayer = new PlayerForSerial();
             serialplayer.id = player.id;
-            serialplayer.Fan = player.Fan;
+            serialplayer.Gold = player.gold;
             serialplayer.level = player.level;
-            serialplayer.Money = player.Money;
+            serialplayer.Alminum = player.Almimun;
             serialplayer.Name = player.Name;
-            serialplayer.SoccerSpetial = player.SoccerSpetial;
+            //serialplayer.SoccerSpetial = player.gold;
             serialplayer.OutOfTeamElixirs = StringToIntArray( player.otherElixirs);
-            serialplayer.OutOfTeamPawns = StringToIntArray(player.otherPawns);
+            serialplayer.UnAttachedPart = StringToIntArray(player.UnAtachedParts);
+            serialplayer.OutOfTeamPawns = StringToLongIntArray(player.outOfTeamPawns);
             //serialplayer.OutOfTeamPawnsRequiredXp = SrtingTointArray(player.otherPawnsRequiredXp);
             serialplayer.PowerLevel = player.PowerLevel;
-            serialplayer.SoccerSpetial = player.SoccerSpetial;
-            serialplayer.Team.CurrentFormation = new AssetManager().ReturnAssetName(AssetType.Formation, player.CurrentFormation  );
+           // serialplayer.SoccerSpetial = player.SoccerSpetial;
+            serialplayer.Team.StartFomation = new AssetManager().ReturnAssetName(AssetType.Formation, player.StartFomation  );
+            serialplayer.Team.AttackFormation = new AssetManager().ReturnAssetName(AssetType.Formation, player.AttackFormation);
+            serialplayer.Team.DefienceForation = new AssetManager().ReturnAssetName(AssetType.Formation, player.DefienceForation);
             serialplayer.Team.ElixirInBench = StringToIntArray(player.ElixirInBench);
-            serialplayer.Team.pawnsInBench = StringToIntArray(player.pawnsInBench);
+            serialplayer.Team.pawnsInBench = StringToLongIntArray(player.pawnsInBench);
             //serialplayer.PawnsinBenchRequiredXp = SrtingTointArray(player.pawnsInBenchRequiredXp);
-            serialplayer.Team.PlayeingPawns = StringToIntArray(player.PlayeingPawns);
+            serialplayer.Team.PlayeingPawns = StringToLongIntArray(player.PlayeingPawns);
             //serialplayer.PlayingPawnsRequiredXp = SrtingTointArray(player.PlayeingPawnsRequiredXp);
-            serialplayer.Team.UsableFormations = StringToIntArray(player.UsableFormations);
-
+           // serialplayer.Team.UsableFormations = StringToIntArray(player.UsableFormations);
+            serialplayer.UsebaleFormations = StringToIntArray(player.UsableFormations);
+            serialplayer.DoneMissions = StringToShorttArray(player.DoneMissions);
+            serialplayer.buildOrders = StringToLongIntArray(player.buildOrders);
             return serialplayer;
         }
 
@@ -155,25 +200,32 @@ namespace soccer1.Models.utilites
             //convert string to int
             TeamForConnectedPlayers plsrs = new TeamForConnectedPlayers();
            
-            for (int i = 0; i < pl.PlayeingPawns.Length; i++) { plsrs.PlayeingPawns[i] = new AssetManager().ReturnAssetIndex(AssetType.Pawn,   pl.PlayeingPawns[i]); }
-            for (int i = 0; i < pl.pawnsInBench.Length; i++) { plsrs.pawnsInBench[i] = new AssetManager().ReturnAssetIndex(AssetType.Pawn, pl.pawnsInBench[i]); }
+            for (int i = 0; i < pl.PlayeingPawns.Length; i++) { plsrs.PlayeingPawns[i] =    pl.PlayeingPawns[i]; }
+            for (int i = 0; i < pl.pawnsInBench.Length; i++) { plsrs.pawnsInBench[i] = pl.pawnsInBench[i]; }
             int usableFormationCounter = 0;
-            for (int i = 0; i < pl.UsableFormations.Length; i++)
-            {
-                if (-1<pl.UsableFormations[i] )
-                {
-                    plsrs.UsableFormations[usableFormationCounter] = new AssetManager().ReturnAssetIndex(AssetType.Formation, pl.UsableFormations[i]);
-                    usableFormationCounter++;
-                }
-            }
+            //for (int i = 0; i < pl.UsableFormations.Length; i++)
+            //{
+            //    if (-1<pl.UsableFormations[i] )
+            //    {
+            //        plsrs.UsableFormations[usableFormationCounter] = new AssetManager().ReturnAssetIndex(AssetType.Formation, pl.UsableFormations[i]);
+            //        usableFormationCounter++;
+            //    }
+            //}
             for (int i = 0; i < pl.ElixirInBench.Length; i++) { plsrs.ElixirInBench[i] = new AssetManager().ReturnAssetIndex(AssetType.Elixir, pl.ElixirInBench[i]); }
 
-            plsrs.CurrentFormation = new AssetManager().ReturnAssetIndex(AssetType.Formation, pl.CurrentFormation); 
-
+            plsrs.StartFomation = new AssetManager().ReturnAssetIndex(AssetType.Formation, pl.StartFomation);
+            plsrs.AttackFormation = new AssetManager().ReturnAssetIndex(AssetType.Formation, pl.AttackFormation);
+            plsrs.DefienceForation = new AssetManager().ReturnAssetIndex(AssetType.Formation, pl.DefienceForation);
             return plsrs;
         }
 
         public  string IntArrayToSrting(int[] ar)
+        {
+            string uu;
+            uu = new JavaScriptSerializer().Serialize(ar);
+            return uu;
+        }
+        public string LongIntArrayToSrting(long[] ar)
         {
             string uu;
             uu = new JavaScriptSerializer().Serialize(ar);
@@ -217,6 +269,28 @@ namespace soccer1.Models.utilites
             return buffer;
         }
 
+        public long[] listLongToLongArray(List<long> list)
+        {
+            long[] buffer = new long[Statistics.MaxPawnOutOfTeam];
+            for (int i = 0; i < buffer.Length; i++)
+            {
+                buffer[i] = -1;
+            }
+            long counter = 0;
+            foreach (long longnum in list)
+            {
+                if (counter < buffer.Length)
+                {
+                    buffer[counter] = longnum;
+                    counter++;
+                }
+                else
+                {
+                    Errors.AddBigError("Eroor - convertors.outOfTeamPawnToIntArray: out of reng");
+                }
+            }
+            return buffer;
+        }
 
         public int[] outOfTeamElixirToIntArray(List<int> list)
         {
@@ -247,11 +321,25 @@ namespace soccer1.Models.utilites
             int[] kk = new JavaScriptSerializer().Deserialize<int[]>(ar);
             return kk;
         }
+
+        public short[] StringToShorttArray(string ar)
+        {
+            short[] kk = new JavaScriptSerializer().Deserialize<short[]>(ar);
+            return kk;
+        }
+        public long[] StringToLongIntArray(string ar)
+        {
+            long[] kk = new JavaScriptSerializer().Deserialize<long[]>(ar);
+            return kk;
+        }
+
         public string[] StringToStringArray(string ar)
         {
             string[] ss = new JavaScriptSerializer().Deserialize<string[]>(ar);
             return ss;
         }
+
+       
 
 
         public  TeamForConnectedPlayers JsonToTeam(string teamJson)
@@ -328,22 +416,26 @@ namespace soccer1.Models.utilites
         public TeamForSerializeSingleString teamCompresor(TeamForSerialize team)
         {
             TeamForSerializeSingleString teamArrayless = new TeamForSerializeSingleString();
-            teamArrayless.CurrentFormation = team.CurrentFormation.ToString();
+            teamArrayless.AttackFormation = team.AttackFormation.ToString();
+            teamArrayless.DefienceForation = team.DefienceForation.ToString();
+            teamArrayless.StartFomation = team.StartFomation.ToString();
             teamArrayless.ElixirInBench = IntArrayToSrting(team.ElixirInBench);
-            teamArrayless.pawnsInBench = IntArrayToSrting(team.pawnsInBench);
-            teamArrayless.PlayeingPawns = IntArrayToSrting(team.PlayeingPawns);
-            teamArrayless.UsableFormations = IntArrayToSrting(team.UsableFormations);
+            teamArrayless.pawnsInBench = LongIntArrayToSrting(team.pawnsInBench);
+            teamArrayless.PlayeingPawns = LongIntArrayToSrting(team.PlayeingPawns);
+           // teamArrayless.UsableFormations = IntArrayToSrting(team.UsableFormations);
             return teamArrayless;
         }
 
         public TeamForSerialize teamDecompresor(TeamForSerializeSingleString team)
         {
             TeamForSerialize teamwithArray = new TeamForSerialize();
-            teamwithArray.CurrentFormation = Int32.Parse( team.CurrentFormation);
+            teamwithArray.AttackFormation = Int32.Parse( team.AttackFormation);
+            teamwithArray.DefienceForation = Int32.Parse(team.DefienceForation);
+            teamwithArray.StartFomation = Int32.Parse(team.StartFomation);
             teamwithArray.ElixirInBench = StringToIntArray(team.ElixirInBench);
-            teamwithArray.pawnsInBench = StringToIntArray(team.pawnsInBench);
-            teamwithArray.PlayeingPawns = StringToIntArray(team.PlayeingPawns);
-            teamwithArray.UsableFormations = StringToIntArray(team.UsableFormations);            
+            teamwithArray.pawnsInBench = StringToLongIntArray(team.pawnsInBench);
+            teamwithArray.PlayeingPawns = StringToLongIntArray(team.PlayeingPawns);
+           // teamwithArray.UsableFormations = StringToIntArray(team.UsableFormations);            
             return teamwithArray;
         }
 

@@ -225,13 +225,13 @@ namespace soccer1.Controllers
             }
         }
 
-
+        
         [HttpPost]
         public string ReturnGamePreference(FormCollection collection)
         {            
             return Statistics.BasePrefrance;
         }
-
+        
 
     }
 

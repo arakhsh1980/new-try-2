@@ -16,13 +16,16 @@ namespace soccer1.Models
     public  class AssetManager
     {        
         const int arraylengh = 100;
-        private static Pawn[] Pawnlist = new Pawn[arraylengh];
+       // private static RoboPart[] RoboPartlist = new RoboPart[arraylengh];
+        private static RoboBase[] RoboBaselist = new RoboBase[arraylengh];
         private static Elixir[] Elixirlist = new Elixir[arraylengh];
         private static Formation[] Formationlist = new Formation[arraylengh];
         private static Offer[] Offerlist = new Offer[arraylengh];
+        private static RoboPart[] RoboPartlist = new RoboPart[arraylengh];
         //private static int pawnsConter = 0;
         //private static int ElixirConter = 0;
         //private static int FormationConter = 0;
+        int RoboPartlistCounter = 0;
         private static int OfferConter = 0;
         //give pawnname add return pawnindex
         public static Mutex assentsLoaded = new Mutex();
@@ -34,8 +37,37 @@ namespace soccer1.Models
         private DataDBContext dataBase = new DataDBContext();
         private bool isDataBaseLoaded = false;
         public int ReturnrequiredXpForNextLevel(int idNum) {
-            return Pawnlist[idNum].RequiredXpForUpgrade;
+            return -1;
+           // return Pawnlist[idNum].RequiredXpForUpgrade;
         }
+
+        public int ReturnRoboPartTimeToBuild(short partId, short partType)
+        {
+            for(int i =0; i< RoboPartlist.Length; i++)if(RoboPartlist[i] != null)
+            {
+                if(RoboPartlist[i].IdNum == partId && (short)RoboPartlist[i].partType == partType)
+                    {
+                        return RoboPartlist[i].minuetToBuild;
+                    }
+            }
+            return -1;
+        }
+
+
+        public RoboPart ReturnRoboPart(short partId, short partType)
+        {
+            RoboPart findedpart = null;
+            for (int i = 0; i < RoboPartlist.Length; i++) if (RoboPartlist[i] != null)
+                {
+                    if (RoboPartlist[i].IdNum == partId && (short)RoboPartlist[i].partType == partType)
+                    {
+                        findedpart = RoboPartlist[i];
+                        return findedpart;
+                    }
+                }
+            return null;
+        }
+
 
         public void LoadDataFromServerifitsFirstTime()
         {
@@ -83,19 +115,7 @@ namespace soccer1.Models
             return IdNum;
         }
         
-        public  Pawn RetrunPawnByIdName(int IdNamePawn)
-        {
-            return Pawnlist[IdNamePawn];
-            /*
-            Pawn p = new Pawn();
-            p.IdNum = 0;            
-            for (int i = 0; i < Pawnlist.Length; i++)
-            {
-                if (Pawnlist[i].IdNum == IdNamePawn){  p = Pawnlist[i]; }
-            }             
-            return p;
-            */
-        }
+     
 
         public  Elixir ReturnElixirByIdName(int IdNamePawn)
         {
@@ -164,11 +184,102 @@ namespace soccer1.Models
             */
         }
 
-        public  Property ReturnAssetPrice(AssetType type, int index)
+        public Property ReturnOrderPrice(short partID, short partType, short goldLevel)
+        {
+            Property pp = new Property();
+            int index = -1;
+            for(int i = 0; i < RoboPartlist.Length; i++)if(RoboPartlist[i] != null)
+            {
+                if((short)RoboPartlist[i].partType == partType && RoboPartlist[i].IdNum == partID)
+                {
+                    index = i;
+                }
+            }
+            if (index < 0)
+            {
+                Errors.AddBigError("assetManager. ReturnOrderPrice. order not find");
+                return pp;
+            }
+            else
+            {
+                Property price = new Property();
+                price.Alminum = RoboPartlist[index].AlmimunValue;
+                price.gold = RoboPartlist[index].GoldValue;
+                switch (goldLevel)
+                {
+                    case 0:
+                        pp.gold = price.gold;
+                        pp.Alminum = price.Alminum;
+                        break;
+                    case 1:
+                        pp.gold = price.gold + (int)Math.Floor(price.Alminum * 0.1f);
+                        pp.Alminum = price.Alminum -(int) Math.Floor(price.Alminum * 0.2f);
+                        break;
+                    case 2:
+                        pp.gold = price.gold + (int)Math.Floor(price.Alminum * 0.2f);
+                        pp.Alminum = price.Alminum - (int)Math.Floor(price.Alminum * 0.5f);
+                        break;
+                    default:
+                        Errors.AddBigError("assetManager. ReturnOrderPrice. goldLevel not finded ??");
+                        break;
+                }
+
+            }
+            return pp;
+        }
+
+        public Property ReturnScrapPrice(short partID, short partType, short goldLevel)
+        {
+            Property pp = new Property();
+            int index = -1;
+            for (int i = 0; i < RoboPartlist.Length; i++) if (RoboPartlist[i] != null)
+                {
+                    if ((short)RoboPartlist[i].partType == partType && RoboPartlist[i].IdNum == partID)
+                    {
+                        index = i;
+                    }
+                }
+            if (index < 0)
+            {
+                Errors.AddBigError("assetManager. ReturnOrderPrice. order not find");
+                return pp;
+            }
+            else
+            {
+                Property price = new Property();
+                price.Alminum = RoboPartlist[index].AlmimunValue;
+                price.gold = RoboPartlist[index].GoldValue;
+                switch (goldLevel)
+                {
+                    case 0:
+                        pp.gold = price.gold;
+                        pp.Alminum = price.Alminum;
+                        break;
+                    case 1:
+                        pp.gold = price.gold + (int)Math.Floor(price.Alminum * 0.1f);
+                        pp.Alminum = price.Alminum - (int)Math.Floor(price.Alminum * 0.2f);
+                        break;
+                    case 2:
+                        pp.gold = price.gold + (int)Math.Floor(price.Alminum * 0.2f);
+                        pp.Alminum = price.Alminum - (int)Math.Floor(price.Alminum * 0.5f);
+                        break;
+                    default:
+                        Errors.AddBigError("assetManager. ReturnOrderPrice. goldLevel not finded ??");
+                        break;
+                }
+
+            }
+            pp.Alminum = (int)Math.Floor(pp.Alminum * 0.5f);
+            return pp;
+        }
+
+
+
+        public Property ReturnAssetPrice(AssetType type, int index)
         {
             
                Property pop = new Property();
-            pop.coin = int.MaxValue;
+            pop.Alminum = int.MaxValue;
             pop.fan = int.MaxValue;
             Property thisprop = new Property();
             if (arraylengh <= index || index < 0)
@@ -182,8 +293,8 @@ namespace soccer1.Models
             {
                 case AssetType.Pawn:
                    // maxAssined = pawnsConter;
-                    thisprop = Pawnlist[index].price;
-                    break;
+                   // thisprop = Pawnlist[index].price;
+                    break;                
                 case AssetType.Elixir:
                    // maxAssined = ElixirConter;
                     thisprop = Elixirlist[index].price;
@@ -194,10 +305,10 @@ namespace soccer1.Models
                     break;
             }
             
-            pop.coin = thisprop.coin;
+            pop.Alminum = thisprop.Alminum;
             pop.fan = thisprop.fan;
             pop.level = thisprop.level;
-            pop.SoccerSpetial = thisprop.SoccerSpetial;
+            pop.gold = thisprop.gold;
             return pop;
         }
 
@@ -212,7 +323,7 @@ namespace soccer1.Models
         {
 
             Property thisprop = new Property();
-            thisprop.coin = int.MaxValue;
+            thisprop.Alminum = int.MaxValue;
             thisprop.fan = int.MaxValue;
             int index=-1;
             for (int i = 0; i < Offerlist.Length; i++) if (Offerlist[i] != null)
@@ -231,10 +342,10 @@ namespace soccer1.Models
             }
             Property cashprop = new Property();
             cashprop = Offerlist[index].price;
-            thisprop.coin = cashprop.coin;
+            thisprop.Alminum = cashprop.Alminum;
             thisprop.fan = cashprop.fan;
             thisprop.level = cashprop.level;
-            thisprop.SoccerSpetial = cashprop.SoccerSpetial;
+            thisprop.gold = cashprop.gold;
             return thisprop;
         }
 
@@ -242,10 +353,10 @@ namespace soccer1.Models
         {
 
             Property thisprop = new Property();
-            thisprop.coin =0;
+            thisprop.Alminum =0;
             thisprop.fan = 0;
             thisprop.level = 0;
-            thisprop.SoccerSpetial = 0;
+            thisprop.gold = 0;
             int index = -1;
             for (int i = 0; i < Offerlist.Length; i++) if (Offerlist[i] != null)
                 {
@@ -264,13 +375,13 @@ namespace soccer1.Models
             switch (Offerlist[index].BuyedmoneyType)
             {
                 case 0:
-                    thisprop.coin += Offerlist[index].BuyedmoneyAmount;
+                    thisprop.Alminum += Offerlist[index].BuyedmoneyAmount;
                     break;
                 case 1:
                     thisprop.fan += Offerlist[index].BuyedmoneyAmount;
                     break;
                 case 2:
-                    thisprop.SoccerSpetial += Offerlist[index].BuyedmoneyAmount;
+                    thisprop.gold += Offerlist[index].BuyedmoneyAmount;
                     break;
                 case 3:
                     thisprop.level += Offerlist[index].BuyedmoneyAmount;
@@ -374,15 +485,27 @@ namespace soccer1.Models
             AddOffermutex.ReleaseMutex();
         }
 
-
-        public void AddPawnToAssets(Pawn p)
+        
+        public void AddRoboPartToAssets(RoboPart p)
         {
             AddPawnmutex.WaitOne();
             if (p.IdNum<0 || 99<p.IdNum) { Errors.AddBigError("AddPawnToAssets. Pawnlist.Length <= pawnsConter"); return; }
             
+            //p.key = p.IdNum.ToString();
+            RoboPartlist[RoboPartlistCounter] = p;
+            RoboPartlistCounter++;
+            new DatabaseManager().AddPartToDataBase(p);
+            AddPawnmutex.ReleaseMutex();
+        }
+
+        public void AddRoboBaseToAssets(RoboBase p)
+        {
+            AddPawnmutex.WaitOne();
+            if (p.IdNum < 0 || 99 < p.IdNum) { Errors.AddBigError("AddPawnToAssets. Pawnlist.Length <= pawnsConter"); return; }
+
             p.key = p.IdNum.ToString();
-            Pawnlist[p.IdNum] = p;
-            new DatabaseManager().AddPawnToDataBase(p);
+            RoboBaselist[p.IdNum] = p;
+            new DatabaseManager().AddRoboBaseToDataBase(p);
             AddPawnmutex.ReleaseMutex();
         }
 
@@ -429,6 +552,13 @@ namespace soccer1.Models
             {
                 Formationlist[formations[i].IdNum] = formations[i];
             }
+            RoboPart[] parts = dataBase.allParts.ToArray();
+            for (int i = 0; i < parts.Length; i++)
+            {
+                RoboPartlist[RoboPartlistCounter] = parts[i];
+                RoboPartlistCounter++;
+            }
+
 
             Elixir[] elixirs = dataBase.allElixires.ToArray();
             for (int i = 0; i < elixirs.Length; i++)
@@ -436,10 +566,12 @@ namespace soccer1.Models
                 Elixirlist[elixirs[i].IdNum] = elixirs[i];
             }
 
-            Pawn[] pawns = dataBase.allPawns.ToArray();
-            for (int i = 0; i < pawns.Length; i++)
+            
+
+            RoboBase[] bases = dataBase.allBases.ToArray();
+            for (int i = 0; i < bases.Length; i++)
             {
-                Pawnlist[pawns[i].IdNum] = pawns[i];
+                RoboBaselist[bases[i].IdNum] = bases[i];
             }
             //dataBase.
             AddElixirmutex.ReleaseMutex();

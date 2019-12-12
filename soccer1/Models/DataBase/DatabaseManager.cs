@@ -117,26 +117,45 @@ namespace soccer1.Models
 
         private DataDBContext dataBase = new DataDBContext();
 
-        public void AddPawnToDataBase(Pawn p)
+        public void AddPartToDataBase(RoboPart p)
         {
-            
 
-            Pawn pp = dataBase.allPawns.Find(p.key);
+
+            RoboPart pp = dataBase.allParts.Find(p.key);
             if (pp == null)
             {
-                dataBase.allPawns.Add(p);
+                dataBase.allParts.Add(p);
                 dataBase.SaveChanges();
             }
             else
             {
-                dataBase.allPawns.Remove(pp);
+                dataBase.allParts.Remove(pp);
                 dataBase.SaveChanges();
-                dataBase.allPawns.Add(p);
+                dataBase.allParts.Add(p);
                 dataBase.SaveChanges();
             }
         }
 
-        
+        public void AddRoboBaseToDataBase(RoboBase p)
+        {
+
+
+            RoboBase pp = dataBase.allBases.Find(p.key);
+            if (pp == null)
+            {
+                dataBase.allBases.Add(p);
+                dataBase.SaveChanges();
+            }
+            else
+            {
+                dataBase.allBases.Remove(pp);
+                dataBase.SaveChanges();
+                dataBase.allBases.Add(p);
+                dataBase.SaveChanges();
+            }
+        }
+
+
 
         public void AddFormationToDataBase(Formation ff)
         {

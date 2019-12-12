@@ -38,7 +38,7 @@ namespace soccer1.Models.main_blocks
 
         public bool SubistitutionsHappened(string PlayerId, int TurnNumber, string jsonpart)
         {
-            bool result = false;
+            //bool result = false;
             if (TurnNumber != currentTurn) { return false; }
             if (PlayerId == playerOneIdName)
             {
@@ -48,7 +48,7 @@ namespace soccer1.Models.main_blocks
             {
                 AddPlayerEvent(playerOneIdName, MatchMassageType.Substituti, jsonpart);
             }
-            return result;
+            return true;
         }
 
 
@@ -391,8 +391,8 @@ namespace soccer1.Models.main_blocks
             pl2.reWriteAccordingTo(player2);
             Property p1Eprice = new Property();
             p1Eprice.DeepCopey(betedMoney);
-            p1Eprice.coin -= GatheredMoneyForWaiting;
-            if (p1Eprice.coin < 0) { p1Eprice.coin = 0; }
+            p1Eprice.Alminum -= GatheredMoneyForWaiting;
+            if (p1Eprice.Alminum < 0) { p1Eprice.Alminum = 0; }
             pl1.SubtractProperty(p1Eprice);
             pl2.SubtractProperty(betedMoney);
             /*
@@ -911,8 +911,9 @@ namespace soccer1.Models.main_blocks
                 pl1.AddProperty(betedMoney);
                 Property waitingMoney = new Property();
                 waitingMoney.SetZiro();
-                waitingMoney.coin += GatheredMoneyForWaiting;
+                waitingMoney.Alminum += GatheredMoneyForWaiting;
                 pl1.AddProperty(waitingMoney);
+                pl1.SaveChanges();
                 /*
                 player1.changePlayer(pl1.returnDataBaseVersion());
                 dataBase.Entry(player1).State = EntityState.Modified;

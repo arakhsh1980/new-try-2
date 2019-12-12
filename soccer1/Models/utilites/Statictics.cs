@@ -27,6 +27,7 @@ namespace soccer1.Models
 
     public static class Statistics
     {
+        public static DateTime BaseStartTime = new DateTime(2019, 1, 1, 1, 1, 1);
         public const float MaxMatchTimeInSeconds=3000;
         public const float AcceptedTimeofStationeryPositionDifference = 50;
         public const float AcceptedWFShootTime = 40;
@@ -41,7 +42,8 @@ namespace soccer1.Models
         public const int pawnsInBenchMax = 4;
         public const int ElixirInBenchMax = 4;
         public const int UsableFormationsMax = 15;
-        public const int StartingCoin = 2000;
+        public const int StartingAlminum = 2000;
+        public const int StartingGold = 2000;
         public const int StartingSS = 10;
         public const float maxAcceptedPowerDiference = 10;
         public const float timeForFisrtRespondOnWFFirstAcceptance = 10;
@@ -64,14 +66,14 @@ namespace soccer1.Models
         public Property LeaugEnterencePice(string LeagName)
         {
             Property BettedMoney = new Property();
-            BettedMoney.coin = 0;
+            BettedMoney.Alminum = 0;
             BettedMoney.fan = 0;
             BettedMoney.level = 0;
-            BettedMoney.SoccerSpetial = 0;
+            BettedMoney.gold = 0;
             switch (LeagName)
             {
                 case "Silver":
-                    BettedMoney.coin = 200;
+                    BettedMoney.Alminum = 200;
                     break;
                 default:
                     break;

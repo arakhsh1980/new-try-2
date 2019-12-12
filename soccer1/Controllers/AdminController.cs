@@ -26,43 +26,67 @@ namespace soccer1.Controllers
         private DataDBContext dataBase = new DataDBContext();
 
         [HttpPost]
-        public string AddPawn(FormCollection collection)
+        public string AddRoboPart(FormCollection collection)
         {
             new AssetManager().LoadDataFromServerifitsFirstTime();
             AddPawnmutex.WaitOne();
             
             //AssetManager.assentsLoaded.WaitOne();
-            Pawn pawn = new Pawn();
-            //pawn.abilityShower= Request.Form["abilityShower"];
-            pawn.ForMatch = Request.Form["ForMatch"];
-            pawn.tired1 = Request.Form["Tired1"];
-            pawn.tired2 = Request.Form["Tired2"];
-            pawn.tired3 = Request.Form["Tired3"];
-            pawn.IdNum = Int32.Parse(Request.Form["IdNum"]);
-            pawn.key = pawn.IdNum.ToString();
-            pawn.ShowName = Request.Form["showName"];
-            //Log.AddLog("AddPawnStarted" + pawn.IdName);
-            PawnAbility pa = new PawnAbility();
-            pa.aiming = Int32.Parse(Request.Form["mainAbility.aiming"]);
-            pa.boddyMass = Int32.Parse(Request.Form["mainAbility.boddyMass"]);
-            pa.endorance = Int32.Parse(Request.Form["mainAbility.endorance"]);
-            pa.shootPower = Int32.Parse(Request.Form["mainAbility.shootPower"]);            
-            pawn.mainAbility = pa;
+            RoboPart newpart = new RoboPart();
+            //pawn.abilityShower= Request.Form["abilityShower"];            
+            newpart.HighGoldEffect = Int32.Parse(Request.Form["HighGoldEffect"]);
+            newpart.IdNum = short.Parse(Request.Form["IdNum"]);            
+            newpart.lowGoldEffect= Int32.Parse(Request.Form["lowGoldEffect"]);
+            newpart.MediomGoldEffect = Int32.Parse(Request.Form["MediomGoldEffect"]);
+            RoboPartType tt;
+            Enum.TryParse<RoboPartType>(Request.Form["partType"],out tt);
+            newpart.partType = tt;
+           newpart.key = (newpart.IdNum + (int)tt *256).ToString();
             Property price = new Property();
-            price.coin= Int32.Parse(Request.Form["price.coin"]);
+            price.Alminum = Int32.Parse(Request.Form["price.coin"]);
             price.fan = Int32.Parse(Request.Form["price.fan"]);
             price.level = Int32.Parse(Request.Form["price.level"]);
-            price.SoccerSpetial = Int32.Parse(Request.Form["price.SoccerSpetial"]);
-            pawn.RequiredXpForUpgrade = Int32.Parse(Request.Form["requiredXpForUpgrade"]);
-            pawn.UpgradeFrom = Int32.Parse(Request.Form["updrageFrom"]);
-
-            
-            pawn.price = price;            
-            //pawn.ShowName = Request.Form["redForSale"];            
-            new AssetManager().AddPawnToAssets(pawn);
+            price.gold = Int32.Parse(Request.Form["price.SoccerSpetial"]);
+            //newpart.price = price;
+            newpart.GoldValue = price.gold;
+            newpart.AlmimunValue = price.Alminum;
+            newpart.minuetToBuild =(int)Math.Ceiling( Int32.Parse(Request.Form["secondToBuild"])/60.0f);
+            new AssetManager().AddRoboPartToAssets(newpart);
             AddPawnmutex.ReleaseMutex();            
-            return "Pawn Loaded"+ pawn.IdNum;            
+            return "Pawn Loaded"+ newpart.IdNum;            
         }
+
+
+        [HttpPost]
+        public string AddRoboBase(FormCollection collection)
+        {
+            new AssetManager().LoadDataFromServerifitsFirstTime();
+            AddPawnmutex.WaitOne();
+
+            //AssetManager.assentsLoaded.WaitOne();
+            RoboBase newRoboBase = new RoboBase();
+            //pawn.abilityShower= Request.Form["abilityShower"];
+            newRoboBase.IdNum = short.Parse(Request.Form["IdNum"]);
+            newRoboBase.level = short.Parse(Request.Form["level"]);
+            newRoboBase.requiredXpToUpgrade = Int32.Parse(Request.Form["requiredXpToUpgrade"]);
+            newRoboBase.upgradeToId1 = short.Parse(Request.Form["upgradeToId1"]);
+            newRoboBase.upgradeToId2 = short.Parse(Request.Form["upgradeToId2"]);
+            newRoboBase.key = newRoboBase.IdNum.ToString();
+            newRoboBase.upgradeToId3 = short.Parse(Request.Form["upgradeToId3"]);
+            //Log.AddLog("AddPawnStarted" + pawn.IdName);
+            PawnAbility mainability = new PawnAbility();
+            mainability.aiming = float.Parse(Request.Form["mainAbility.aiming"]);
+            mainability.boddyMass = float.Parse(Request.Form["mainAbility.boddyMass"]);
+            mainability.endorance = float.Parse(Request.Form["mainAbility.endorance"]);
+            mainability.shootPower = float.Parse(Request.Form["mainAbility.shootPower"]);
+            mainability.force = float.Parse(Request.Form["mainAbility.force"]);
+            newRoboBase.mainAbility = mainability;
+            //pawn.ShowName = Request.Form["redForSale"];            
+            new AssetManager().AddRoboBaseToAssets(newRoboBase);
+            AddPawnmutex.ReleaseMutex();
+            return "Pawn Loaded" + newRoboBase.IdNum;
+        }
+
 
         [HttpPost]
         public string AddElixir(FormCollection collection)
@@ -83,10 +107,10 @@ namespace soccer1.Controllers
             sp.ShowName = Request.Form["spPower.ShowName"];
             elixir.spPower = sp;
             Property price = new Property();
-            price.coin = Int32.Parse(Request.Form["price.coin"]);
+            price.Alminum = Int32.Parse(Request.Form["price.coin"]);
             price.fan = Int32.Parse(Request.Form["price.fan"]);
             price.level = Int32.Parse(Request.Form["price.level"]);
-            price.SoccerSpetial = Int32.Parse(Request.Form["price.SoccerSpetial"]);
+            price.gold = Int32.Parse(Request.Form["price.SoccerSpetial"]);
             elixir.price = price;
             new AssetManager().AddElixirToAssets(elixir);
             AddElixirmutex.ReleaseMutex();           
@@ -106,10 +130,10 @@ namespace soccer1.Controllers
             formation.showName = Request.Form["showName"];
                        
             Property price = new Property();
-            price.coin = Int32.Parse(Request.Form["price.coin"]);
+            price.Alminum = Int32.Parse(Request.Form["price.coin"]);
             price.fan = Int32.Parse(Request.Form["price.fan"]);
             price.level = Int32.Parse(Request.Form["price.level"]);
-            price.SoccerSpetial = Int32.Parse(Request.Form["price.SoccerSpetial"]);
+            price.gold = Int32.Parse(Request.Form["price.SoccerSpetial"]);
             formation.price = price;
             formation.positions = new PawnStartPosition[5];
             for (int i=0; i< formation.positions.Length; i++)
@@ -136,10 +160,10 @@ namespace soccer1.Controllers
             newOffer.IdName = Request.Form["IdName"];
             newOffer.realDollerPrice = Int32.Parse(Request.Form["realDollerPrice"]);
             Property price = new Property();
-            price.coin = Int32.Parse(Request.Form["price.coin"]);
+            price.Alminum = Int32.Parse(Request.Form["price.coin"]);
             price.fan = Int32.Parse(Request.Form["price.fan"]);
             price.level = Int32.Parse(Request.Form["price.level"]);
-            price.SoccerSpetial = Int32.Parse(Request.Form["price.SoccerSpetial"]);
+            price.gold = Int32.Parse(Request.Form["price.SoccerSpetial"]);
             newOffer.price = price;
 
             new AssetManager().AddOfferToAssets(newOffer);

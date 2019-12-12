@@ -18,11 +18,11 @@ namespace soccer1.Models.main_blocks
         [Key]
         public string id { get; set; }
 
-        public int Fan { get; set; }
+        public int gold { get; set; }
 
         public string Name { get; set; }
 
-        public int Money { get; set; }
+        public int Almimun { get; set; }
 
         public float PowerLevel { get; set; }
 
@@ -30,11 +30,15 @@ namespace soccer1.Models.main_blocks
 
         public int lastMatchId { get; set; }
 
-        public int SoccerSpetial { get; set; }
+        //public int SoccerSpetial { get; set; }
 
-        public int CurrentFormation { get; set; }
+        public int StartFomation { get; set; }
+        public int AttackFormation { get; set; }
+        public int DefienceForation { get; set; }
 
-        public string otherPawns { get; set; }
+
+
+        public string outOfTeamPawns { get; set; }
 
         public string PlayeingPawns { get; set; }
 
@@ -46,21 +50,30 @@ namespace soccer1.Models.main_blocks
 
         public string ElixirInBench { get; set; }
 
+        public string UnAtachedParts { get; set; }
+
+        public string buildOrders { get; set; }
+
+        public string DoneMissions { get; set; }
+
         public void changePlayer(PlayerForDatabase otherplayer)
         {
 
-            Fan = otherplayer.Fan;
+            gold = otherplayer.gold;
             Name = otherplayer.Name;
-            Money = otherplayer.Money;
+            Almimun = otherplayer.Almimun;
             PowerLevel = otherplayer.PowerLevel;
             level = otherplayer.level;
             lastMatchId = otherplayer.lastMatchId;
-            SoccerSpetial = otherplayer.SoccerSpetial;
-            CurrentFormation = otherplayer.CurrentFormation;
-            otherPawns = otherplayer.otherPawns;
+            gold = otherplayer.gold;
+            StartFomation = otherplayer.StartFomation;
+            AttackFormation = otherplayer.AttackFormation;
+            DefienceForation = otherplayer.DefienceForation;
+            outOfTeamPawns = otherplayer.outOfTeamPawns;
             PlayeingPawns = otherplayer.PlayeingPawns;
             pawnsInBench = otherplayer.pawnsInBench;
             UsableFormations = otherplayer.UsableFormations;
+            UnAtachedParts = otherplayer.UnAtachedParts;
             otherElixirs = otherplayer.otherElixirs;
             ElixirInBench = otherplayer.ElixirInBench;
         }

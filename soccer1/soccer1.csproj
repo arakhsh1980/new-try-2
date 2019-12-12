@@ -199,8 +199,11 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\ChoosePlayerController.cs" />
+    <Compile Include="Controllers\FactoryController.cs" />
+    <Compile Include="Controllers\GarageController.cs" />
     <Compile Include="Controllers\LoadingController.cs" />
     <Compile Include="Controllers\LeagueController.cs" />
+    <Compile Include="Controllers\MissionController.cs" />
     <Compile Include="Controllers\ProfileController.cs" />
     <Compile Include="Controllers\SellAndBuyController.cs" />
     <Compile Include="Controllers\symMatchController.cs" />
@@ -225,6 +228,8 @@
     <Compile Include="Models\main blocks\Player.cs" />
     <Compile Include="Models\main blocks\PlayerForDatabase.cs" />
     <Compile Include="Models\main blocks\PlayerForSerial.cs" />
+    <Compile Include="Models\main blocks\roboPart.cs" />
+    <Compile Include="Models\main blocks\roboPartBuilder.cs" />
     <Compile Include="Models\main blocks\symShootMatch.cs" />
     <Compile Include="Models\main blocks\Team.cs" />
     <Compile Include="Models\main blocks\playerCennectionInfo.cs" />
@@ -313,9 +318,12 @@
     <Folder Include="Views\Admin\" />
     <Folder Include="Views\ChoosePlayer\" />
     <Folder Include="Views\Connecting\" />
+    <Folder Include="Views\Factory\" />
+    <Folder Include="Views\Garage\" />
     <Folder Include="Views\Loading\" />
     <Folder Include="Views\Match\" />
     <Folder Include="Views\Menu\" />
+    <Folder Include="Views\Mission\" />
     <Folder Include="Views\Profile\" />
     <Folder Include="Views\SellAndBuy\" />
     <Folder Include="Views\symMatch\" />

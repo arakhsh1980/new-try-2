@@ -11,11 +11,11 @@ namespace soccer1.Models.main_blocks
 
         public string id;
 
-        public int Fan;
+        public int Gold;
 
         public string Name;
 
-        public int Money;
+        public int Alminum;
 
         public int CoonId;
 
@@ -23,19 +23,27 @@ namespace soccer1.Models.main_blocks
 
         public int level;
 
-        public int SoccerSpetial;
+        //public int SoccerSpetial;
 
-        public int[] OutOfTeamPawns;
+        public long[] OutOfTeamPawns;
 
         public int[] OutOfTeamPawnsRequiredXp;
 
         public int[] OutOfTeamElixirs;
+
+        public int[] UsebaleFormations;
+
+        public int[] UnAttachedPart;
 
         public TeamForSerialize Team;
 
         public int[] PlayingPawnsRequiredXp;
 
         public int[] PawnsinBenchRequiredXp;
+
+        public short[] DoneMissions;
+
+        public long[] buildOrders;
     }
 
     /*

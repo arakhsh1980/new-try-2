@@ -48,6 +48,10 @@ namespace soccer1.Controllers
                 {
                     result = pl.BuyAsset(assetType, assetId, AssetPrice);
                 }
+                if (result)
+                {
+                    pl.SaveChanges();
+                }
                 /*
                 if (result) {
                     player.changePlayer(pl.returnDataBaseVersion());
@@ -55,7 +59,7 @@ namespace soccer1.Controllers
                     dataBase.SaveChanges();
                 }
                 */
-                
+
                 //Log.AddLog("Error : reusult:" + result.ToString());
                 return result.ToString();
             }
@@ -82,6 +86,10 @@ namespace soccer1.Controllers
                 PlayerForConnectedPlayer pl = new PlayerForConnectedPlayer();
                 pl.reWriteAccordingTo(player);
                 result = pl.BuyOffer(BuyingMaterial , AssetPrice);
+                if (result)
+                {
+                    pl.SaveChanges();
+                }
                 /*
                 if (result)
                 {

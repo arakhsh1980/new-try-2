@@ -16,13 +16,17 @@ namespace soccer1.Models.DataBase
             Database.SetInitializer<DataDBContext>(new CreateDatabaseIfNotExists<DataDBContext>());
         }
         public DbSet<PlayerForDatabase> playerInfoes { get; set; }
-        public DbSet<Pawn> allPawns { get; set; }
+        //public DbSet<Pawn> allPawns { get; set; }
 
         public DbSet<Elixir> allElixires { get; set; }
 
         public DbSet<Formation> allFormations { get; set; }
 
         public DbSet<Offer> allOffers { get; set; }
+
+        public DbSet<RoboPart> allParts { get; set; }
+
+        public DbSet<RoboBase> allBases { get; set; }
 
 
 

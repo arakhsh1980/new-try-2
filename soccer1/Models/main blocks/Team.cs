@@ -12,40 +12,45 @@ namespace soccer1.Models.main_blocks
         
         public TeamForConnectedPlayers()
         {
-            CurrentFormation = 1;
-            PlayeingPawns =new int[Statistics.PlayingPawns];
-            pawnsInBench = new int[Statistics.pawnsInBenchMax];
-            UsableFormations = new int[Statistics.UsableFormationsMax];
+            StartFomation = 1;
+            AttackFormation = 1;
+            DefienceForation = 1;
+            PlayeingPawns =new long[Statistics.PlayingPawns];
+            pawnsInBench = new long[Statistics.pawnsInBenchMax];
+           // UsableFormations = new int[Statistics.UsableFormationsMax];
             ElixirInBench = new int[Statistics.ElixirInBenchMax];
             for(int i=0; i< PlayeingPawns.Length; i++) { PlayeingPawns[i] = 1; }
             for (int i = 0; i < pawnsInBench.Length; i++) { pawnsInBench[i] = 1; }
-            for (int i = 0; i < UsableFormations.Length; i++) { UsableFormations[i] = -1; }
+           // for (int i = 0; i < UsableFormations.Length; i++) { UsableFormations[i] = -1; }
             for (int i = 0; i < ElixirInBench.Length; i++) { ElixirInBench[i] = 1; }
         }
 
 
-        public int CurrentFormation { get; set; }
+        public int StartFomation { get; set; }
+
+        public int AttackFormation { get; set; }
+        public int DefienceForation { get; set; }
 
 
 
-        public int[] PlayeingPawns { get; set; }
+        public long[] PlayeingPawns { get; set; }
 
-        public int[] PlayeingPawnsRequiredXp { get; set; }
+        //public int[] PlayeingPawnsRequiredXp { get; set; }
 
-        public int[] pawnsInBench { get; set; }
+        public long[] pawnsInBench { get; set; }
 
-        public int[] pawnsInBenchRequiredXp { get; set; }
+        //public int[] pawnsInBenchRequiredXp { get; set; }
 
-        public int[] UsableFormations { get; set; }
+       // public int[] UsableFormations { get; set; }
 
         public int[] ElixirInBench { get; set; }
 
         int UsableFormationsCounter = 0;
-        public void AddToUsableFormations(int formationIndex)
-        {
-            UsableFormations[UsableFormationsCounter] = formationIndex;
-            UsableFormationsCounter++;
-        }
+        //public void AddToUsableFormations(int formationIndex)
+        //{
+        //    UsableFormations[UsableFormationsCounter] = formationIndex;
+        //    UsableFormationsCounter++;
+        //}
 
         public void AddXpToPawn(int pawnAssinedIndex, int xpVal)
         {
@@ -112,17 +117,20 @@ namespace soccer1.Models.main_blocks
     [Serializable]
     public struct TeamForSerialize
     {
+      
+        public int StartFomation;
+        public int AttackFormation;
+        public int DefienceForation;
 
-        public int CurrentFormation;
+        public long[] PlayeingPawns;
 
-        public int[] PlayeingPawns;
+        public long[] pawnsInBench;
 
-        public int[] pawnsInBench;
-
-        public int[] UsableFormations;
+        //public int[] UsableFormations;
 
         public int[] ElixirInBench;
     }
+
 
     [Serializable]
     public struct testtt
@@ -134,14 +142,17 @@ namespace soccer1.Models.main_blocks
     [Serializable]
     public struct TeamForSerializeSingleString
     {
+        
 
-        public string CurrentFormation { get; set; }
+        public string StartFomation { get; set; }
+        public string AttackFormation { get; set; }
+        public string DefienceForation { get; set; }
 
         public string PlayeingPawns { get; set; }
 
         public string pawnsInBench { get; set; }
 
-        public string UsableFormations { get; set; }
+       // public string UsableFormations { get; set; }
 
         public string ElixirInBench { get; set; }
     }

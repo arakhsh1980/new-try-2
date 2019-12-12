@@ -44,6 +44,10 @@ namespace soccer1.Controllers
                     dataBase.SaveChanges();
                 } 
                 */
+                if (interactionResult)
+                {
+                    pl.SaveChanges();
+                }
             }
             return interactionResult.ToString();
         }
@@ -69,6 +73,10 @@ namespace soccer1.Controllers
                     dataBase.SaveChanges();
                 }
                 */
+                if (interactionResult)
+                {
+                    pl.SaveChanges();
+                }
             }
             return interactionResult.ToString();
         }
