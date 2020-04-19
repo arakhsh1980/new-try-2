@@ -52,34 +52,7 @@ namespace soccer1.Controllers
             return interactionResult.ToString();
         }
 
-        [HttpPost]
-        public string UpgradePawnto(FormCollection collection)
-        {            
-            int pawnCode = Int32.Parse(Request.Form["pawnCode"]);
-            int newPawnType = Int32.Parse(Request.Form["newPawnType"]);
-            string PlayerId = Request.Form["PlayerId"];
-            bool interactionResult = false;
-            PlayerForDatabase player = dataBase.playerInfoes.Find(PlayerId);
-            if (player != null)
-            {
-                PlayerForConnectedPlayer pl = new PlayerForConnectedPlayer();
-                pl.reWriteAccordingTo(player);
-                interactionResult = pl.UpgradePawnto(pawnCode, newPawnType);
-                /*
-                if (interactionResult)
-                {
-                    player.changePlayer(pl.returnDataBaseVersion());
-                    dataBase.Entry(player).State = EntityState.Modified;
-                    dataBase.SaveChanges();
-                }
-                */
-                if (interactionResult)
-                {
-                    pl.SaveChanges();
-                }
-            }
-            return interactionResult.ToString();
-        }
+       
 
     }
 }

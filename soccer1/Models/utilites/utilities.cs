@@ -96,7 +96,7 @@ namespace soccer1.Models.utilites
             bool check = true;
             if (property1.Alminum < property2.Alminum ) { check = false; }
             if (property1.fan < property2.fan) { check = false; }
-            if (property1.level < property2.level) { check = false; }
+            if (property1.tropy < property2.tropy) { check = false; }
             if (property1.gold < property2.gold) { check = false; }
              
             return check;
@@ -112,17 +112,22 @@ namespace soccer1.Models.utilites
 
             List<int> elixirOutOfTeam = new List<int>();
             List<int> unattachedParts = new List<int>();
-            unattachedParts.Add(981);
-            unattachedParts.Add(1201);
+            //unattachedParts.Add(981);
+            //unattachedParts.Add(1201);
             //unattachedParts.Add(382);
             //unattachedParts.Add(462);
             player.StartFomation = team.StartFomation;
+            player.playPrehibititionFinishTime = TimePointofNow();
             player.AttackFormation = team.AttackFormation;
             player.DefienceForation = team.DefienceForation;
             player.ElixirInBench = new Convertors().IntArrayToSrting(team.ElixirInBench);
             player.gold = Statistics.StartingGold;
             player.level = 1;
             player.Almimun = Statistics.StartingAlminum;
+            player.sponsorAlmimun = Statistics.StartingsponsorAlmimun;
+            player.sponsorGold = Statistics.StartingsponsorGold;
+            player.sponsorName = "WarmMountain";
+            player.lastTimeSponsorAddDone = TimePointofNow();
             player.Name = "Defult";
             player.otherElixirs = new Convertors().IntArrayToSrting(new Convertors().listIntToIntArray(elixirOutOfTeam));
             player.UnAtachedParts = new Convertors().IntArrayToSrting(new Convertors().listIntToIntArray(unattachedParts));
@@ -130,6 +135,12 @@ namespace soccer1.Models.utilites
             player.pawnsInBench = new Convertors().LongIntArrayToSrting(team.pawnsInBench);
             player.PlayeingPawns = new Convertors().LongIntArrayToSrting(team.PlayeingPawns);
             player.PowerLevel = 1;
+            short[] remaningPK = new short[11];
+            player.remaingPakages = new Convertors().ShortArrayToSrting(remaningPK);
+            player.timeOfXpPakageExpiration = 0;
+            List<short> emptyShortList = new List<short>();
+            player.DoneMissions = new Convertors().ShortListToSrting(emptyShortList);
+
             //player.gold = Statistics.StartingSS;
             int[] usableFormations = new int[3];
             usableFormations[0] = player.StartFomation;
@@ -214,8 +225,16 @@ namespace soccer1.Models.utilites
             for (int i = 0; i < team.PlayeingPawns.Length; i++) { team.PlayeingPawns[i] = returnDefultPlayerCode(i,10); }
             for (int i = 0; i < team.pawnsInBench.Length; i++) { team.pawnsInBench[i] = returnDefultPlayerCode(i+5, 10); }
            
-          team.PlayeingPawns[0] = ReturnPlayerCode(0, 10, new int[] { 1,0,1,0}, 1);            
-           // for (int i = 0; i < team.UsableFormations.Length; i++) { team.UsableFormations[i] = -1; }
+            //team.PlayeingPawns[0] = ReturnPlayerCode(0, 50, new int[] { 1,0,0,0,0}, 11);
+            team.PlayeingPawns[1] = ReturnPlayerCode(1, 50, new int[] { 0, 0, 1, 0,0 }, 21);
+            team.PlayeingPawns[2] = ReturnPlayerCode(2, 50, new int[] { 0, 0, 0, 1,0 }, 31);
+            team.PlayeingPawns[3] = ReturnPlayerCode(3, 50, new int[] { 0, 0, 0, 0,1 }, 11);
+            team.PlayeingPawns[4] = ReturnPlayerCode(4, 10, new int[] { 1, 0, 0, 0,0 }, 1);
+            //team.pawnsInBench[0] = ReturnPlayerCode(5, 50, new int[] { 1, 0, 1, 0,0 }, 11);
+            //team.pawnsInBench[1] = ReturnPlayerCode(6, 50, new int[] { 0, 0, 0, 0,0 }, 21);
+           // team.pawnsInBench[2] = ReturnPlayerCode(7, 50, new int[] { 1, 0, 0, 0,1 }, 31);
+            //team.pawnsInBench[3] = ReturnPlayerCode(8, 10, new int[] { 1, 0, 0, 1,0 }, 1);
+            // for (int i = 0; i < team.UsableFormations.Length; i++) { team.UsableFormations[i] = -1; }
             for (int i = 0; i < team.ElixirInBench.Length; i++) { team.ElixirInBench[i] = -1; }
             team.ElixirInBench[0] = defultElixirIndex;
            // team.UsableFormations[0] = defultFormationIndex;
@@ -241,7 +260,83 @@ namespace soccer1.Models.utilites
             return type;
         }
 
+        public Property ReturnPakagePrice(short level, int xpEmount)
+        {
+            Property pr = new Property();
+            if(level<0 || 100 < level) {
+                Errors.AddBigError("Utilities.returnPakagePrice. level is unAcceptable ");
+                return pr; 
+            }
+            else
+            {
+                pr.Alminum = xpEmount * 50;
+                pr.gold = xpEmount * 5;
+                return pr;
+            }            
+        }
 
+
+
+        public Property ReturnBaseTransaqtionPrice(short oldbase, short newbase)
+        {
+            Property pr = new Property();
+            return pr;           
+        }
+
+        public int ReturnBaseUpgradeXp(int level)
+        {
+            switch (level)
+            {
+                case 0:
+                    return 10;
+                    break;
+                case 1:
+                    return 50;
+                    break;
+                case 2:
+                    return 200;
+                    break;
+                case 3:
+                    return 600;
+                    break;
+                case 4:
+                    return 1500;
+                    break;
+                case 5:
+                    return 3000;
+                    break;
+                case 6:
+                    return 4000;
+                    break;
+                case 7:
+                    return 5000;
+                    break;
+                case 8:
+                    return 6000;
+                    break;
+                case 9:
+                    return 7000;
+                    break;
+                case 10:
+                    return 8000;
+                    break;
+                default:
+                    break;
+            }
+            return 0;
+        }
+        public int ReturnPakageXPamunt(short level)
+        {            
+            if (level < 0 || 100 < level)
+            {
+                Errors.AddBigError("Utilities.returnPakagePrice. level is unAcceptable ");
+                return -1;
+            }
+            else
+            {               
+                return (int)Math.Floor( ReturnBaseUpgradeXp(level)*0.25f);
+            }
+        }
         public AssetType ReturnOfferByName(string typeName)
         {
             AssetType type = AssetType.none;
@@ -268,7 +363,7 @@ namespace soccer1.Models.utilites
             newPro = currentProp;
             newPro.Alminum -= subbedProp.Alminum;
             newPro.fan -= subbedProp.fan;
-            newPro.level -= subbedProp.level;
+            newPro.tropy -= subbedProp.tropy;
             newPro.gold -= subbedProp.gold;
             return newPro;
         }

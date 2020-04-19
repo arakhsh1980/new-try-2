@@ -40,6 +40,26 @@ namespace soccer1.Models.main_blocks
         public short upgradeToId3 { get; set; }
         public int requiredXpToUpgrade { get; set; }
         public PawnAbility mainAbility { get; set; }
+        public short SpaceForAddOn { get; set; }
+    }
+
+
+
+    public class Sponsor
+    {
+        public Sponsor()
+        {
+
+        }
+
+        [Key]
+        public string key { get; set; }
+        //public int IdNum { get; set; }
+        public int goldPerWin { get; set; }
+        public int AlminumPerWin { get; set; }
+        public int MaxTickets { get; set; }
+        public int TimeForNewTicket { get; set; }
+        public string name { get; set; }
     }
 
     public class BuildedRoboPart

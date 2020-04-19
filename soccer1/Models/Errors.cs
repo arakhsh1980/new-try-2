@@ -10,20 +10,22 @@ namespace soccer1.Models
         static string[] Bigerrors = new string[1000];
         static string[] SmallErrors = new string[1000];
         static string[] clientErrors = new string[1000];
-        static int errorCounter = 0;
+        static int bigErrorCounter = 0;
         static int clientErrorCounter = 0;
         static int SmallErrorsCounter = 0;
-        static int returnErrorsCounter = 0;
+        static int returnBErrorsCounter = 0;
+        static int returnCErrorsCounter = 0;
+        static int returnSErrorsCounter = 0;
 
-        
+
         public static void AddBigError(string ErrorBody)
         {
-            if (errorCounter >= 1000) { errorCounter = 0; }
+            if (bigErrorCounter >= 1000) { bigErrorCounter = 0; }
             
             
-                if (Bigerrors[errorCounter] == null) { Bigerrors[errorCounter] = ErrorBody; }
-                Bigerrors[errorCounter] = ErrorBody;
-                errorCounter++;
+                if (Bigerrors[bigErrorCounter] == null) { Bigerrors[bigErrorCounter] = ErrorBody; }
+                Bigerrors[bigErrorCounter] = ErrorBody;
+                bigErrorCounter++;
             
         }
         
@@ -51,19 +53,49 @@ namespace soccer1.Models
 
         public static string ReturnBigError()
         {
-            if (returnErrorsCounter >= 1000) { returnErrorsCounter = 0; }
-            if (returnErrorsCounter == errorCounter)
+            if (returnBErrorsCounter >= 1000) { returnBErrorsCounter = 0; }
+            if (returnBErrorsCounter == bigErrorCounter)
             {
                 return "NoNew";
             }
             else
             {
-                returnErrorsCounter++;
-                if (returnErrorsCounter >= 1001) { returnErrorsCounter = 1; }
-                return Bigerrors[returnErrorsCounter - 1];
+                returnBErrorsCounter++;
+                if (returnBErrorsCounter >= 1001) { returnBErrorsCounter = 1; }
+                return Bigerrors[returnBErrorsCounter - 1];
             }
         }
 
+        public static string ReturnClientError()
+        {
+            if (returnCErrorsCounter >= 1000) { returnCErrorsCounter = 0; }
+            if (returnCErrorsCounter == clientErrorCounter )
+            {
+                return "NoNew";
+            }
+            else
+            {
+                returnCErrorsCounter++;
+                if (returnCErrorsCounter >= 1001) { returnCErrorsCounter = 1; }
+                return clientErrors[returnCErrorsCounter - 1];
+            }
+        }
+
+
+        public static string ReturnSmallError()
+        {
+            if (returnSErrorsCounter >= 1000) { returnSErrorsCounter = 0; }
+            if (returnSErrorsCounter == SmallErrorsCounter)
+            {
+                return "NoNew";
+            }
+            else
+            {
+                returnSErrorsCounter++;
+                if (returnSErrorsCounter >= 1001) { returnSErrorsCounter = 1; }
+                return SmallErrors[returnSErrorsCounter - 1];
+            }
+        }
 
 
 

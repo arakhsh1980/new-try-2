@@ -198,15 +198,19 @@
     <Compile Include="App_Start\StartingServer.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AdminController.cs" />
+    <Compile Include="Controllers\AdvertizmentController.cs" />
     <Compile Include="Controllers\ChoosePlayerController.cs" />
     <Compile Include="Controllers\FactoryController.cs" />
     <Compile Include="Controllers\GarageController.cs" />
+    <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\LoadingController.cs" />
     <Compile Include="Controllers\LeagueController.cs" />
     <Compile Include="Controllers\MissionController.cs" />
     <Compile Include="Controllers\ProfileController.cs" />
     <Compile Include="Controllers\SellAndBuyController.cs" />
     <Compile Include="Controllers\symMatchController.cs" />
+    <Compile Include="Controllers\UpdatingController.cs" />
+    <Compile Include="Controllers\UpgradePawnController.cs" />
     <Compile Include="Controllers\ViewAppController.cs" />
     <Compile Include="Controllers\WaitingForOtherPlayerController.cs" />
     <Compile Include="Global.asax.cs">
@@ -217,14 +221,16 @@
     <Compile Include="Models\DataBase\databaseFomat.cs" />
     <Compile Include="Models\DataBase\DatabaseManager.cs" />
     <Compile Include="Models\DataBase\DataBaseInitializer.cs" />
+    <Compile Include="Models\DataClasses.cs" />
     <Compile Include="Models\Log.cs" />
+    <Compile Include="Models\main blocks\BuyableXpPakage.cs" />
+    <Compile Include="Models\main blocks\DualString.cs" />
     <Compile Include="Models\main blocks\Elixir.cs" />
     <Compile Include="Models\main blocks\ErrorView.cs" />
     <Compile Include="Models\main blocks\Formation.cs" />
     <Compile Include="Models\main blocks\LogMassage.cs" />
-    <Compile Include="Models\main blocks\match team.cs" />
+    <Compile Include="Models\main blocks\MissionDefinition.cs" />
     <Compile Include="Models\main blocks\Pawn.cs" />
-    <Compile Include="Models\main blocks\PawnsInfoes.cs" />
     <Compile Include="Models\main blocks\Player.cs" />
     <Compile Include="Models\main blocks\PlayerForDatabase.cs" />
     <Compile Include="Models\main blocks\PlayerForSerial.cs" />
@@ -236,6 +242,7 @@
     <Compile Include="Models\Errors.cs" />
     <Compile Include="Models\main blocks\ShootActionCode.cs" />
     <Compile Include="Models\main blocks\TwoPlayerMatch.cs" />
+    <Compile Include="Models\main blocks\UpdateData.cs" />
     <Compile Include="Models\SymShootMatchesList.cs" />
     <Compile Include="Models\utilites\Statictics.cs" />
     <Compile Include="Models\utilites\Convertors.cs" />
@@ -314,8 +321,11 @@
   <ItemGroup>
     <Folder Include="App2_Data\" />
     <Folder Include="App_Data\" />
+    <Folder Include="Files\" />
+    <Folder Include="Models\data\" />
     <Folder Include="obj\Debug\TempPE\" />
     <Folder Include="Views\Admin\" />
+    <Folder Include="Views\Advertizment\" />
     <Folder Include="Views\ChoosePlayer\" />
     <Folder Include="Views\Connecting\" />
     <Folder Include="Views\Factory\" />
@@ -327,6 +337,8 @@
     <Folder Include="Views\Profile\" />
     <Folder Include="Views\SellAndBuy\" />
     <Folder Include="Views\symMatch\" />
+    <Folder Include="Views\Updating\" />
+    <Folder Include="Views\UpgradePawn\" />
     <Folder Include="Views\ViewApp\" />
     <Folder Include="Views\WaitingForOtherPlayer\" />
   </ItemGroup>

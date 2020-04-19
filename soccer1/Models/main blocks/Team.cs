@@ -52,17 +52,24 @@ namespace soccer1.Models.main_blocks
         //    UsableFormationsCounter++;
         //}
 
-        public void AddXpToPawn(int pawnAssinedIndex, int xpVal)
+        public int AddXpToPawn(int pawnAssinedIndex, int xpVal)
         {
+            int total = 0;
             for (int i = 0; i < PlayeingPawns.Length; i++)
             {
                 PawnOfPlayerData pawnn = new Convertors().PawnCodeToPawnOfPlayerData(PlayeingPawns[i]);
                 if(pawnn.playerPawnIndex == pawnAssinedIndex)
                 {
-                    if (pawnn.requiredXpForNextLevel < xpVal) { pawnn.requiredXpForNextLevel = 0; }
+                    if (pawnn.requiredXpForNextLevel < xpVal) {
+                        total += pawnn.requiredXpForNextLevel;
+                        pawnn.requiredXpForNextLevel = 0;
+                        
+                    }
                     else
                     {
+                        total += xpVal;
                         pawnn.requiredXpForNextLevel -= xpVal;
+
                     }
                     PlayeingPawns[i] =  new Convertors().PawnOfPlayerDataToPawnCode(pawnn);
                     Log.AddLog("AddXpToPawn"+ pawnAssinedIndex.ToString());
@@ -73,27 +80,38 @@ namespace soccer1.Models.main_blocks
                 PawnOfPlayerData pawnn = new Convertors().PawnCodeToPawnOfPlayerData(pawnsInBench[i]);
                 if (pawnn.playerPawnIndex == pawnAssinedIndex)
                 {
-                    if (pawnn.requiredXpForNextLevel < xpVal) { pawnn.requiredXpForNextLevel = 0; }
+                    if (pawnn.requiredXpForNextLevel < xpVal) {
+                        total += pawnn.requiredXpForNextLevel;
+                        pawnn.requiredXpForNextLevel = 0;
+                    }
                     else
                     {
+                        total += xpVal;
                         pawnn.requiredXpForNextLevel -= xpVal;
                     }
                     pawnsInBench[i] = new Convertors().PawnOfPlayerDataToPawnCode(pawnn);
                 }
             }
+            return total;
         }
 
-        public void AddXpToTeam( int xpVal)
+        public int AddXpToTeam( int xpVal)
         {
+            int totoal = 0;
             for (int i = 0; i < PlayeingPawns.Length; i++)
             {
                 PawnOfPlayerData pawnn = new Convertors().PawnCodeToPawnOfPlayerData(PlayeingPawns[i]);
                 
                 {
-                    if (pawnn.requiredXpForNextLevel < xpVal) { pawnn.requiredXpForNextLevel = 0; }
+                    if (pawnn.requiredXpForNextLevel < xpVal) {
+                        totoal += pawnn.requiredXpForNextLevel;
+                        pawnn.requiredXpForNextLevel = 0;
+                        
+                    }
                     else
                     {
                         pawnn.requiredXpForNextLevel -= xpVal;
+                        totoal += xpVal;
                     }
                     PlayeingPawns[i] = new Convertors().PawnOfPlayerDataToPawnCode(pawnn);
                 }
@@ -103,14 +121,20 @@ namespace soccer1.Models.main_blocks
                 PawnOfPlayerData pawnn = new Convertors().PawnCodeToPawnOfPlayerData(pawnsInBench[i]);
                 
                 {
-                    if (pawnn.requiredXpForNextLevel < xpVal) { pawnn.requiredXpForNextLevel = 0; }
+                    if (pawnn.requiredXpForNextLevel < xpVal) {
+                        totoal += pawnn.requiredXpForNextLevel;
+                        pawnn.requiredXpForNextLevel = 0;
+                        
+                    }
                     else
                     {
                         pawnn.requiredXpForNextLevel -= xpVal;
+                        totoal += xpVal;
                     }
                     pawnsInBench[i] = new Convertors().PawnOfPlayerDataToPawnCode(pawnn);
                 }
             }
+            return totoal;
         }
     }
 

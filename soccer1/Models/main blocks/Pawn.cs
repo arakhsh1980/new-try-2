@@ -161,7 +161,7 @@ namespace soccer1.Models.main_blocks
 {
         public void SetZiro()
         {
-            level = 0;
+            tropy = 0;
             fan = 0;
             Alminum = 0;
             gold = 0;
@@ -169,15 +169,22 @@ namespace soccer1.Models.main_blocks
 
         public void DeepCopey(Property pp)
         {
-            level = pp.level;
+            tropy = pp.tropy;
             fan = pp.fan;
             Alminum = pp.Alminum;
             gold = pp.gold;
         }
 
+        public void AddToThis(Property pp)
+        {
+            tropy += pp.tropy;
+            fan += pp.fan;
+            Alminum += pp.Alminum;
+            gold += pp.gold;
 
+        }
 
-        public int level { get; set; }
+        public int tropy { get; set; }
         public int fan { get; set; }
         public int Alminum { get; set; }
         public int gold { get; set; }

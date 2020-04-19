@@ -78,7 +78,7 @@ namespace soccer1.Models.main_blocks
         {
             connectedId = 0;
             Name = "Defult";
-            PowerLevel = 1.0f;
+            totalXp = 1.0f;
             team = new TeamForConnectedPlayers();
             PlayerProperty = new Property();
             Utilities utilities = new Utilities();
@@ -86,9 +86,12 @@ namespace soccer1.Models.main_blocks
             PlayerProperty = new Property();
             PlayerProperty.fan = 0;
             PlayerProperty.Alminum = Statistics.StartingAlminum;
-            PlayerProperty.level = 1;
+            PlayerProperty.tropy = 1;
             PlayerProperty.gold = Statistics.StartingSS;
             buildOrders = new BuildPartOrder[4];
+            RemaingPakages = new short[11];
+            DoneMissions = new List<short>();
+            DoneMissions.Clear();
     }
 
         private DataDBContext dataBase = new DataDBContext();
@@ -100,15 +103,18 @@ namespace soccer1.Models.main_blocks
         public static Mutex SaveChengesMutex = new Mutex();
 
         long[] BuildOrdersIntFormt = new long[4];
-        private string Name { get; set; }
+        public string Name { get; set; }
 
         public int connectedId { get; set; }
 
-        public float PowerLevel { get; set; }
+        public float totalXp { get; set; }
 
+        short[] RemaingPakages { get; set; }
+
+        long TimeOfXpPakageExpiartion { get; set; }
         private TeamForConnectedPlayers team { get; set; }
 
-        private Property PlayerProperty;
+        public Property PlayerProperty;
                
         private List<long> pawnOutOfTeam = new List<long>();
 
@@ -116,30 +122,227 @@ namespace soccer1.Models.main_blocks
 
         private List<int> unAttachedPart = new List<int>();
 
+        private List<int> useableFormations = new List<int>();
+
         private Convertors convertor = new Convertors();
 
         private BuildPartOrder[] buildOrders ; 
 
         private bool isChanged=false;
 
-        private short[] DoneMissions;
+        private List<short> DoneMissions = new List<short>();
+
+        public int sponsorAlmimun;
+
+        public string sponsorName;
+
+        public int sponsorGold;
+
+        public int lastTimeSponsorAddDone;
+
+        public long playPrehibititionFinishTime;
+
+        //public bool IsTHisAHostPlayer;
 
         #region public functions
 
-        public void GainMatchXp(GainedXp gainedXp)
+        public bool UpgradePawnto(long pawnCode, int newBaseId)
         {
-            
-            team.AddXpToTeam(gainedXp.xpVAl[gainedXp.xpVAl.Length - 1]);
-            for (int i = 0; i < gainedXp.AssingedIndex.Length; i++)
+
+            PawnOfPlayerData pp = new PawnOfPlayerData();
+            pp = new Convertors().PawnCodeToPawnOfPlayerData(pawnCode);
+            RoboBase oldBase = new AssetManager().ReturnBaseInfo(pp.baceTypeIndex);
+            RoboBase newbase = new AssetManager().ReturnBaseInfo(newBaseId);
+            if (0 < pp.requiredXpForNextLevel)
             {
-                if (0 < gainedXp.AssingedIndex[i])
+                Errors.AddClientError("player.UpgradePawnto.0 < requiredXpForNextLevel ");
+                return false;
+            }
+            if (oldBase.upgradeToId1 != newBaseId && oldBase.upgradeToId2 != newBaseId && oldBase.upgradeToId3 != newBaseId)
+            {
+                Errors.AddClientError("player.UpgradePawnto. wrong transition ");
+                return false;
+            }
+            Property transaqtionPrice = new Utilities().ReturnBaseTransaqtionPrice(oldBase.IdNum, newbase.IdNum);
+            if (!new Utilities().CheckIfFirstPropertyIsBigger(PlayerProperty, transaqtionPrice))
+            {
+                Errors.AddClientError("player.BuyXpPakage. not enogth property");
+                return false;
+            }
+            SubtractProperty(transaqtionPrice);
+            pp.baceTypeIndex = newbase.IdNum;
+            pp.requiredXpForNextLevel = new Utilities().ReturnBaseUpgradeXp(newbase.level);
+            long newPawnCode = new Convertors().PawnOfPlayerDataToPawnCode(pp);
+            PawnOfPlayerData forTest = new Convertors().PawnCodeToPawnOfPlayerData(newPawnCode);
+            return SubstitutePawn(pawnCode, newPawnCode);
+        }
+
+
+        public bool BuyXpPakage(long pawnCode)
+        {
+
+            PawnOfPlayerData pp = new PawnOfPlayerData();
+            pp = new Convertors().PawnCodeToPawnOfPlayerData(pawnCode);
+            int baseLevel = new AssetManager().ReturnBaseLevel(pp.baceTypeIndex);
+            if (baseLevel < 0)
+            {
+                Errors.AddBigError("player.BuyXpPakage.baseLevel is lower than 0  ");
+                return false;
+            }
+            if (RemaingPakages.Length < baseLevel)
+            {
+                Errors.AddBigError("player.BuyXpPakage.baseLevel is higher than RemaingPakages .Length  ");
+                return false;
+            }
+            if (RemaingPakages[baseLevel] < 1)
+            {
+                Errors.AddClientError("player.BuyXpPakage. RemaingPakages[" + baseLevel.ToString() + "] is zero");
+                return false;
+            }
+            //int baseRXNL =  new AssetManager().ReturnBaseLevel()
+            int xpAmunt = new Utilities().ReturnPakageXPamunt((short)baseLevel);
+            Property pakagePrice = new Utilities().ReturnPakagePrice((short)baseLevel, xpAmunt);
+            if (!new Utilities().CheckIfFirstPropertyIsBigger(PlayerProperty, pakagePrice))
+            {
+                Errors.AddClientError("player.BuyXpPakage. not enogth property");
+                return false;
+            }
+            SubtractProperty(pakagePrice);
+            pp.requiredXpForNextLevel -= xpAmunt;
+            if (pp.requiredXpForNextLevel < 0) { pp.requiredXpForNextLevel = 0; }
+            RemaingPakages[baseLevel] -= 1;
+            long newPawnCode = new Convertors().PawnOfPlayerDataToPawnCode(pp);
+            return SubstitutePawn(pawnCode, newPawnCode);
+        }
+
+
+        public BuyableXpPakage RequestPlayerPakage()
+        {
+            if (TimeOfXpPakageExpiartion <= new Utilities().TimePointofNow())
+            {
+                // renew Player pakage
+                TimeOfXpPakageExpiartion = new Utilities().TimePointofNow() + 14400;
+                short[] levels = ReturnlevelsOfPlayerPawns();
+                for (int i = 0; i < RemaingPakages.Length; i++)
                 {
-                    team.AddXpToPawn(gainedXp.AssingedIndex[i], gainedXp.xpVAl[i]);
+                    RemaingPakages[i] = 0;
+                }
+                short minLevel = 0;
+                while (levels[minLevel] < 1 && minLevel < (levels.Length - 1)) { minLevel++; }
+                RemaingPakages[minLevel] = levels[minLevel];
+                if (levels[minLevel] < 10)
+                {
+                    RemaingPakages[minLevel + 1] = (short)(10 - levels[minLevel]);
+                }
+                SaveChanges();
+            }
+            BuyableXpPakage playerPack = new BuyableXpPakage();
+            playerPack.expireTime = TimeOfXpPakageExpiartion;
+            playerPack.special = "Defult";
+            playerPack.requiredAl = new int[10];
+            playerPack.requiredGold = new int[10];
+            playerPack.xpValue = new int[10];
+            Property vall;
+            for (int i = 0; i < playerPack.requiredAl.Length; i++)
+            {
+                playerPack.xpValue[i] = new Utilities().ReturnPakageXPamunt((short)i);
+                vall = new Utilities().ReturnPakagePrice((short)i, playerPack.xpValue[i]);
+                playerPack.requiredAl[i] = vall.Alminum;
+                playerPack.requiredGold[i] = vall.gold;
+            }
+
+            playerPack.numberOfAvalablePakages = new short[RemaingPakages.Length];
+            for (int i = 0; i < playerPack.numberOfAvalablePakages.Length; i++)
+            {
+                playerPack.numberOfAvalablePakages[i] = RemaingPakages[i];
+            }
+            return playerPack;
+        }
+
+
+        public bool ElixirUse(int ElixirType)
+        {
+            bool result = false;
+            int elixirPlace = -1;
+            for (int i = 0; i < team.ElixirInBench.Length; i++) if (team.ElixirInBench[i] == ElixirType) { elixirPlace = i; }
+            if (-1 < elixirPlace)
+            {
+                team.ElixirInBench[elixirPlace] = -1;
+                //SaveChanges();
+                result = true;
+            }
+
+            return result;
+        }
+        public void GainMatchResult(GainedFromMatch gainedResult)
+        { 
+
+            totalXp += team.AddXpToTeam(gainedResult.xpVAl[gainedResult.xpVAl.Length - 1]);
+            for (int i = 0; i < gainedResult.AssingedIndex.Length; i++)
+            {
+                if (0 < gainedResult.AssingedIndex[i])
+                {
+                    totalXp += team.AddXpToPawn(gainedResult.AssingedIndex[i], gainedResult.xpVAl[i]);
                 }
             }
+            AddProperty(gainedResult.gained);
+            
+            
+
             //SaveChanges();
+
+
+        }
+
+
+        public bool MissionDone(short missionId)
+        {
+            if(DoneMissions!= null)
+            {
+                foreach (short s in DoneMissions)
+                {
+                    if (s == missionId)
+                    {
+                        return false;
+                    }
+                }
+            }
+            else
+            {
+                DoneMissions = new List<short>();
+            }
             
-            
+           
+            MissionDefinition donemission = new AssetManager().ReturnMission(missionId);
+            if(donemission== null) { return false; }
+            short[] preReq = convertor.StringToShorttArray(donemission.preRequisite);
+            bool resultcheck = false;
+            if(preReq != null)
+            {
+                for (int i = 0; i < preReq.Length; i++)
+                {
+                    resultcheck = false;
+                    foreach (short s in DoneMissions)
+                    {
+                        if (s == preReq[i])
+                        {
+                            resultcheck = true;
+                        }
+                    }
+                    if (!resultcheck)
+                    {
+                        return false;
+                    }
+                }
+            }
+            DoneMissions.Add(missionId);
+            Property toAdd = new Property();
+            toAdd.Alminum = 0;
+            toAdd.fan = 0;
+            toAdd.tropy = 0;
+            toAdd.gold = donemission.rewardInGold;
+            AddProperty(toAdd);
+            return true;           
         }
 
 
@@ -160,6 +363,23 @@ namespace soccer1.Models.main_blocks
             }
         }
 
+       // public void AddSponserVAlue
+
+        public bool ChangeSponser(string newSponserName)
+        {
+            Sponsor thisplayerSponser = new AssetManager().ReturnSponsor(newSponserName);
+            if (thisplayerSponser != null)
+            {                
+                sponsorName = newSponserName;
+                sponsorAlmimun = 0;
+                sponsorGold = 0;
+                SaveChanges();
+                return true;
+            }else
+            {
+                return false;
+            }
+        }
 
         public bool ScrapPartOrder(short partID, short partType, short goldLevel)
         {
@@ -337,7 +557,7 @@ namespace soccer1.Models.main_blocks
             PlayerProperty.Alminum += prop.Alminum;
             PlayerProperty.gold += prop.gold;
             PlayerProperty.fan += prop.fan;
-            PlayerProperty.level += prop.level;
+            PlayerProperty.tropy += prop.tropy;
            // SaveChanges();
         }
 
@@ -580,69 +800,6 @@ namespace soccer1.Models.main_blocks
 
         #endregion
 
-        public bool UpgradePawnto(int pawnCode, int newPawnType) {
-            
-            PawnOfPlayerData pp = new PawnOfPlayerData();
-            pp = new Convertors().PawnCodeToPawnOfPlayerData(pawnCode);
-            pp.parts[0] = newPawnType;
-            pp.requiredXpForNextLevel = new AssetManager().ReturnrequiredXpForNextLevel(newPawnType);
-            long newPawnCode = new Convertors().PawnOfPlayerDataToPawnCode(pp);
-            bool isFinded = false;
-            bool isREmovedPastFromPawnOutOfTeam = false;
-
-            isREmovedPastFromPawnOutOfTeam = pawnOutOfTeam.Remove( pawnCode);
-            if (isREmovedPastFromPawnOutOfTeam)
-            {
-                pawnOutOfTeam.Add(newPawnCode);
-                //SaveChanges();
-                return true;
-            }
-            for (int i = 0; i < team.PlayeingPawns.Length; i++)
-            {
-                int isFindedPlace = -1;
-                if (team.PlayeingPawns[i] == pawnCode)
-                {
-                    isFindedPlace = i;                   
-                }
-                if (-1 < isFindedPlace)
-                {
-                    team.PlayeingPawns[isFindedPlace] = newPawnCode;
-                    //SaveChanges();
-                    return true;
-                }
-            }
-            for (int i = 0; i < team.pawnsInBench.Length; i++)
-            {
-                int isFindedPlace = -1;
-                if (team.pawnsInBench[i] == pawnCode)
-                {
-                    isFindedPlace = i;
-                    
-                }
-                if (-1 < isFindedPlace)
-                {
-                    team.pawnsInBench[i] = newPawnCode;
-                    //SaveChanges();
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        public bool ElixirUse(int ElixirType)
-        {
-            bool result = false;
-            int elixirPlace = -1;
-            for (int i=0; i < team.ElixirInBench.Length; i++)if(team.ElixirInBench[i]== ElixirType) { elixirPlace = i; }
-            if (-1 < elixirPlace)
-            {
-                team.ElixirInBench[elixirPlace] = -1;
-                //SaveChanges();
-                result = true;
-            }
-
-            return result;
-        }
 
 
         public  void reWriteAccordingTo(PlayerForDatabase pl)
@@ -653,12 +810,20 @@ namespace soccer1.Models.main_blocks
             Name = pl.Name;
             PlayerProperty.Alminum = pl.Almimun;
             connectedId = -1;
-            PowerLevel = pl.PowerLevel;
-            PlayerProperty.level = pl.level;
+            totalXp = pl.PowerLevel;
+            PlayerProperty.tropy = pl.level;
             PlayerProperty.gold = pl.gold;
             team.StartFomation = pl.StartFomation;
             team.AttackFormation = pl.AttackFormation;
             team.DefienceForation = pl.DefienceForation;
+            lastTimeSponsorAddDone = pl.lastTimeSponsorAddDone;
+            TimeOfXpPakageExpiartion = pl.timeOfXpPakageExpiration;
+            RemaingPakages = convertor.StringToShortArray(pl.remaingPakages);
+            sponsorAlmimun = pl.sponsorAlmimun;
+            sponsorGold = pl.sponsorGold;
+            sponsorName = pl.sponsorName;
+            playPrehibititionFinishTime = pl.playPrehibititionFinishTime;
+            //DoneMissions = pl.DoneMissions
             //convert of Playerfordatabase Class to Player Class 
             //convert string to int
             //int[] pawnBuffer = convertor.StringToIntArray(pl.outOfTeamPawns);
@@ -682,6 +847,12 @@ namespace soccer1.Models.main_blocks
                     unAttachedPart.Add(partBuffer[i]);
                 }
 
+            int[] useableFormationsBuffer = convertor.StringToIntArray(pl.UsableFormations);
+            useableFormations.Clear();
+            for (int i = 0; i < useableFormationsBuffer.Length; i++) if (0 <= useableFormationsBuffer[i])
+                {
+                    useableFormations.Add(useableFormationsBuffer[i]);
+                }
             team.PlayeingPawns = convertor.StringToLongIntArray(pl.PlayeingPawns);
             team.pawnsInBench = convertor.StringToLongIntArray(pl.pawnsInBench);
             //team.UsableFormations = convertor.StringToIntArray(pl.UsableFormations);
@@ -696,12 +867,13 @@ namespace soccer1.Models.main_blocks
                     buildOrders[i].FromCode(BuildOrdersIntFormt[i]);
                 }
             }
-            DoneMissions = convertor.StringToShorttArray(pl.DoneMissions);
+            DoneMissions = convertor.StringToShortList(pl.DoneMissions);
+           // IsTHisAHostPlayer = pl.IsTHisAHostPlayer;
             mainMutex.ReleaseMutex();
         }
 
 
-        
+        /*
         private PlayerForDatabase returnDataBaseVersion()
         {
             mainMutex.WaitOne();
@@ -722,12 +894,109 @@ namespace soccer1.Models.main_blocks
             plsrs.PlayeingPawns = convertor.LongIntArrayToSrting(team.PlayeingPawns);
             plsrs.PowerLevel = PowerLevel;
             plsrs.gold = PlayerProperty.gold;
-          //  plsrs.UsableFormations = convertor.IntArrayToSrting(team.UsableFormations);
+            plsrs.lastTimeSponsorAddDone = lastTimeSponsorAddDone;
+            plsrs.sponsorAlmimun = sponsorAlmimun;
+            plsrs.sponsorGold = sponsorGold;
+            plsrs.sponsorId = sponsorId;
+            //  plsrs.UsableFormations = convertor.IntArrayToSrting(team.UsableFormations);
             mainMutex.ReleaseMutex();
             return plsrs;
         }
-        
-        public void SaveChanges()
+        */
+
+        public string ReturnSponserPorperty()
+        {
+            return sponsorAlmimun.ToString() + "*" + sponsorGold.ToString();
+        }
+
+        public bool SubtractSponserPorperty(int AlminumVAl, int GoldVAl )
+        {
+            
+            sponsorAlmimun -= AlminumVAl;
+            sponsorGold -= GoldVAl;
+            SaveChanges();
+            return true;
+        }
+
+        public void UpdateSpnserPorperty()
+        {
+            
+            int CurrentTime = new Utilities().TimePointofNow();
+            int clapsedTime = CurrentTime - lastTimeSponsorAddDone;
+            if (true)//10 < (clapsedTime))
+            {
+                Sponsor thisplayerSponser = new AssetManager().ReturnSponsor(sponsorName);
+                if (thisplayerSponser == null) { return; }
+                lastTimeSponsorAddDone = CurrentTime;
+                sponsorAlmimun += thisplayerSponser.AlminumPerWin * clapsedTime;
+                sponsorGold += thisplayerSponser.goldPerWin * clapsedTime;
+                if (thisplayerSponser.TimeForNewTicket < sponsorAlmimun) { sponsorAlmimun = thisplayerSponser.TimeForNewTicket; }
+                if (thisplayerSponser.MaxTickets < sponsorGold) { sponsorGold = thisplayerSponser.MaxTickets; }
+            }
+            SaveChanges();
+        }
+
+
+
+        public PlayerForSerial ReturnForSerialize()
+        {
+            PlayerForSerial serialplayer = new PlayerForSerial();
+            serialplayer.id = id;
+            serialplayer.Gold = PlayerProperty.gold;
+            serialplayer.level = PlayerProperty.tropy;
+            serialplayer.Alminum = PlayerProperty.Alminum;
+            serialplayer.Name = Name;
+            //serialplayer.SoccerSpetial = player.gold;
+            serialplayer.OutOfTeamElixirs =elixirOutOfTeam.ToArray();
+            serialplayer.UnAttachedPart = unAttachedPart.ToArray();
+            serialplayer.OutOfTeamPawns = pawnOutOfTeam.ToArray();
+            //serialplayer.OutOfTeamPawnsRequiredXp = SrtingTointArray(player.otherPawnsRequiredXp);
+            serialplayer.PowerLevel = totalXp;
+            // serialplayer.SoccerSpetial = player.SoccerSpetial;
+            serialplayer.Team.StartFomation =team.StartFomation;
+            serialplayer.Team.AttackFormation = team.AttackFormation;
+            serialplayer.Team.DefienceForation = team.DefienceForation;
+            serialplayer.Team.ElixirInBench =team.ElixirInBench;
+            serialplayer.Team.pawnsInBench = team.pawnsInBench;
+            //serialplayer.PawnsinBenchRequiredXp = SrtingTointArray(player.pawnsInBenchRequiredXp);
+            serialplayer.Team.PlayeingPawns = team.PlayeingPawns;
+            //serialplayer.PlayingPawnsRequiredXp = SrtingTointArray(player.PlayeingPawnsRequiredXp);
+            // serialplayer.Team.UsableFormations = StringToIntArray(player.UsableFormations);
+            serialplayer.UsebaleFormations = useableFormations.ToArray();
+
+            serialplayer.DoneMissions = DoneMissions.ToArray();
+            serialplayer.buildOrders = new long[buildOrders.Length];
+            for (int i = 0; i < buildOrders.Length; i++)
+            {
+                if (buildOrders[i] != null)
+                {
+                    serialplayer.buildOrders[i] = buildOrders[i].ToCode();
+                }
+                else
+                {
+                    serialplayer.buildOrders[i] = -1;
+                }
+            }
+            serialplayer.remaningPakages = RemaingPakages;
+            serialplayer.TimeOfXpPakageExpiartion = TimeOfXpPakageExpiartion;
+            serialplayer.lastTimeSponsorAddDone = lastTimeSponsorAddDone;
+            serialplayer.sponsorAlmimun = sponsorAlmimun;
+            serialplayer.sponsorGold = sponsorGold;
+            //serialplayer.sponsorId = sponsorId;
+            Sponsor thisPlayerSp = new AssetManager().ReturnSponsor(sponsorName);
+            serialplayer.sponsorAlminumMax = thisPlayerSp.TimeForNewTicket;
+            serialplayer.sponsorGoldMAX = thisPlayerSp.MaxTickets;
+            serialplayer.sponsorName = thisPlayerSp.name;
+            serialplayer.sponsorGoldPerMinute = thisPlayerSp.goldPerWin;
+            serialplayer.sponsorAlmimunPerMinute = thisPlayerSp.AlminumPerWin;
+            serialplayer.playPrehibititionFinishTime = playPrehibititionFinishTime;
+            //serialplayer.IsTHisAHostPlayer = IsTHisAHostPlayer;
+            return serialplayer;
+        }
+
+
+
+                public void SaveChanges()
         {
             mainMutex.WaitOne();
             PlayerForDatabase thisPlayerAtServer =dataBase.playerInfoes.Find(id);
@@ -737,7 +1006,7 @@ namespace soccer1.Models.main_blocks
             thisPlayerAtServer.ElixirInBench = convertor.IntArrayToSrting(team.ElixirInBench);
             thisPlayerAtServer.gold = PlayerProperty.gold;
             //plsrs.id = id;
-            thisPlayerAtServer.level = PlayerProperty.level;
+            thisPlayerAtServer.level = PlayerProperty.tropy;
             thisPlayerAtServer.Almimun = PlayerProperty.Alminum;
             thisPlayerAtServer.Name = Name;
             thisPlayerAtServer.otherElixirs = convertor.IntArrayToSrting(convertor.listIntToIntArray(elixirOutOfTeam));
@@ -745,22 +1014,31 @@ namespace soccer1.Models.main_blocks
             thisPlayerAtServer.outOfTeamPawns = convertor.LongIntArrayToSrting(convertor.listLongToLongArray(pawnOutOfTeam));
             thisPlayerAtServer.pawnsInBench = convertor.LongIntArrayToSrting(team.pawnsInBench);
             thisPlayerAtServer.PlayeingPawns = convertor.LongIntArrayToSrting(team.PlayeingPawns);
-            thisPlayerAtServer.PowerLevel = PowerLevel;
+            thisPlayerAtServer.PowerLevel = totalXp;
             thisPlayerAtServer.gold = PlayerProperty.gold;
-            for(int i =0; i <buildOrders.Length; i++) {
+            thisPlayerAtServer.sponsorAlmimun = sponsorAlmimun;
+            thisPlayerAtServer.sponsorGold = sponsorGold;
+            thisPlayerAtServer.sponsorName = sponsorName;
+            thisPlayerAtServer.lastTimeSponsorAddDone = lastTimeSponsorAddDone;
+            for (int i =0; i <buildOrders.Length; i++) {
                 BuildOrdersIntFormt[i] = -1;
                 if(buildOrders[i] != null)
                 {
                     BuildOrdersIntFormt[i] = buildOrders[i].ToCode();
                 }
             }
+            thisPlayerAtServer.DoneMissions = convertor.ShortListToSrting(DoneMissions);
             thisPlayerAtServer.buildOrders = convertor.LongIntArrayToSrting(BuildOrdersIntFormt);
+            thisPlayerAtServer.remaingPakages = convertor.ShortArrayToSrting(RemaingPakages);
+            thisPlayerAtServer.timeOfXpPakageExpiration = TimeOfXpPakageExpiartion;
+            //thisPlayerAtServer.IsTHisAHostPlayer = IsTHisAHostPlayer;
             //  thisPlayerAtServer.UsableFormations = convertor.IntArrayToSrting(team.UsableFormations);            
             dataBase.Entry(thisPlayerAtServer).State = EntityState.Modified;
             dataBase.SaveChanges();
             mainMutex.ReleaseMutex();
         }
 
+        /*
         public void AddTodDataBase()
         {
             mainMutex.WaitOne();
@@ -769,7 +1047,7 @@ namespace soccer1.Models.main_blocks
             dataBase.SaveChanges();
             mainMutex.ReleaseMutex();
         }
-
+        */
 
         public TeamForConnectedPlayers ReturnYourTeam()
         {
@@ -777,6 +1055,74 @@ namespace soccer1.Models.main_blocks
         }
 
         #region inner function
+        private short[] ReturnlevelsOfPlayerPawns()
+        {
+
+            short[] levels = new short[20];
+            PawnOfPlayerData pp;
+            int baseLevel;
+            foreach (long p in pawnOutOfTeam)
+            {
+                pp = new Convertors().PawnCodeToPawnOfPlayerData(p);
+                baseLevel = new AssetManager().ReturnBaseLevel(pp.baceTypeIndex);
+                levels[baseLevel]++;
+            }           
+            for (int i = 0; i < team.PlayeingPawns.Length; i++)
+            {
+                pp = new Convertors().PawnCodeToPawnOfPlayerData(team.PlayeingPawns[i]);
+                baseLevel = new AssetManager().ReturnBaseLevel(pp.baceTypeIndex);
+                levels[baseLevel]++;
+            }
+            for (int i = 0; i < team.pawnsInBench.Length; i++)
+            {
+                pp = new Convertors().PawnCodeToPawnOfPlayerData(team.pawnsInBench[i]);
+                baseLevel = new AssetManager().ReturnBaseLevel(pp.baceTypeIndex);
+                levels[baseLevel]++;
+            }
+            return levels;
+        }
+
+        private bool SubstitutePawn(long OldCode , long newCode)
+        {
+            bool isREmovedPastFromPawnOutOfTeam = false;
+            isREmovedPastFromPawnOutOfTeam = pawnOutOfTeam.Remove(OldCode);
+            if (isREmovedPastFromPawnOutOfTeam)
+            {
+                pawnOutOfTeam.Add(newCode);
+                //SaveChanges();
+                return true;
+            }
+            for (int i = 0; i < team.PlayeingPawns.Length; i++)
+            {
+                int isFindedPlace = -1;
+                if (team.PlayeingPawns[i] == OldCode)
+                {
+                    isFindedPlace = i;
+                }
+                if (-1 < isFindedPlace)
+                {
+                    team.PlayeingPawns[isFindedPlace] = newCode;
+                    //SaveChanges();
+                    return true;
+                }
+            }
+            for (int i = 0; i < team.pawnsInBench.Length; i++)
+            {
+                int isFindedPlace = -1;
+                if (team.pawnsInBench[i] == OldCode)
+                {
+                    isFindedPlace = i;
+
+                }
+                if (-1 < isFindedPlace)
+                {
+                    team.pawnsInBench[i] = newCode;
+                    //SaveChanges();
+                    return true;
+                }
+            }
+            return false;
+        }
         #endregion
     }
 

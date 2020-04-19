@@ -15,14 +15,12 @@ namespace soccer1.Controllers
     {
         private DataDBContext dataBase = new DataDBContext();
         // public static Mutex AddNewPartmutex = new Mutex();
+       
         [HttpPost]
         public string MissionDone(FormCollection collection)
         {
-            string PlayerId = Request.Form["PlayerId"];
-            short PartID = short.Parse(Request.Form["PartID"]);
-            short builderNumber = short.Parse(Request.Form["builderNumber"]);
-            short partType = short.Parse(Request.Form["partType"]);
-            short goldLevel = short.Parse(Request.Form["goldLevel"]);
+            string PlayerId = Request.Form["PlayerId"];    
+            short IdNum = short.Parse(Request.Form["IdNum"]);
             bool result = false;
             PlayerForDatabase player = dataBase.playerInfoes.Find(PlayerId);
             if (player != null)
@@ -30,7 +28,7 @@ namespace soccer1.Controllers
 
                 PlayerForConnectedPlayer pl = new PlayerForConnectedPlayer();
                 pl.reWriteAccordingTo(player);
-                result = pl.AddBuildOrder(PartID, partType, goldLevel, builderNumber);
+                result = pl.MissionDone(IdNum);
                 if (result)
                 {
                     pl.SaveChanges();

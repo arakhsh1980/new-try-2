@@ -23,13 +23,15 @@ namespace soccer1.Controllers
             string PlayerId = Request.Form["PlayerId"];
             int matchId = Int32.Parse(Request.Form["MatchId"]);
             string MatchType = Request.Form["MatchType"];
-            if(MatchType == "SymShoots")
+            int EventNumber = Int32.Parse(Request.Form["EventNumber"]);
+            string request = Request.Form["request"];
+            if (MatchType == "SymShoots")
             {
-                return new SymShootMatchesList().ReturnEvent(PlayerId, matchId);
+                return new SymShootMatchesList().ReturnEvent(PlayerId, matchId, EventNumber, request);
             }
             else
             {
-                return new SymShootMatchesList().ReturnEvent(PlayerId, matchId);
+                return new SymShootMatchesList().ReturnEvent(PlayerId, matchId, EventNumber, request);
                 // return new MatchList().ReturnEvent(PlayerId, matchId);
             }
 
@@ -42,11 +44,14 @@ namespace soccer1.Controllers
         [HttpPost]
         public string ReadyToPlay(FormCollection collection)
         {
-            
-            string  PlayerId = Request.Form["PlayerId"];
-            string  SelectedLeage = Request.Form["SelectedLeage"];
+            string PlayerId = Request.Form["PlayerId"];
+            string SelectedLeage = Request.Form["SelectedLeage"];
             string MatchType = Request.Form["MatchType"];
-            
+            bool IsPlayAsHost = bool.Parse(Request.Form["IsPlayAsHost"]);
+            bool ShouldSendNotification = bool.Parse(Request.Form["ShouldSendNotification"]);
+            string groundCharSt = Request.Form["groundCharSt"];
+            int numberOfTurns = int.Parse(Request.Form["numberOfTurns"]);
+
             PlayerForDatabase player = dataBase.playerInfoes.Find(PlayerId);
             if (player != null)
             {
@@ -55,14 +60,14 @@ namespace soccer1.Controllers
                 if (MatchType == "SymShoots")
                 {
                     new SymShootMatchesList().ClearMatchesOfPlayer(player.id);
-                    int bestmatch = new SymShootMatchesList().FindSutableMatch(pl.PowerLevel, SelectedLeage);
+                    int bestmatch = new SymShootMatchesList().FindSutableMatch(pl.totalXp, SelectedLeage, groundCharSt);
                     string PlIdName = pl.id;
-                    float PlPower = pl.PowerLevel;
+                    float PlPower = pl.totalXp;
                     int matchId;
                     // FindSutableMatch return -1 if dident find a sutable match
                     if (bestmatch == -1)
                     {
-                        matchId = new SymShootMatchesList().AddNewMatchWithPlayerOne(PlIdName, PlPower, SelectedLeage);
+                        matchId = new SymShootMatchesList().AddNewMatchWithPlayerOne(PlIdName, PlPower, SelectedLeage, groundCharSt, numberOfTurns);
 
                         return "YouAreFisrtt" + matchId;
                     }

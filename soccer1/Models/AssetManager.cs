@@ -10,6 +10,7 @@ using System.Data.Entity;
 using System.Web.Mvc;
 using soccer1;
 using System.Threading;
+using System.Web.Script.Serialization;
 
 namespace soccer1.Models
 {
@@ -22,10 +23,15 @@ namespace soccer1.Models
         private static Formation[] Formationlist = new Formation[arraylengh];
         private static Offer[] Offerlist = new Offer[arraylengh];
         private static RoboPart[] RoboPartlist = new RoboPart[arraylengh];
+        private static Sponsor[] Sponserslist = new Sponsor[arraylengh];
+        private static MissionDefinition[] missionslist = new MissionDefinition[arraylengh];
+        public static List<int> hostPlayers = new List<int>();
         //private static int pawnsConter = 0;
         //private static int ElixirConter = 0;
         //private static int FormationConter = 0;
-        int RoboPartlistCounter = 0;
+        private static int RoboPartlistCounter = 0;
+        private static int SponserlistCounter = 0;
+        private static int missionslistCounter = 0;
         private static int OfferConter = 0;
         //give pawnname add return pawnindex
         public static Mutex assentsLoaded = new Mutex();
@@ -33,13 +39,46 @@ namespace soccer1.Models
         private static Mutex AddPawnmutex = new Mutex();
         public static Mutex AddElixirmutex = new Mutex();
         public static Mutex AddFormationmutex = new Mutex();
+        public static Mutex AddMissionmutex = new Mutex();
         public static Mutex AddOffermutex = new Mutex();
+        //public static Mutex AddMissionmutex = new Mutex();
         private DataDBContext dataBase = new DataDBContext();
-        private bool isDataBaseLoaded = false;
+        private static bool isDataBaseLoaded = false;
         public int ReturnrequiredXpForNextLevel(int idNum) {
             return -1;
            // return Pawnlist[idNum].RequiredXpForUpgrade;
         }
+
+        public int ReturnBaseLevel(int idNum)
+        {
+            int result = -1;
+            for (int i = 0; i < RoboBaselist.Length; i++)if(RoboBaselist[i] != null)
+                {
+                    if (RoboBaselist[i].IdNum == idNum)
+                    {
+                        result = RoboBaselist[i].level;
+                    }
+                }
+                
+            return result;
+            // return Pawnlist[idNum].RequiredXpForUpgrade;
+        }
+
+        public RoboBase ReturnBaseInfo(int idNum)
+        {
+            RoboBase result = null;
+            for (int i = 0; i < RoboBaselist.Length; i++) if (RoboBaselist[i] != null)
+                {
+                    if (RoboBaselist[i].IdNum == idNum)
+                    {
+                        result = RoboBaselist[i];
+                    }
+                }
+
+            return result;
+            // return Pawnlist[idNum].RequiredXpForUpgrade;
+        }
+
 
         public int ReturnRoboPartTimeToBuild(short partId, short partType)
         {
@@ -69,12 +108,45 @@ namespace soccer1.Models
         }
 
 
+        public Sponsor ReturnSponsor(string name)
+        {
+            Sponsor findedsp = null;
+            for (int i = 0; i < Sponserslist.Length; i++) if (Sponserslist[i] != null)
+                {
+                    if (Sponserslist[i].name == name )
+                    {
+                        findedsp = Sponserslist[i];
+                        return findedsp;
+                    }
+                }
+            // if could not fine sponser, return defult one;            
+            return ReturnSponsor("WarmMountain");
+        }
+
+
+        public MissionDefinition ReturnMission(short missionId)
+        {
+            MissionDefinition findedMission = null;
+            for (int i = 0; i < missionslist.Length; i++) if (missionslist[i] != null)
+                {
+                    if (missionslist[i].IdNum == missionId )
+                    {
+                        findedMission = missionslist[i];
+                        return findedMission;
+                    }
+                }
+            return null;
+        }
+
+
         public void LoadDataFromServerifitsFirstTime()
         {
             if (!isDataBaseLoaded)
             {
+                isDataBaseLoaded = true;
                 FillArrays();
-                new SymShootMatchesList().FillArrays();
+                SymShootMatchesList.FillArrays();
+                
             }
         }
 
@@ -307,7 +379,7 @@ namespace soccer1.Models
             
             pop.Alminum = thisprop.Alminum;
             pop.fan = thisprop.fan;
-            pop.level = thisprop.level;
+            pop.tropy = thisprop.tropy;
             pop.gold = thisprop.gold;
             return pop;
         }
@@ -344,7 +416,7 @@ namespace soccer1.Models
             cashprop = Offerlist[index].price;
             thisprop.Alminum = cashprop.Alminum;
             thisprop.fan = cashprop.fan;
-            thisprop.level = cashprop.level;
+            thisprop.tropy = cashprop.tropy;
             thisprop.gold = cashprop.gold;
             return thisprop;
         }
@@ -355,7 +427,7 @@ namespace soccer1.Models
             Property thisprop = new Property();
             thisprop.Alminum =0;
             thisprop.fan = 0;
-            thisprop.level = 0;
+            thisprop.tropy = 0;
             thisprop.gold = 0;
             int index = -1;
             for (int i = 0; i < Offerlist.Length; i++) if (Offerlist[i] != null)
@@ -384,7 +456,7 @@ namespace soccer1.Models
                     thisprop.gold += Offerlist[index].BuyedmoneyAmount;
                     break;
                 case 3:
-                    thisprop.level += Offerlist[index].BuyedmoneyAmount;
+                    thisprop.tropy += Offerlist[index].BuyedmoneyAmount;
                     break;
             }            
             return thisprop;
@@ -497,6 +569,121 @@ namespace soccer1.Models
             new DatabaseManager().AddPartToDataBase(p);
             AddPawnmutex.ReleaseMutex();
         }
+        public Property returnSponserWinPrise(string spName)
+        {
+           
+           
+            Property result = new Property();
+            for (int i = 0; i < Sponserslist.Length; i++) if (Sponserslist[i] != null)
+                {
+                    if (Sponserslist[i].name == spName) {
+                        result.Alminum = Sponserslist[i].AlminumPerWin;
+                        result.gold = Sponserslist[i].goldPerWin;
+                        return result;
+                    }
+                }
+            return result;
+        }
+
+        public void AddSponserToAssets(Sponsor p)
+        {
+            AddPawnmutex.WaitOne();
+            // if (p.IdNum < 0 || 99 < p.IdNum) { Errors.AddBigError("AddPawnToAssets. Pawnlist.Length <= pawnsConter"); return; }
+            int isThereWithSameName =-1;
+            for (int i = 0; i < Sponserslist.Length; i++)if(Sponserslist[i]!= null )
+            {
+                if(Sponserslist[i].name == p.name) { isThereWithSameName = i; }
+            }
+            if (-1 < isThereWithSameName)
+            {
+                p.key = Sponserslist[isThereWithSameName].key;
+                Sponserslist[isThereWithSameName] = p;
+                new DatabaseManager().AddSponsorToDataBase(p);
+            }
+            else
+            {
+                Sponserslist[SponserlistCounter] = p;
+                SponserlistCounter++;
+                p.key = SponserlistCounter.ToString();
+                new DatabaseManager().AddSponsorToDataBase(p);
+            }
+            //p.key = p.IdNum.ToString();
+            AddPawnmutex.ReleaseMutex();
+        }
+
+        public List<string> PlayerChosableSponsers(PlayerForConnectedPlayer p)
+        {
+            List<string> result = new List<string>();
+
+            for (int i = 0; i < Sponserslist.Length; i++)if(Sponserslist[i] != null)
+                
+                {
+                    if (Sponserslist[i].name != p.sponsorName && sponsorChosableityCheck(Sponserslist[i].name, p))
+                {
+                        
+                    result.Add(Sponserslist[i].name);
+                }
+                    
+                }
+            return result;
+        }
+
+        public bool sponsorChosableityCheck(string spname, PlayerForConnectedPlayer p)
+        {
+            switch (spname)
+            {
+                case "BlackBound":
+                    if (200 <= p.PlayerProperty.tropy)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                    break;
+                case "TheExpand":
+                    if (800 <= p.PlayerProperty.tropy)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                    break;
+                case "WarmMountain":
+                    return true;
+                    break;
+                default:
+                    return false;
+                    break;
+            }
+        }
+
+        public List<string> PlayerSujestabeSponsers(PlayerForConnectedPlayer p)
+        {
+            List<string> result = new List<string>();
+
+            for (int i = 0; i < Sponserslist.Length; i++) if (Sponserslist[i] != null)
+                {
+                    if (Sponserslist[i].name != p.sponsorName)
+                    {
+                        result.Add(Sponserslist[i].name);
+                    }
+
+                }
+            return result;
+        }
+
+        public void AddMissionsToAssets(MissionDefinition mm)
+        {
+            AddPawnmutex.WaitOne();
+            missionslist[RoboPartlistCounter] = mm;
+            RoboPartlistCounter++;
+            new DatabaseManager().AddMissionToDataBase(mm);
+            AddPawnmutex.ReleaseMutex();
+        }
 
         public void AddRoboBaseToAssets(RoboBase p)
         {
@@ -533,13 +720,16 @@ namespace soccer1.Models
             new DatabaseManager().AddElixirToDataBase(el);
             AddElixirmutex.ReleaseMutex();
         }
-        
+
+        bool fillArrayRunded = false;
         public void FillArrays()
         {
             AddElixirmutex.WaitOne();
             AddFormationmutex.WaitOne();
             AddPawnmutex.WaitOne();
+            AddMissionmutex.WaitOne();
             assentsLoaded.WaitOne();
+            if (fillArrayRunded) { return; }
             for (int i=0; i< arraylengh; i++)
             {
                 //Pawnlist[i] = new Pawn();
@@ -559,13 +749,32 @@ namespace soccer1.Models
                 RoboPartlistCounter++;
             }
 
+            Sponsor[] sp = dataBase.allSponsor.ToArray();
+            for (int i = 0; i < sp.Length; i++)
+            {
+                Sponserslist[SponserlistCounter] = sp[i];
+                SponserlistCounter++;
+            }
+
+            MissionDefinition[] missions = dataBase.allMissions.ToArray();
+            for (int i = 0; i < missions.Length; i++)
+            {
+                missionslist[missionslistCounter] = missions[i];
+                missionslistCounter++;
+            }
+
 
             Elixir[] elixirs = dataBase.allElixires.ToArray();
             for (int i = 0; i < elixirs.Length; i++)
             {
                 Elixirlist[elixirs[i].IdNum] = elixirs[i];
             }
-
+            DualString finded = dataBase.GameDataStrings.Find("GamePrefrance");
+            if(finded!= null)
+            {
+                Statistics.GamePrefernceString = finded.value;
+                //Statistics.SavedPreference = new JavaScriptSerializer().Deserialize<MatchCharestristic>(finded.value);
+            }
             
 
             RoboBase[] bases = dataBase.allBases.ToArray();
@@ -573,10 +782,18 @@ namespace soccer1.Models
             {
                 RoboBaselist[bases[i].IdNum] = bases[i];
             }
+            hostPlayers.Clear();
+            IntArrayClass[] hosts = dataBase.HostPlayers.ToArray();
+            for (int i = 0; i < hosts.Length; i++)
+            {
+                hostPlayers.Add(hosts[i].ar);
+            }
             //dataBase.
+            fillArrayRunded = true;
             AddElixirmutex.ReleaseMutex();
             AddFormationmutex.ReleaseMutex();
             AddPawnmutex.ReleaseMutex();
+            AddMissionmutex.ReleaseMutex();
             assentsLoaded.ReleaseMutex();
 
         }

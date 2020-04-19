@@ -45,6 +45,7 @@ namespace soccer1.Controllers
         [HttpPost]
         public string PlayerShootDesition(FormCollection collection)
         {
+
             string PlayerId = Request.Form["PlayerId"];
             int matchId = Int32.Parse(Request.Form["MatchId"]);
             int TurnNumber = Int32.Parse(Request.Form["TurnNumber"]);
@@ -55,7 +56,7 @@ namespace soccer1.Controllers
             bool result = false;
            // ShootActionCode shoot = new JavaScriptSerializer().Deserialize<ShootActionCode>(jsonpart);
             //Log.AddLog("shoot resived. shotter : " + shoot.playerIDName);
-            if (/*ConnectedPlayersList.IsShootValid(shoot)*/ true)
+            if (-1<TurnNumber && -1<matchId)/*ConnectedPlayersList.IsShootValid(shoot)*/ 
             {
                 result = new SymShootMatchesList().shootHapened(matchId, PlayerId, TurnNumber, jsonpart);
             }
@@ -166,10 +167,12 @@ namespace soccer1.Controllers
         [HttpPost]
         public string CheckForNewMatchEvent(FormCollection collection)
         {
-            int ConnectionId = Int32.Parse(Request.Form["ConnectionId"]);
+            //int ConnectionId = Int32.Parse(Request.Form["ConnectionId"]);
             int matchId = Int32.Parse(Request.Form["MatchId"]);
             string PlayerId = Request.Form["PlayerId"];
-            return new SymShootMatchesList().ReturnEvent(PlayerId, matchId);
+            int EventNumber = Int32.Parse(Request.Form["EventNumber"]);
+            string request = Request.Form["request"];
+            return new SymShootMatchesList().ReturnEvent(PlayerId, matchId, EventNumber, request);
         }
 
         [HttpPost]
