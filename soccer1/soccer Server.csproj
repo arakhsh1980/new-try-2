@@ -234,6 +234,7 @@
     <Compile Include="Models\main blocks\Player.cs" />
     <Compile Include="Models\main blocks\PlayerForDatabase.cs" />
     <Compile Include="Models\main blocks\PlayerForSerial.cs" />
+    <Compile Include="Models\main blocks\Results.cs" />
     <Compile Include="Models\main blocks\roboPart.cs" />
     <Compile Include="Models\main blocks\roboPartBuilder.cs" />
     <Compile Include="Models\main blocks\symShootMatch.cs" />

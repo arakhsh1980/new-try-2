@@ -35,7 +35,9 @@ namespace soccer1.Controllers
                 interactionResult = pl.UpgradePawnto(pawnCode, newBaseID);                
                 if (interactionResult)
                 {
-                    pl.SaveChanges();
+                    player.ChangesAcoordingTo(pl);
+                    dataBase.Entry(player).State = EntityState.Modified;
+                    dataBase.SaveChanges();
                 }
             }
             return interactionResult.ToString();
@@ -56,7 +58,9 @@ namespace soccer1.Controllers
                 
                 if (interactionResult)
                 {
-                    pl.SaveChanges();
+                    player.ChangesAcoordingTo(pl);
+                    dataBase.Entry(player).State = EntityState.Modified;
+                    dataBase.SaveChanges();
                 }
             }
             return interactionResult.ToString();

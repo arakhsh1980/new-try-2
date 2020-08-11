@@ -32,6 +32,37 @@ namespace soccer1.Controllers
         private DataDBContext dataBase = new DataDBContext();
 
 
+
+        
+
+            [HttpPost]
+        public string ChallengeResult(FormCollection collection)
+        {
+            string PlayerId = Request.Form["PlayerId"];
+            Property reward = new Property();
+            reward.Alminum = Int32.Parse(Request.Form["reward_Alminum"]);
+            reward.gold = Int32.Parse(Request.Form["reward_gold"]);
+            reward.tropy= Int32.Parse(Request.Form["reward_tropy"]);
+
+
+
+
+            PlayerForDatabase player = dataBase.playerInfoes.Find(PlayerId);
+            if (player != null)
+            {
+                PlayerForConnectedPlayer pl = new PlayerForConnectedPlayer();
+                pl.reWriteAccordingTo(player);
+                pl.AddProperty(reward);
+                player.ChangesAcoordingTo(pl);
+                dataBase.Entry(player).State = EntityState.Modified;
+                dataBase.SaveChanges();
+                return true.ToString();
+            }
+            return false.ToString();
+
+        }
+
+
         [HttpPost]
         public string PlayerLeftTheMatch(FormCollection collection)
         {
@@ -172,7 +203,34 @@ namespace soccer1.Controllers
             string PlayerId = Request.Form["PlayerId"];
             int EventNumber = Int32.Parse(Request.Form["EventNumber"]);
             string request = Request.Form["request"];
-            return new SymShootMatchesList().ReturnEvent(PlayerId, matchId, EventNumber, request);
+            MatchEventsArray result = new SymShootMatchesList().ReturnEvent(PlayerId, matchId, EventNumber, request);
+            for (int i = 0; i < result.Events.Length; i++)
+            {
+                if (result.Events[i].EventTypes == MatchMassageType.FinishDraw  )
+                {
+
+                }
+                if (result.Events[i].EventTypes == MatchMassageType.Winnerisii )
+                {
+                    GainedFromMatch gainedResult = new JavaScriptSerializer().Deserialize<GainedFromMatch>(result.Events[i].desitionBodys);
+                    if(gainedResult.WinnerId == PlayerId)
+                    {
+                        PlayerForDatabase player = dataBase.playerInfoes.Find(PlayerId);
+                        if(player != null)
+                        {
+                            PlayerForConnectedPlayer pl = new PlayerForConnectedPlayer();
+                            pl.reWriteAccordingTo(player);
+                            pl.GainMatchResult(gainedResult);
+                            player.ChangesAcoordingTo(pl);
+                            dataBase.Entry(player).State = EntityState.Modified;
+                            dataBase.SaveChanges();
+                        }
+                       
+                    }
+                }
+
+            }            
+            return new JavaScriptSerializer().Serialize(result);
         }
 
         [HttpPost]
@@ -183,6 +241,8 @@ namespace soccer1.Controllers
             string PlayerId = Request.Form["PlayerId"];
             new SymShootMatchesList().TimerIsUp(PlayerId, matchId, TurnNumber);
         }
+
+
 
     }
 }

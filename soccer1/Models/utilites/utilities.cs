@@ -45,7 +45,7 @@ namespace soccer1.Models.utilites
             long orderCode = goldLevel;
             orderCode += partType * 3;
             orderCode += partID * 3*10;
-            int finishTimePoint = TimePointofNow()+new AssetManager().ReturnRoboPartTimeToBuild(partID, partType);
+            int finishTimePoint = TimePointofNow()+new AssetManager().ReturnRoboPartTimeToBuild(partID);
             orderCode += (long)finishTimePoint * 3 * 10 * 300;
             return orderCode;            
         }
@@ -73,9 +73,9 @@ namespace soccer1.Models.utilites
         public long RoboPartBuildOrderfinishTime(short partID, short partType)
         {
            
-            DateTime finishOrderDateTime = DateTime.Now.AddSeconds(new AssetManager().ReturnRoboPartTimeToBuild(partID, partType));
+            DateTime finishOrderDateTime = DateTime.Now.AddSeconds(new AssetManager().ReturnRoboPartTimeToBuild(partID));
             DateTimeOffset finishOrderDateTime1 = DateTimeOffset.UtcNow;
-            finishOrderDateTime1.AddSeconds(new AssetManager().ReturnRoboPartTimeToBuild(partID, partType));
+            finishOrderDateTime1.AddSeconds(new AssetManager().ReturnRoboPartTimeToBuild(partID));
             finishOrderDateTime1.ToUnixTimeSeconds();
             return finishOrderDateTime.ToBinary();
         }
@@ -122,19 +122,22 @@ namespace soccer1.Models.utilites
             player.DefienceForation = team.DefienceForation;
             player.ElixirInBench = new Convertors().IntArrayToSrting(team.ElixirInBench);
             player.gold = Statistics.StartingGold;
-            player.level = 1;
+            player.Tropy = 1;
             player.Almimun = Statistics.StartingAlminum;
-            player.sponsorAlmimun = Statistics.StartingsponsorAlmimun;
-            player.sponsorGold = Statistics.StartingsponsorGold;
+            player.lastTimeUpdated = new Utilities().TimePointofNow();
+            player.NumberOfTickets = 4.1f;
             player.sponsorName = "WarmMountain";
-            player.lastTimeSponsorAddDone = TimePointofNow();
             player.Name = "Defult";
+            List<short> buyedBluePrints = new List<short>();
+            buyedBluePrints.Add(1);
+            buyedBluePrints.Add(5);
+            player.buyedBluePrints = new Convertors().ShortListToSrting(buyedBluePrints);
             player.otherElixirs = new Convertors().IntArrayToSrting(new Convertors().listIntToIntArray(elixirOutOfTeam));
             player.UnAtachedParts = new Convertors().IntArrayToSrting(new Convertors().listIntToIntArray(unattachedParts));
             player.outOfTeamPawns = new Convertors().LongIntArrayToSrting(pawnOutOfTeam);
             player.pawnsInBench = new Convertors().LongIntArrayToSrting(team.pawnsInBench);
             player.PlayeingPawns = new Convertors().LongIntArrayToSrting(team.PlayeingPawns);
-            player.PowerLevel = 1;
+            player.totalXp = 1;
             short[] remaningPK = new short[11];
             player.remaingPakages = new Convertors().ShortArrayToSrting(remaningPK);
             player.timeOfXpPakageExpiration = 0;
@@ -171,10 +174,11 @@ namespace soccer1.Models.utilites
             newpawn.requiredXpForUpgrade = requiredXpForUpdrade;
             for (int i = 0; i < newpawn.parts.Length; i++)
             {
-                newpawn.parts[i] = new BuildedRoboPart(0);
-                if(i< parts.Length)
+                newpawn.parts[i] = new BuildedRoboPart();
+                newpawn.parts[i].SetPartByCode(0);
+                if (i< parts.Length)
                 {
-                    newpawn.parts[i].PartID = (short)parts[i];
+                    newpawn.parts[i].partType = (RoboPartType)parts[i];
                     newpawn.parts[i].goldLevel = 0;
                 }
             }
@@ -225,16 +229,12 @@ namespace soccer1.Models.utilites
             for (int i = 0; i < team.PlayeingPawns.Length; i++) { team.PlayeingPawns[i] = returnDefultPlayerCode(i,10); }
             for (int i = 0; i < team.pawnsInBench.Length; i++) { team.pawnsInBench[i] = returnDefultPlayerCode(i+5, 10); }
            
-            //team.PlayeingPawns[0] = ReturnPlayerCode(0, 50, new int[] { 1,0,0,0,0}, 11);
+            /*
             team.PlayeingPawns[1] = ReturnPlayerCode(1, 50, new int[] { 0, 0, 1, 0,0 }, 21);
-            team.PlayeingPawns[2] = ReturnPlayerCode(2, 50, new int[] { 0, 0, 0, 1,0 }, 31);
-            team.PlayeingPawns[3] = ReturnPlayerCode(3, 50, new int[] { 0, 0, 0, 0,1 }, 11);
-            team.PlayeingPawns[4] = ReturnPlayerCode(4, 10, new int[] { 1, 0, 0, 0,0 }, 1);
-            //team.pawnsInBench[0] = ReturnPlayerCode(5, 50, new int[] { 1, 0, 1, 0,0 }, 11);
-            //team.pawnsInBench[1] = ReturnPlayerCode(6, 50, new int[] { 0, 0, 0, 0,0 }, 21);
-           // team.pawnsInBench[2] = ReturnPlayerCode(7, 50, new int[] { 1, 0, 0, 0,1 }, 31);
-            //team.pawnsInBench[3] = ReturnPlayerCode(8, 10, new int[] { 1, 0, 0, 1,0 }, 1);
-            // for (int i = 0; i < team.UsableFormations.Length; i++) { team.UsableFormations[i] = -1; }
+            team.PlayeingPawns[2] = ReturnPlayerCode(2, 50, new int[] { 0, 0, 0, 5,0 }, 31);
+            team.PlayeingPawns[3] = ReturnPlayerCode(3, 50, new int[] { 0, 0, 0, 0,0 }, 11);
+            team.PlayeingPawns[4] = ReturnPlayerCode(4, 10, new int[] { 0, 0, 0, 0,0 }, 1);
+            */
             for (int i = 0; i < team.ElixirInBench.Length; i++) { team.ElixirInBench[i] = -1; }
             team.ElixirInBench[0] = defultElixirIndex;
            // team.UsableFormations[0] = defultFormationIndex;

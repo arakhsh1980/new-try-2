@@ -50,7 +50,9 @@ namespace soccer1.Controllers
                 }
                 if (result)
                 {
-                    pl.SaveChanges();
+                    player.ChangesAcoordingTo(pl);
+                    dataBase.Entry(player).State = EntityState.Modified;
+                    dataBase.SaveChanges();
                 }
                 /*
                 if (result) {
@@ -88,7 +90,9 @@ namespace soccer1.Controllers
                 result = pl.BuyOffer(BuyingMaterial , AssetPrice);
                 if (result)
                 {
-                    pl.SaveChanges();
+                    player.ChangesAcoordingTo(pl);
+                    dataBase.Entry(player).State = EntityState.Modified;
+                    dataBase.SaveChanges();
                 }
                 /*
                 if (result)

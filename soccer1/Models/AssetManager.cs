@@ -80,11 +80,11 @@ namespace soccer1.Models
         }
 
 
-        public int ReturnRoboPartTimeToBuild(short partId, short partType)
+        public int ReturnRoboPartTimeToBuild(short partId)
         {
             for(int i =0; i< RoboPartlist.Length; i++)if(RoboPartlist[i] != null)
             {
-                if(RoboPartlist[i].IdNum == partId && (short)RoboPartlist[i].partType == partType)
+                if(RoboPartlist[i].partType == (RoboPartType)partId )
                     {
                         return RoboPartlist[i].minuetToBuild;
                     }
@@ -93,12 +93,12 @@ namespace soccer1.Models
         }
 
 
-        public RoboPart ReturnRoboPart(short partId, short partType)
+        public RoboPart ReturnRoboPart(short partId)
         {
             RoboPart findedpart = null;
             for (int i = 0; i < RoboPartlist.Length; i++) if (RoboPartlist[i] != null)
                 {
-                    if (RoboPartlist[i].IdNum == partId && (short)RoboPartlist[i].partType == partType)
+                    if (RoboPartlist[i].partType == (RoboPartType)partId )
                     {
                         findedpart = RoboPartlist[i];
                         return findedpart;
@@ -256,13 +256,13 @@ namespace soccer1.Models
             */
         }
 
-        public Property ReturnOrderPrice(short partID, short partType, short goldLevel)
+        public Property ReturnOrderPrice(RoboPartType partType, short goldLevel)
         {
             Property pp = new Property();
             int index = -1;
             for(int i = 0; i < RoboPartlist.Length; i++)if(RoboPartlist[i] != null)
             {
-                if((short)RoboPartlist[i].partType == partType && RoboPartlist[i].IdNum == partID)
+                if(RoboPartlist[i].partType == partType)
                 {
                     index = i;
                 }
@@ -300,13 +300,13 @@ namespace soccer1.Models
             return pp;
         }
 
-        public Property ReturnScrapPrice(short partID, short partType, short goldLevel)
+        public Property ReturnScrapPrice(short partID, short goldLevel)
         {
             Property pp = new Property();
             int index = -1;
             for (int i = 0; i < RoboPartlist.Length; i++) if (RoboPartlist[i] != null)
                 {
-                    if ((short)RoboPartlist[i].partType == partType && RoboPartlist[i].IdNum == partID)
+                    if ((short)RoboPartlist[i].partType == partID )
                     {
                         index = i;
                     }
@@ -561,7 +561,7 @@ namespace soccer1.Models
         public void AddRoboPartToAssets(RoboPart p)
         {
             AddPawnmutex.WaitOne();
-            if (p.IdNum<0 || 99<p.IdNum) { Errors.AddBigError("AddPawnToAssets. Pawnlist.Length <= pawnsConter"); return; }
+            //if (p.IdNum<0 || 99<p.IdNum) { Errors.AddBigError("AddPawnToAssets. Pawnlist.Length <= pawnsConter"); return; }
             
             //p.key = p.IdNum.ToString();
             RoboPartlist[RoboPartlistCounter] = p;
@@ -618,7 +618,7 @@ namespace soccer1.Models
             for (int i = 0; i < Sponserslist.Length; i++)if(Sponserslist[i] != null)
                 
                 {
-                    if (Sponserslist[i].name != p.sponsorName && sponsorChosableityCheck(Sponserslist[i].name, p))
+                    if (Sponserslist[i].name != p.sponsorName && sponsorChosableityCheck(Sponserslist[i].name, p) && Sponserslist[i].minAcceptableTropy <= p.PlayerProperty.tropy && Sponserslist[i].minAcceptableXp <= p.totalXp)
                 {
                         
                     result.Add(Sponserslist[i].name);
@@ -630,33 +630,23 @@ namespace soccer1.Models
 
         public bool sponsorChosableityCheck(string spname, PlayerForConnectedPlayer p)
         {
+            
             switch (spname)
             {
                 case "BlackBound":
-                    if (200 <= p.PlayerProperty.tropy)
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
+                    return true;
                     break;
                 case "TheExpand":
-                    if (800 <= p.PlayerProperty.tropy)
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
+                    return true;                   
                     break;
                 case "WarmMountain":
                     return true;
                     break;
+                case "ColdMountain":
+                    return true;
+                    break;
                 default:
-                    return false;
+                    return true;
                     break;
             }
         }

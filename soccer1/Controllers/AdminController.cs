@@ -7,13 +7,7 @@ using soccer1.Models;
 using System.Web.Script.Serialization;
 using soccer1.Models.main_blocks;
 using System.Threading;
-using System.Data.Entity;
-using soccer1.Models.main_blocks;
-using System.ComponentModel.DataAnnotations;
-using soccer1.Models.utilites;
 using soccer1.Models.DataBase;
-using System.Web.Script.Serialization;
-using System.Threading;
 
 namespace soccer1.Controllers
 {
@@ -41,28 +35,133 @@ namespace soccer1.Controllers
                 RoboPart newpart = new RoboPart();
             //pawn.abilityShower= Request.Form["abilityShower"];            
             newpart.HighGoldEffect = Int32.Parse(Request.Form["HighGoldEffect"]);
-            newpart.IdNum = short.Parse(Request.Form["IdNum"]);            
+            short IdNum = short.Parse(Request.Form["IdNum"]);
+            newpart.partType = (RoboPartType)IdNum;
             newpart.lowGoldEffect= Int32.Parse(Request.Form["lowGoldEffect"]);
-            newpart.MediomGoldEffect = Int32.Parse(Request.Form["MediomGoldEffect"]);
-            RoboPartType tt;
-            Enum.TryParse<RoboPartType>(Request.Form["partType"],out tt);
-            newpart.partType = tt;
-           newpart.key = (newpart.IdNum + (int)tt *256).ToString();
+            newpart.MediomGoldEffect = Int32.Parse(Request.Form["MediomGoldEffect"]);            
+            //Enum.TryParse<RoboPartType>(Request.Form["partType"],out tt);
+            newpart.key =  newpart.partType.ToString();
             Property price = new Property();
             price.Alminum = Int32.Parse(Request.Form["price.coin"]);
             price.fan = Int32.Parse(Request.Form["price.fan"]);
             price.tropy = Int32.Parse(Request.Form["price.level"]);
             price.gold = Int32.Parse(Request.Form["price.SoccerSpetial"]);
+
+            Property BluePrintprice = new Property();
+            BluePrintprice.Alminum = Int32.Parse(Request.Form["BluePrintPrice.coin"]);
+            BluePrintprice.fan = Int32.Parse(Request.Form["BluePrintPrice.fan"]);
+            BluePrintprice.tropy = Int32.Parse(Request.Form["BluePrintPrice.level"]);
+            BluePrintprice.gold = Int32.Parse(Request.Form["BluePrintPrice.SoccerSpetial"]);
+            newpart.numberOfBuildableParts = Int32.Parse(Request.Form["numberOfBuildableParts"]);
+            newpart.BluePrintAlmimunValue = BluePrintprice.Alminum;
+            newpart.GoldValue= BluePrintprice.gold;
             //newpart.price = price;
             newpart.GoldValue = price.gold;
             newpart.AlmimunValue = price.Alminum;
             newpart.minuetToBuild = Int32.Parse(Request.Form["minuteToBuild"]);
             new AssetManager().AddRoboPartToAssets(newpart);
             AddPawnmutex.ReleaseMutex();            
-            return "RoboPart Loaded" + newpart.partType.ToString()+" "+ newpart.IdNum;            
+            return "RoboPart Loaded" + newpart.partType.ToString();            
         }
 
-        
+        /*
+        [HttpPost]
+        public string AddOrUpdateAnString(FormCollection collection)
+        {
+            new AssetManager().LoadDataFromServerifitsFirstTime();
+            AddPawnmutex.WaitOne();
+            string AdminCode = Request.Form["AdminCode"];
+            if (AdminCode != Statistics.AdminCode)
+            {
+                AddPawnmutex.ReleaseMutex();
+                return "wrong Admin Code";
+            }
+            string StringLastName = Request.Form["StringLastName"];
+            string StringNewName = Request.Form["StringNewName"];
+            string newdata = Request.Form["newdata"];           
+
+            if (newdata != null)
+            {
+
+                DualString finded = dataBase.GameDataStrings.Find(StringLastName);
+                if (finded != null)
+                {
+                    finded.key = StringNewName;
+                    finded.TimeOfLastUpdate = DateTime.UtcNow.ToBinary();
+                    finded.value = newdata;
+                }
+                else
+                {
+                    DualString DataForsave = new DualString();
+                    DataForsave.key = StringNewName;
+                    DataForsave.TimeOfLastUpdate = DateTime.UtcNow.ToBinary();
+                    DataForsave.value = newdata;
+                    dataBase.GameDataStrings.Add(DataForsave);
+                }
+                dataBase.SaveChanges();
+                DualString[] allstrings = dataBase.GameDataStrings.ToArray();
+                string newlist= "";
+                for (int i = 0; i < allstrings.Length; i++)if(allstrings[i].key != "ListOfStrings")
+                {
+                        newlist +=  allstrings[i].key+ "^"+allstrings[i].TimeOfLastUpdate.ToString()+"*";
+                }
+                DualString liststring = dataBase.GameDataStrings.Find("ListOfStrings");
+                liststring.value = newlist;
+                liststring.TimeOfLastUpdate = DateTime.UtcNow.ToBinary();
+                //dataBase.GameDataStrings.
+                dataBase.SaveChanges();
+            }
+            else
+            {
+
+            }
+            AddPawnmutex.ReleaseMutex();
+            return "done";
+        }
+
+        */
+
+
+        [HttpPost]
+        public string UpdateAnPlanetData(FormCollection collection)
+        {
+            new AssetManager().LoadDataFromServerifitsFirstTime();
+            AddPawnmutex.WaitOne();
+            string AdminCode = Request.Form["AdminCode"];
+            if (AdminCode != Statistics.AdminCode)
+            {
+                AddPawnmutex.ReleaseMutex();
+                return "wrong Admin Code";
+            }
+            string newdata = Request.Form["PlanetData"];
+            string part2 = Request.Form["PlanetName"];
+            string nameCode = "PlanetData" + part2;
+
+            if (newdata != null)
+            {
+                
+                DualString finded = dataBase.GameDataStrings.Find(nameCode);
+                if (finded != null)
+                {
+                    finded.value = newdata;
+                }
+                else
+                {
+                    DualString DataForsave = new DualString();
+                    DataForsave.key = nameCode;
+                    DataForsave.value = newdata;
+                    dataBase.GameDataStrings.Add(DataForsave);
+                }
+                //dataBase.GameDataStrings.
+                dataBase.SaveChanges();
+            }
+            else
+            {
+
+            }
+            AddPawnmutex.ReleaseMutex();
+            return "done";
+        }
 
 
 
@@ -122,6 +221,8 @@ namespace soccer1.Controllers
                 return "wrong Admin Code";
             }
             string newdata = Request.Form["GamePrefranceString"];
+            string preferenceName = Request.Form["preferenceName"];
+            string nameCode = "GamePrefrance:" + preferenceName;
             if (newdata != null)
             {
                 Statistics.GamePrefernceString = newdata;
@@ -135,7 +236,7 @@ namespace soccer1.Controllers
                 else
                 {
                     DualString DataForsave = new DualString();
-                    DataForsave.key = "GamePrefrance";
+                    DataForsave.key = nameCode;
                     DataForsave.value = newdata;
                     dataBase.GameDataStrings.Add(DataForsave);
                 }
@@ -201,15 +302,18 @@ namespace soccer1.Controllers
                 AddPawnmutex.ReleaseMutex();
                 return "wrong Admin Code";
             }
-
             //AssetManager.assentsLoaded.WaitOne();
             Sponsor newsp = new Sponsor();
             //pawn.abilityShower= Request.Form["abilityShower"];
-            newsp.TimeForNewTicket = Int32.Parse(Request.Form["AlminumMaxCap"]);
-            newsp.AlminumPerWin = Int32.Parse(Request.Form["AlminumPerMinute"]);
-            newsp.MaxTickets = Int32.Parse(Request.Form["goldMaxCap"]);
-            newsp.goldPerWin = Int32.Parse(Request.Form["goldPerMinute"]);
+            newsp.MaxTickets = Int32.Parse(Request.Form["MaxTickets"]);
+            newsp.goldPerWin = Int32.Parse(Request.Form["goldPerWin"]);
+            newsp.MaxTickets = Int32.Parse(Request.Form["MaxTickets"]);
+            newsp.minAcceptableTropy = Int32.Parse(Request.Form["minAcceptableTropy"]);
+            newsp.minAcceptableXp = Int32.Parse(Request.Form["minAcceptableXp"]);
             newsp.name = Request.Form["name"];
+            newsp.prerequisite = Request.Form["prerequisite"];
+            newsp.prerequisiteCode = Request.Form["prerequisiteCode"];
+            newsp.TimeBetweenTickets = Int32.Parse(Request.Form["TimeBetweenTickets"]);
             new AssetManager().AddSponserToAssets(newsp);
             AddPawnmutex.ReleaseMutex();
             return "Sponser saved :" + newsp.name;

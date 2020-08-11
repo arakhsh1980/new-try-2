@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using soccer1.Models;
+using System.Data.Entity;
 
 namespace soccer1.Controllers
 {

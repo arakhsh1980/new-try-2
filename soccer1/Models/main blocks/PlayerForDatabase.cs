@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Data.Entity;
 using soccer1.Models.main_blocks;
+using soccer1.Models.utilites;
 using System.ComponentModel.DataAnnotations;
 
 namespace soccer1.Models.main_blocks
@@ -25,16 +26,16 @@ namespace soccer1.Models.main_blocks
 
         public int Almimun { get; set; }
 
-        public int sponsorAlmimun { get; set; }
+        public  int lastTimeUpdated { get; set; }
+        public float NumberOfTickets { get; set; }
 
         public string sponsorName { get; set; }
 
-        public int sponsorGold { get; set; }
+        public float totalXp { get; set; }
 
-        public int lastTimeSponsorAddDone { get; set; }
-        public float PowerLevel { get; set; }
+        public int Tropy { get; set; }
 
-        public int level { get; set; }
+        public string HistoryCode { get; set; }
 
         public int lastMatchId { get; set; }
 
@@ -54,6 +55,8 @@ namespace soccer1.Models.main_blocks
 
         public string PlayeingPawns { get; set; }
 
+        public string buyedBluePrints { get; set; }
+
         public string pawnsInBench { get; set; }
         
         public string UsableFormations { get; set; }
@@ -68,30 +71,46 @@ namespace soccer1.Models.main_blocks
 
         public string DoneMissions { get; set; }
 
-        /*
-        public void changePlayer(PlayerForDatabase otherplayer)
-        {
 
-            gold = otherplayer.gold;
-            Name = otherplayer.Name;
-            Almimun = otherplayer.Almimun;
-            PowerLevel = otherplayer.PowerLevel;
-            level = otherplayer.level;
-            lastMatchId = otherplayer.lastMatchId;
-            gold = otherplayer.gold;
-            StartFomation = otherplayer.StartFomation;
-            AttackFormation = otherplayer.AttackFormation;
-            DefienceForation = otherplayer.DefienceForation;
-            outOfTeamPawns = otherplayer.outOfTeamPawns;
-            PlayeingPawns = otherplayer.PlayeingPawns;
-            pawnsInBench = otherplayer.pawnsInBench;
-            UsableFormations = otherplayer.UsableFormations;
-            UnAtachedParts = otherplayer.UnAtachedParts;
-            otherElixirs = otherplayer.otherElixirs;
-            ElixirInBench = otherplayer.ElixirInBench;
+        public void ChangesAcoordingTo(PlayerForConnectedPlayer pl)
+        {
+            Convertors convertor = new Convertors();
+            AttackFormation = pl.team.AttackFormation;
+            StartFomation = pl.team.StartFomation;
+            DefienceForation = pl.team.DefienceForation;
+            ElixirInBench = convertor.IntArrayToSrting(pl.team.ElixirInBench);
+            gold = pl.PlayerProperty.gold;
+            //plsrs.id = id;
+            Tropy = pl.PlayerProperty.tropy;
+            Almimun = pl.PlayerProperty.Alminum;
+            Name = pl.Name;
+            otherElixirs = convertor.IntArrayToSrting(convertor.listIntToIntArray(pl.elixirOutOfTeam));
+            UnAtachedParts = convertor.IntArrayToSrting(convertor.listIntToIntArray(pl.unAttachedPart));
+            outOfTeamPawns = convertor.LongIntArrayToSrting(convertor.listLongToLongArray(pl.pawnOutOfTeam));
+            pawnsInBench = convertor.LongIntArrayToSrting(pl.team.pawnsInBench);
+            PlayeingPawns = convertor.LongIntArrayToSrting(pl.team.PlayeingPawns);
+            totalXp = pl.totalXp;
+            gold = pl.PlayerProperty.gold;
+            sponsorName = pl.sponsorName;
+            for (int i = 0; i < pl.buildOrders.Length; i++)
+            {
+                pl.BuildOrdersIntFormt[i] = -1;
+                if (pl.buildOrders[i] != null)
+                {
+                    pl.BuildOrdersIntFormt[i] = pl.buildOrders[i].ToCode();
+                }
+            }
+            DoneMissions = convertor.ShortListToSrting(pl.DoneMissions);
+            buildOrders = convertor.LongIntArrayToSrting(pl.BuildOrdersIntFormt);
+            remaingPakages = convertor.ShortArrayToSrting(pl.RemaingPakages);
+            buyedBluePrints = convertor.ShortListToSrting(pl.BuyedBluePrints);
+            timeOfXpPakageExpiration = pl.TimeOfXpPakageExpiartion;
+            NumberOfTickets = pl.NumberOfTickets;
+            lastTimeUpdated = pl.lastTimeUpdated;
+
         }
-        */
+
 
     }
-    
+
 }

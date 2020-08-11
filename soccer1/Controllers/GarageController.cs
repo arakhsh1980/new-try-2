@@ -8,6 +8,7 @@ using soccer1.Models.main_blocks;
 using soccer1.Models.utilites;
 using soccer1.Models.DataBase;
 using System.Threading;
+using System.Data.Entity;
 
 namespace soccer1.Controllers
 {
@@ -35,7 +36,9 @@ namespace soccer1.Controllers
                 result = pl.ScrapPartOrder(PartID, partType, goldLevel);
                 if (result)
                 {
-                    pl.SaveChanges();
+                    player.ChangesAcoordingTo(pl);
+                    dataBase.Entry(player).State = EntityState.Modified;
+                    dataBase.SaveChanges();
                 }
                 return result.ToString();
             }
@@ -71,7 +74,9 @@ namespace soccer1.Controllers
                 result = pl.ChangeRoboParts(newRobos, newOutOfTeamPawns);
                 if (result)
                 {
-                    pl.SaveChanges();
+                    player.ChangesAcoordingTo(pl);
+                    dataBase.Entry(player).State = EntityState.Modified;
+                    dataBase.SaveChanges();
                 }
                 return result.ToString();
             }

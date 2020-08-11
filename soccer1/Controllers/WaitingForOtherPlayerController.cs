@@ -6,6 +6,7 @@ using System.Web.Mvc;
 using soccer1.Models;
 using soccer1.Models.DataBase;
 using soccer1.Models.main_blocks;
+using System.Data.Entity;
 
 namespace soccer1.Controllers
 {
@@ -13,6 +14,7 @@ namespace soccer1.Controllers
     {
         private DataDBContext dataBase = new DataDBContext();
         // GET: Menu/Details/5
+        /*
         [HttpPost]
         public string CheckForNewEvent(FormCollection collection)
         {
@@ -34,7 +36,7 @@ namespace soccer1.Controllers
 
 
         }
-
+        */
         [HttpPost]
         public string NotAcceptedToPlay(FormCollection collection)
         {
@@ -68,6 +70,7 @@ namespace soccer1.Controllers
             if (MatchType == "SymShoots")
             {
                 return new SymShootMatchesList().PlayAccepted(PlayerId, matchId, GatheredMoney);
+                
             }
             else
             {
@@ -102,7 +105,9 @@ namespace soccer1.Controllers
                         Property AddedForWaiting = new Property();
                         AddedForWaiting.Alminum = reuslt;
                         pl.AddProperty(AddedForWaiting);
-                            pl.SaveChanges();
+                        player.ChangesAcoordingTo(pl);
+                        dataBase.Entry(player).State = EntityState.Modified;
+                        dataBase.SaveChanges();
                     }
                     else
                     {

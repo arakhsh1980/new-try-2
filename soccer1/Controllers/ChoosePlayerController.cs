@@ -114,9 +114,15 @@ namespace soccer1.Controllers
                     dataBase.SaveChanges();
                 }
                 //
+
                 new SymShootMatchesList().ClearMatchesOfPlayer(player.id);
                 PlayerForConnectedPlayer pl = new PlayerForConnectedPlayer();
                 pl.reWriteAccordingTo(player);
+                pl.UpdateAll();
+                if (pl.NumberOfTickets < 1)
+                {
+                    return "NotEnothTicket";
+                }
                 if (new Utilities().TimePointofNow() < pl.playPrehibititionFinishTime)
                 {
                     return "wait " + (pl.playPrehibititionFinishTime - new Utilities().TimePointofNow()).ToString() + " minutes and try agane";
@@ -141,15 +147,18 @@ namespace soccer1.Controllers
                     {
                         sendNotificationToHosts();
                     }
+                    string PlayerShowName = pl.Name;
+                    string PlayerSponserName = pl.sponsorName;
+                    string PlayerTeamString = new JavaScriptSerializer().Serialize(pl.team);
                     if (bestmatch == -1)
                     {
-                        matchId = new SymShootMatchesList().AddNewMatchWithPlayerOne(PlIdName, PlPower, SelectedLeage, groundCharSt, numberOfTurns);
+                        matchId = new SymShootMatchesList().AddNewMatchWithPlayerOne(PlIdName, PlPower, SelectedLeage, groundCharSt, numberOfTurns, PlayerShowName, PlayerSponserName, PlayerTeamString);
 
                         return "YouAreFisrtt" + matchId;
                     }
                     else
                     {
-                        new SymShootMatchesList().AddSecondPlayer(bestmatch, PlIdName, PlPower);
+                        new SymShootMatchesList().AddSecondPlayer(bestmatch, PlIdName, PlPower, PlayerShowName, PlayerSponserName, PlayerTeamString);
                         return "YouAreSecond" + bestmatch;
                     }
                 }
@@ -235,12 +244,29 @@ namespace soccer1.Controllers
             string request = Request.Form["request"];
             if (MatchType == "SymShoots")
             {
-                return new SymShootMatchesList().ReturnEvent(PlayerId, matchId, EventNumber, request);
+                MatchEventsArray result = new SymShootMatchesList().ReturnEvent(PlayerId, matchId, EventNumber, request);
+                for (int i = 0; i < result.Events.Length; i++)if(result.Events[i].EventTypes == MatchMassageType.GoToMatchi)
+                {
+                        PlayerForDatabase player = dataBase.playerInfoes.Find(PlayerId);
+                        if (player != null)
+                        {
+                            PlayerForConnectedPlayer pl = new PlayerForConnectedPlayer();
+                            pl.reWriteAccordingTo(player);
+                            pl.NumberOfTickets = pl.NumberOfTickets - 1.0f;
+                            pl.playPrehibititionFinishTime = 0; 
+                            player.ChangesAcoordingTo(pl);
+                            dataBase.Entry(player).State = EntityState.Modified;
+                            dataBase.SaveChanges();
+                        }
+
+                    }
+                return new JavaScriptSerializer().Serialize(result);
             }
             else
             {
-                return new SymShootMatchesList().ReturnEvent(PlayerId, matchId, EventNumber, request);
+                //return new SymShootMatchesList().ReturnEvent(PlayerId, matchId, EventNumber, request);
                 // return new MatchList().ReturnEvent(PlayerId, matchId);
+                return "";
             }
 
 

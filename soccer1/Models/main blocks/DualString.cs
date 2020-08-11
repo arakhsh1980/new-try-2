@@ -11,6 +11,7 @@ namespace soccer1.Models.main_blocks
         [Key]
         public string key { get; set; }
 
+        //public long TimeOfLastUpdate { get; set; }
         public string value { get; set; }
     }
 }

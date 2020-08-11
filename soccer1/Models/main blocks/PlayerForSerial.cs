@@ -17,20 +17,16 @@ namespace soccer1.Models.main_blocks
 
         public int Alminum;
 
-        public int sponsorAlmimun;
-        public int sponsorAlmimunPerMinute;
+        public float numberOfTicket;
+        public int lastTimeUpdate;
+
         public string sponsorName;
-        public int sponsorGold;
-        public int sponsorGoldPerMinute;
-        public int sponsorGoldMAX;
-        public int sponsorAlminumMax;
-        public int lastTimeSponsorAddDone;
 
         public int CoonId;
 
-        public float PowerLevel;
+        public float totalXp;
 
-        public int level;
+        public int totaltropy;
 
         //public int SoccerSpetial;
 
@@ -53,6 +49,8 @@ namespace soccer1.Models.main_blocks
         public short[] DoneMissions;
 
         public short[] remaningPakages;
+
+        public short[] buyedBluePrints;
 
         public long TimeOfXpPakageExpiartion;
 

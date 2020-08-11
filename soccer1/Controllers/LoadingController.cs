@@ -14,6 +14,7 @@ using soccer1.Models.utilites;
 using soccer1.Models.main_blocks;
 using System.Threading;
 using soccer1.Models.DataBase;
+using System.Data.Entity;
 
 
 
@@ -48,7 +49,10 @@ namespace soccer1.Controllers
             else
             {
                 pl.reWriteAccordingTo(player);
-                pl.UpdateSpnserPorperty();
+                pl.UpdateAll();
+                player.ChangesAcoordingTo(pl);
+                dataBase.Entry(player).State = EntityState.Modified;
+                dataBase.SaveChanges();
             }
             //new MatchList().ClearMatchesOfPlayer(player.id);
             new SymShootMatchesList().ClearMatchesOfPlayer(player.id);
@@ -69,7 +73,7 @@ namespace soccer1.Controllers
             return uu;  
         }
 
-
+        /*
         public string SponserUpdate(FormCollection collection)
         {
             string id = Request.Form["PlayerId"];
@@ -83,12 +87,12 @@ namespace soccer1.Controllers
             else
             {
                 pl.reWriteAccordingTo(player);
-                pl.UpdateSpnserPorperty();
+                pl.UpdateAll();
                 dataBase.SaveChanges();
                 return  pl.sponsorAlmimun + "*" + pl.sponsorGold;
             }
         }
-
+        */
 
         [HttpPost]
         public string ReturnXpPakage(FormCollection collection)
@@ -102,6 +106,9 @@ namespace soccer1.Controllers
                 PlayerForConnectedPlayer pl = new PlayerForConnectedPlayer();
                 pl.reWriteAccordingTo(player);
                 BuyableXpPakage returningPack = pl.RequestPlayerPakage();
+                player.ChangesAcoordingTo(pl);
+                dataBase.Entry(player).State = EntityState.Modified;
+                dataBase.SaveChanges();
                 string uu = new JavaScriptSerializer().Serialize(returningPack);
                 return uu;
             }

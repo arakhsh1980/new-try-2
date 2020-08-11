@@ -15,6 +15,7 @@ using System.Web.Script.Serialization;
 using soccer1.Models.utilites;
 using soccer1.Models;
 using soccer1.Models.DataBase;
+using System.Data.Entity;
 
 
 namespace soccer1.Controllers
@@ -63,9 +64,12 @@ namespace soccer1.Controllers
 
 
         [HttpGet]
-        public string ReturnPrefrence()
+        public string ReturnPrefrence(FormCollection collection)
         {
+            //string preferenceName = Request.Form["PerformanceType"];
+            //string nameCode = "GamePrefrance:" + preferenceName;
             DualString finded = dataBase.GameDataStrings.Find("GamePrefrance");
+
             if (finded != null)
             {
                 return finded.value;

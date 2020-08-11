@@ -78,9 +78,9 @@ namespace soccer1.Models
         }
 
 
-        public string ReturnEvent(string playerId, int matchId, int EventNumber, string request)
+        public MatchEventsArray ReturnEvent(string playerId, int matchId, int EventNumber, string request)
         {
-            string result = "Error";
+            
             MatchEventsArray defultEvent = new MatchEventsArray();
             defultEvent.Events = new MatchEvents[1];
             defultEvent.Events[0].EventTypes = MatchMassageType.Error;
@@ -92,7 +92,7 @@ namespace soccer1.Models
             {
                 if (matchList[matchId] != null)
                 {
-                    result = matchList[matchId].ReturnEvent(playerId, EventNumber, request);
+                    MatchEventsArray result = matchList[matchId].ReturnEvent(playerId, EventNumber, request);
                     return result;
                 }
                 else
@@ -104,8 +104,8 @@ namespace soccer1.Models
             {
                 defultEvent.Events[0].desitionBodys = "matchId out of renge ";
             }
-            result = new JavaScriptSerializer().Serialize(defultEvent);
-            return result;
+            //result.st1 = new JavaScriptSerializer().Serialize(defultEvent);
+            return defultEvent;
         }
 
 
@@ -127,14 +127,17 @@ namespace soccer1.Models
                 Errors.AddBigError("matchList[" + matchId.ToString() + "] == null");
                 return ;
             }
-            matchList[matchId].playerLostOrCenceled(playerId);
+            matchList[matchId].playerLostOrCenceledCheckFromOut(playerId);
         }
 
         public string PlayAccepted(string playerId, int matchId, int GatheredMoney)
         {
+
             if (matchList[matchId] == null)
             {
                 Errors.AddBigError("matchList[" + matchId.ToString() + "] == null");
+                DoubleString Dresult = new DoubleString();
+                Dresult.st1 = "Error";
                 return "Error";
             }
             return matchList[matchId].PlayerOnePlayAccepted(playerId, GatheredMoney);
@@ -239,7 +242,7 @@ namespace soccer1.Models
             Errors.AddBigError("this player is not in its clamed match");
             return "Erroer";
         }
-        public void AddSecondPlayer(int matchNumber, string playerNameId, float playerPower)
+        public void AddSecondPlayer(int matchNumber, string playerNameId, float playerPower, string PlayerShowName, string PlayerSponserName, string PlayerTeamString)
         {
             if (matchList[matchNumber] == null)
             {
@@ -248,13 +251,13 @@ namespace soccer1.Models
             }
             if ( matchList[matchNumber].GivePreSituation() == PreMatchSituation.WFSecondPlayer)
             {
-                matchList[matchNumber].AddSecondPlayerStartImideatly(playerNameId, playerPower);
+                matchList[matchNumber].AddSecondPlayerStartImideatly(playerNameId, playerPower, PlayerShowName, PlayerSponserName, PlayerTeamString);
             }
             else
             {
                 if (matchList[matchNumber].GivePreSituation() == PreMatchSituation.WFSecondPlayerAtHome)
                 {
-                    matchList[matchNumber].AddSecondPlayerAndWaitForFisrtRespond(playerNameId, playerPower);
+                    matchList[matchNumber].AddSecondPlayerAndWaitForFisrtRespond(playerNameId, playerPower, PlayerShowName, PlayerSponserName, PlayerTeamString);
                 }
             }
         }
@@ -265,7 +268,7 @@ namespace soccer1.Models
         {
             for (int i = 0; i < matchList.Length; i++)
             {
-                if (matchList[i] != null) { matchList[i].playerLostOrCenceled(nameId); }
+                if (matchList[i] != null) { matchList[i].playerLostOrCenceledCheckFromOut(nameId); }
             }
         }
 
@@ -282,12 +285,12 @@ namespace soccer1.Models
                 return;
             }
             //Log.AddMatchLog(matchId, " player " + PlayerNameId + " Of Match Lost");
-            matchList[matchId].playerLostOrCenceled(PlayerNameId);
+            matchList[matchId].playerLostOrCenceledCheckFromOut(PlayerNameId);
         }
 
 
         private static Mutex addMatch = new Mutex();
-        public int AddNewMatchWithPlayerOne(string playerIdName, float playerPower, string SelectedLeage, string groundCharSt,int numberOfTurns)
+        public int AddNewMatchWithPlayerOne(string playerIdName, float playerPower, string SelectedLeage, string groundCharSt,int numberOfTurns, string PlayerShowName, string PlayerSponserName, string PlayerTeamString)
         {
            
             addMatch.WaitOne();
@@ -323,7 +326,7 @@ namespace soccer1.Models
             }
             
                 matchList[bestMatch] = new symShootMatch();
-                matchList[bestMatch].InitiatMatchWithOnePlayer(playerIdName, playerPower, bestMatch, SelectedLeage, groundCharSt, numberOfTurns);
+                matchList[bestMatch].InitiatMatchWithOnePlayer(playerIdName, playerPower, bestMatch, SelectedLeage, groundCharSt, numberOfTurns, PlayerShowName, PlayerSponserName, PlayerTeamString);
 
 
                 //Log.AddMatchLog(bestMatch, "added with player" + playerIdName + " as first player");
@@ -391,7 +394,7 @@ namespace soccer1.Models
             }
             if (-1<matchId && matchId< matchList.Length)
             {
-                matchList[matchId].playerLostOrCenceled(NameId);
+                matchList[matchId].playerLostOrCenceledCheckFromOut(NameId);
             }
         }
 

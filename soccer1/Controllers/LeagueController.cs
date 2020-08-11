@@ -16,6 +16,7 @@ namespace soccer1.Controllers
         private DataDBContext dataBase = new DataDBContext();
 
         // GET: Menu/Details/5
+        /*
         [HttpPost]
         public string CheckForNewEvent(FormCollection collection)
         {
@@ -37,10 +38,11 @@ namespace soccer1.Controllers
 
             
         }
-
+        */
 
         
         // POST: if first player return true.
+        /*
         [HttpPost]
         public string ReadyToPlay(FormCollection collection)
         {
@@ -79,7 +81,7 @@ namespace soccer1.Controllers
                 }
                 else
                 {
-                    /*
+                    
                     new MatchList().ClearMatchesOfPlayer(player.id);
                     int bestmatch = new MatchList().FindSutableMatch(pl.PowerLevel, SelectedLeage);
                     string PlIdName = pl.id;
@@ -97,12 +99,12 @@ namespace soccer1.Controllers
                         new MatchList().AddSecondPlayerToMatch(bestmatch, PlIdName, PlPower);
                         return "YouAreSecond" + bestmatch;
                     }
-                    */
+                    
                 }
             }
             return "you are connected";
         }
-
+*/
 
     }
 }
