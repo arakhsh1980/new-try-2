@@ -296,8 +296,5 @@ namespace soccer1.Models.main_blocks
             string sum = type.ToString() + "+" + nameCode + "+" + TimeOfLastUpdate.ToString() + "+" + innerData;
             return sum;
         }
-
-
-        
     }
 }

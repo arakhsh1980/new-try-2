@@ -5,11 +5,10 @@ namespace soccer1.Models.main_blocks
 {
     public class OneStepChalenge
     {
-        [Key]
-        public float level { get; set; }
+        
         [Key]
         public string BuilderId { get; set; }
-        [Key]
+        public float level { get; set; }
         public short BuilderChalengeNumber { get; set; }
         public string startPositions;
         public string OpponentShoot1;
@@ -21,11 +20,10 @@ namespace soccer1.Models.main_blocks
 
     public class TwoStepChalenge
     {
-        [Key]
-        public float level { get; set; }
+        
         [Key]
         public string BuilderId { get; set; }
-        [Key]
+        public float level { get; set; }
         public short BuilderChalengeNumber { get; set; }
         public string startPositions { get; set; }
     public string endPositionsAfter { get; set; }
