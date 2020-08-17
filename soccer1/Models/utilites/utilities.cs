@@ -152,7 +152,9 @@ namespace soccer1.Models.utilites
             player.UsableFormations = new Convertors().IntArrayToSrting(usableFormations);
             long[] buildOrders = new long[4];
             buildOrders[0] = 0; buildOrders[1] = 0; buildOrders[2] = -1; buildOrders[3] = -1;
-            player.buildOrders = new Convertors().LongIntArrayToSrting(buildOrders);            
+            player.buildOrders = new Convertors().LongIntArrayToSrting(buildOrders);
+            player.LastConnectionTime = new Utilities().TimePointofNow();
+            player.requestMemory = player.LastConnectionTime.ToString();
             return player;
         }
 

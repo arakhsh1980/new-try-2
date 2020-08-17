@@ -17,7 +17,7 @@ namespace soccer1.Models
 
     public enum AssetType { Pawn, Elixir, Formation, none };
 
-    public enum MatchMassageType { Error, NothingNew, DoYouPlayy, WatForOthr, GoToMatchi, ActTisShot, Winnerisii, FinishDraw, Disconcted, PlayerGoal, PlrTimeOut, Substituti, ElixirUsea, ChangeTurn, SubBetdMon, pl2Cancled, gaindedXps, difrentRes }
+    public enum MatchMassageType { Error, NothingNew, DoYouPlayy, WatForOthr, GoToMatchi, ActTisShot, Winnerisii, FinishDraw, Disconcted, PlayerGoal, PlrTimeOut, Substituti, ElixirUsea, ChangeTurn, SubBetdMon, pl2Cancled, gaindedXps, difrentRes, goalMemory }
 
     public struct MatchMassage
     {

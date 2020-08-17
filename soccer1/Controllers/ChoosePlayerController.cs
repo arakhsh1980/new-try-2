@@ -114,10 +114,11 @@ namespace soccer1.Controllers
                     dataBase.SaveChanges();
                 }
                 //
-
+                player.AddRequestToHistory(playerRequestType.tryToPlayOnline);
                 new SymShootMatchesList().ClearMatchesOfPlayer(player.id);
                 PlayerForConnectedPlayer pl = new PlayerForConnectedPlayer();
                 pl.reWriteAccordingTo(player);
+               
                 pl.UpdateAll();
                 if (pl.NumberOfTickets < 1)
                 {

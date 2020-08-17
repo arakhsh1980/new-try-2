@@ -199,18 +199,14 @@ namespace soccer1.Models.main_blocks
 
     public struct PawnAbility
 {
-    
-    public float shootPower { get; set; }       
-    public float endorance { get; set; }        
-    public float boddyMass { get; set; }        
-    public float aiming { get; set; }
-        public float force { get; set; }
-        public SpetialPower spPower1 { get; set; }
-        public int spPower1Level { get; set; }
-        public int spPower2Level { get; set; }
-        public int spPower3Level { get; set; }
-        public SpetialPower spPower2 { get; set; }
-        public SpetialPower spPower3 { get; set; }
+
+        
+        public float shooter;
+        public float shild;// after eath shot new power would be power*(100-endorance)/100
+         public float wieght;
+        public float aiming;
+        public float force;
+        public float energyConsume;
     }
 public struct SpetialPower
 {

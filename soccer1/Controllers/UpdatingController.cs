@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using System;
 using System.Net.Http;
 using System.Threading.Tasks;
-using System;
 using System.Net;
 using System.IO;
 using System.Text;
@@ -61,6 +59,42 @@ namespace soccer1.Controllers
 
 
         }
+
+        [HttpPost]
+        public string UpdateClasses(FormCollection collection)
+        {
+            new AssetManager().LoadDataFromServerifitsFirstTime();
+            string lastTimeUpdate = Request.Form["lastTimeUpdate"];
+            long lastTimeUpdateCode;
+            if (! long.TryParse(lastTimeUpdate, out lastTimeUpdateCode))
+            {
+                lastTimeUpdateCode = long.MinValue;
+            }
+            List<string> ClassForUpdates = new AssetManager().returnClassAddedClassesAfterThisTime(lastTimeUpdateCode);
+            if (ClassForUpdates.Count == 0) {
+                return "NoNewUpdate";
+            } else
+            {
+                return ClassesListToSingleString(ClassForUpdates, DateTime.UtcNow.ToBinary().ToString());
+            }
+        }
+
+        string ClassesListToSingleString(List<string> inputs, string Time)// shared with client . change client if changed
+        {
+            string summOfAll = "";
+            for (int i = 0; i < inputs.Count ; i++)
+            {
+                summOfAll += inputs[i] + "*";
+            }
+            summOfAll += Time;
+            return summOfAll;
+        }
+
+        string[] SingleStringToClasses(string sumOfClasses)// shared with client . change client if changed
+        {
+            return sumOfClasses.Split('*');
+        }
+
 
 
         [HttpGet]

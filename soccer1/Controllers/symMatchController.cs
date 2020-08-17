@@ -228,6 +228,13 @@ namespace soccer1.Controllers
                        
                     }
                 }
+                if (result.Events[i].EventTypes == MatchMassageType.goalMemory)
+                {
+                    PlayerForDatabase player = dataBase.playerInfoes.Find(PlayerId);
+                    player.AddGoalMemory(result.Events[i].desitionBodys);
+                    dataBase.Entry(player).State = EntityState.Modified;
+                    dataBase.SaveChanges();
+                }
 
             }            
             return new JavaScriptSerializer().Serialize(result);

@@ -150,7 +150,14 @@ namespace soccer1.Models.main_blocks
         public List<short> BuyedBluePrints = new List<short>();
 
         public string sponsorName;
-        
+
+        public string goalMemory0;
+        public string goalMemory1;
+        public string goalMemory2;
+        public string goalMemory3;
+        public string goalMemory4;
+
+        public int LastfilledGoalMemory;
 
         public long playPrehibititionFinishTime;
 
@@ -170,19 +177,19 @@ namespace soccer1.Models.main_blocks
                 Errors.AddClientError("player.UpgradePawnto.0 < requiredXpForNextLevel ");
                 return false;
             }
-            if (oldBase.upgradeToId1 != newBaseId && oldBase.upgradeToId2 != newBaseId && oldBase.upgradeToId3 != newBaseId)
+            if (oldBase.upgradeToId[0] != newBaseId && oldBase.upgradeToId[1] != newBaseId && oldBase.upgradeToId[2] != newBaseId)
             {
                 Errors.AddClientError("player.UpgradePawnto. wrong transition ");
                 return false;
             }
-            Property transaqtionPrice = new Utilities().ReturnBaseTransaqtionPrice(oldBase.IdNum, newbase.IdNum);
+            Property transaqtionPrice = new Utilities().ReturnBaseTransaqtionPrice(oldBase.BaseID, newbase.BaseID);
             if (!new Utilities().CheckIfFirstPropertyIsBigger(PlayerProperty, transaqtionPrice))
             {
                 Errors.AddClientError("player.BuyXpPakage. not enogth property");
                 return false;
             }
             SubtractProperty(transaqtionPrice);
-            pp.baceTypeIndex = newbase.IdNum;
+            pp.baceTypeIndex = newbase.BaseID;
             pp.requiredXpForNextLevel = new Utilities().ReturnBaseUpgradeXp(newbase.level);
             long newPawnCode = new Convertors().PawnOfPlayerDataToPawnCode(pp);
             PawnOfPlayerData forTest = new Convertors().PawnCodeToPawnOfPlayerData(newPawnCode);
@@ -877,7 +884,13 @@ namespace soccer1.Models.main_blocks
                 }
             }
             DoneMissions = convertor.StringToShortList(pl.DoneMissions);
-           // IsTHisAHostPlayer = pl.IsTHisAHostPlayer;
+            // IsTHisAHostPlayer = pl.IsTHisAHostPlayer;
+            //goalsMemory[0] = pl.GoalMemory0;
+            //goalsMemory[1] = pl.GoalMemory1;
+            //goalsMemory[2] = pl.GoalMemory2;
+            //goalsMemory[3] = pl.GoalMemory3;
+            //goalsMemory[4] = pl.GoalMemory4;
+            LastfilledGoalMemory = pl.LastfilledGoalMemory;
             mainMutex.ReleaseMutex();
         }
 
@@ -1001,6 +1014,8 @@ namespace soccer1.Models.main_blocks
             
             
             serialplayer.playPrehibititionFinishTime = playPrehibititionFinishTime;
+            
+            serialplayer.LastfilledGoalMemory = LastfilledGoalMemory;
             //serialplayer.IsTHisAHostPlayer = IsTHisAHostPlayer;
             return serialplayer;
         }

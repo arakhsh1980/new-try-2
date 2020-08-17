@@ -199,6 +199,7 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\AdvertizmentController.cs" />
+    <Compile Include="Controllers\ChallengeController.cs" />
     <Compile Include="Controllers\ChoosePlayerController.cs" />
     <Compile Include="Controllers\FactoryController.cs" />
     <Compile Include="Controllers\GarageController.cs" />
@@ -217,6 +218,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\AssetManager.cs" />
+    <Compile Include="Models\ChallengeFinder.cs" />
     <Compile Include="Models\ConnectedPlayersList.cs" />
     <Compile Include="Models\DataBase\databaseFomat.cs" />
     <Compile Include="Models\DataBase\DatabaseManager.cs" />
@@ -224,6 +226,7 @@
     <Compile Include="Models\DataClasses.cs" />
     <Compile Include="Models\Log.cs" />
     <Compile Include="Models\main blocks\BuyableXpPakage.cs" />
+    <Compile Include="Models\main blocks\ClassData.cs" />
     <Compile Include="Models\main blocks\DualString.cs" />
     <Compile Include="Models\main blocks\Elixir.cs" />
     <Compile Include="Models\main blocks\ErrorView.cs" />
@@ -237,6 +240,7 @@
     <Compile Include="Models\main blocks\Results.cs" />
     <Compile Include="Models\main blocks\roboPart.cs" />
     <Compile Include="Models\main blocks\roboPartBuilder.cs" />
+    <Compile Include="Models\main blocks\OneStepChalenge.cs" />
     <Compile Include="Models\main blocks\symShootMatch.cs" />
     <Compile Include="Models\main blocks\Team.cs" />
     <Compile Include="Models\main blocks\playerCennectionInfo.cs" />
@@ -327,6 +331,7 @@
     <Folder Include="obj\Debug\TempPE\" />
     <Folder Include="Views\Admin\" />
     <Folder Include="Views\Advertizment\" />
+    <Folder Include="Views\Challenge\" />
     <Folder Include="Views\ChoosePlayer\" />
     <Folder Include="Views\Connecting\" />
     <Folder Include="Views\Factory\" />

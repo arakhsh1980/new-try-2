@@ -505,5 +505,34 @@ namespace soccer1.Models.utilites
             return kk;
         }
 
+
+        public static string IntArrayToSrtingWithChar(int[] ar, Char ch)
+        {
+            if (ar.Length < 1)
+            {
+                return "";
+            }
+            string uu = "";
+            uu = ar[0].ToString();
+            for (int i = 1; i < ar.Length; i++)
+            {
+                uu += ch + ar[i].ToString();
+            }
+            return uu;
+        }
+
+        public static int[] StringToIntArrayWithChar(string ar, Char ch)
+        {
+            string[] splitted = ar.Split(ch);
+            int[] res = new int[splitted.Length];
+            for (int i = 0; i < res.Length; i++)
+            {
+                res[i] = int.Parse(splitted[i]);
+            }
+            return res;
+        }
+
+
+
     }
 }

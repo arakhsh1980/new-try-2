@@ -12,66 +12,6 @@ namespace soccer1.Models.main_blocks
     
     // public enum RoboPartEffectType { aimer, shild, battry, shooter, engine }
     public enum RoboPartGoldLevel { low, mediom, high }
-    public class RoboPart
-    {
-        [Key]
-        public string key { get; set; }
-        public RoboPartType partType { get; set; }
-        //public short IdNum { get; set; }
-       // public RoboPartEffectType effectType { get; set; }
-        public int lowGoldEffect { get; set; }
-        public int MediomGoldEffect { get; set; }
-        public int HighGoldEffect { get; set; }
-       // public Property price { get; set; }
-        public int GoldValue { get; set; }
-        public int AlmimunValue { get; set; }
-        public int BluePrintGoldValue { get; set; }
-        public int BluePrintAlmimunValue { get; set; }
-        public short MinBaseLevel { get; set; }
-        public int minuetToBuild { get; set; }
-        public int numberOfBuildableParts { get; set; }
-    }
-
-    public class RoboBase
-    {
-        [Key]
-        public string key { get; set; }
-        public short IdNum { get; set; }
-       // public RoboPartEffectType effectType { get; set; }
-        public short level { get; set; }
-        public short upgradeToId1 { get; set; }
-        public short upgradeToId2 { get; set; }
-        public short upgradeToId3 { get; set; }
-        public int requiredXpToUpgrade { get; set; }
-        public PawnAbility mainAbility { get; set; }
-        public short SpaceForAddOn { get; set; }
-    }
-
-
-
-    public class Sponsor
-    {
-        public Sponsor()
-        {
-
-        }
-
-        [Key]
-        public string key { get; set; }
-        //public int IdNum { get; set; }
-        public int goldPerWin { get; set; }
-        public int AlminumPerWin { get; set; }
-        public int MaxTickets { get; set; }
-        public int TimeBetweenTickets { get; set; }
-        public string name { get; set; }
-        public int minAcceptableTropy { get; set; }
-        public int minAcceptableXp { get; set; }
-        public string prerequisite { get; set; }
-
-        public string prerequisiteCode { get; set; }
-
-
-    }
 
     public class BuildedRoboPart
     {

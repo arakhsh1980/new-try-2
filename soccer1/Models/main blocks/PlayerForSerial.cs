@@ -58,6 +58,9 @@ namespace soccer1.Models.main_blocks
 
         public long[] buildOrders;
         public bool IsTHisAHostPlayer;
+
+        
+        public int LastfilledGoalMemory;
     }
 
     /*

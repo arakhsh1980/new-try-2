@@ -28,7 +28,6 @@ namespace soccer1.Controllers
         private static Mutex AddNew = new Mutex();
         // POST: Loading/LoadPlayerData
         [HttpPost]
-        
         public string LoadPlayerData(FormCollection collection)
         {            
             string id = Request.Form["PlayerId"];
@@ -72,6 +71,49 @@ namespace soccer1.Controllers
             string uu = new JavaScriptSerializer().Serialize(plsr);
             return uu;  
         }
+
+
+        [HttpPost]
+        public string LoadGaolMemory(FormCollection collection)
+        {
+            string id = Request.Form["PlayerId"];
+            string GoalmemoryNumber = Request.Form["GoalmemoryNumber"];
+            new AssetManager().LoadDataFromServerifitsFirstTime();
+            PlayerForDatabase player = dataBase.playerInfoes.Find(id);
+            string result="";
+            if (player == null)
+            {
+                return "";
+            }
+            else
+            {
+                switch (GoalmemoryNumber)
+                {
+                    case "0":
+                        result = player.GoalMemory0;
+                        break;
+                    case "1":
+                        result = player.GoalMemory1;
+                        break;
+                    case "2":
+                        result = player.GoalMemory2;
+                        break;
+                    case "3":
+                        result = player.GoalMemory3;
+                        break;
+                    case "4":
+                        result = player.GoalMemory4;
+                        break;
+                    default:
+                        break;
+                }
+            }
+            return result;
+        }
+
+
+        
+
 
         /*
         public string SponserUpdate(FormCollection collection)

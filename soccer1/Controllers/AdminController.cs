@@ -8,6 +8,7 @@ using System.Web.Script.Serialization;
 using soccer1.Models.main_blocks;
 using System.Threading;
 using soccer1.Models.DataBase;
+using soccer1.Models.utilites;
 
 namespace soccer1.Controllers
 {
@@ -17,52 +18,9 @@ namespace soccer1.Controllers
         public static Mutex AddElixirmutex = new Mutex();
         public static Mutex AddFormationmutex = new Mutex();
         public static Mutex AddOffermutex = new Mutex();
+        public static Mutex AddAdminControlermutex = new Mutex();
         private DataDBContext dataBase = new DataDBContext();
 
-        [HttpPost]
-        public string AddRoboPart(FormCollection collection)
-        {
-            new AssetManager().LoadDataFromServerifitsFirstTime();
-            
-                AddPawnmutex.WaitOne();
-            string AdminCode = Request.Form["AdminCode"];
-            if (AdminCode != Statistics.AdminCode)
-            {
-                AddPawnmutex.ReleaseMutex();
-                return "wrong Admin Code" ;
-            }
-                //AssetManager.assentsLoaded.WaitOne();
-                RoboPart newpart = new RoboPart();
-            //pawn.abilityShower= Request.Form["abilityShower"];            
-            newpart.HighGoldEffect = Int32.Parse(Request.Form["HighGoldEffect"]);
-            short IdNum = short.Parse(Request.Form["IdNum"]);
-            newpart.partType = (RoboPartType)IdNum;
-            newpart.lowGoldEffect= Int32.Parse(Request.Form["lowGoldEffect"]);
-            newpart.MediomGoldEffect = Int32.Parse(Request.Form["MediomGoldEffect"]);            
-            //Enum.TryParse<RoboPartType>(Request.Form["partType"],out tt);
-            newpart.key =  newpart.partType.ToString();
-            Property price = new Property();
-            price.Alminum = Int32.Parse(Request.Form["price.coin"]);
-            price.fan = Int32.Parse(Request.Form["price.fan"]);
-            price.tropy = Int32.Parse(Request.Form["price.level"]);
-            price.gold = Int32.Parse(Request.Form["price.SoccerSpetial"]);
-
-            Property BluePrintprice = new Property();
-            BluePrintprice.Alminum = Int32.Parse(Request.Form["BluePrintPrice.coin"]);
-            BluePrintprice.fan = Int32.Parse(Request.Form["BluePrintPrice.fan"]);
-            BluePrintprice.tropy = Int32.Parse(Request.Form["BluePrintPrice.level"]);
-            BluePrintprice.gold = Int32.Parse(Request.Form["BluePrintPrice.SoccerSpetial"]);
-            newpart.numberOfBuildableParts = Int32.Parse(Request.Form["numberOfBuildableParts"]);
-            newpart.BluePrintAlmimunValue = BluePrintprice.Alminum;
-            newpart.GoldValue= BluePrintprice.gold;
-            //newpart.price = price;
-            newpart.GoldValue = price.gold;
-            newpart.AlmimunValue = price.Alminum;
-            newpart.minuetToBuild = Int32.Parse(Request.Form["minuteToBuild"]);
-            new AssetManager().AddRoboPartToAssets(newpart);
-            AddPawnmutex.ReleaseMutex();            
-            return "RoboPart Loaded" + newpart.partType.ToString();            
-        }
 
         /*
         [HttpPost]
@@ -121,50 +79,6 @@ namespace soccer1.Controllers
 
         */
 
-
-        [HttpPost]
-        public string UpdateAnPlanetData(FormCollection collection)
-        {
-            new AssetManager().LoadDataFromServerifitsFirstTime();
-            AddPawnmutex.WaitOne();
-            string AdminCode = Request.Form["AdminCode"];
-            if (AdminCode != Statistics.AdminCode)
-            {
-                AddPawnmutex.ReleaseMutex();
-                return "wrong Admin Code";
-            }
-            string newdata = Request.Form["PlanetData"];
-            string part2 = Request.Form["PlanetName"];
-            string nameCode = "PlanetData" + part2;
-
-            if (newdata != null)
-            {
-                
-                DualString finded = dataBase.GameDataStrings.Find(nameCode);
-                if (finded != null)
-                {
-                    finded.value = newdata;
-                }
-                else
-                {
-                    DualString DataForsave = new DualString();
-                    DataForsave.key = nameCode;
-                    DataForsave.value = newdata;
-                    dataBase.GameDataStrings.Add(DataForsave);
-                }
-                //dataBase.GameDataStrings.
-                dataBase.SaveChanges();
-            }
-            else
-            {
-
-            }
-            AddPawnmutex.ReleaseMutex();
-            return "done";
-        }
-
-
-
         [HttpPost]
         public string UpdateGameData(FormCollection collection)
         {
@@ -177,16 +91,16 @@ namespace soccer1.Controllers
                 return "wrong Admin Code";
             }
             string newdata = Request.Form["GameData"];
-            
+
             if (newdata != null)
-            {               
+            {
                 DualString finded = dataBase.GameDataStrings.Find("GameData");
                 if (finded != null)
                 {
                     finded.value = newdata;
                     DualString dataVersion = dataBase.GameDataStrings.Find("GameDataVersion");
                     int dataVersionnum = Int32.Parse(dataVersion.value);
-                    dataVersion.value = (dataVersionnum + 1).ToString();                    
+                    dataVersion.value = (dataVersionnum + 1).ToString();
                 }
                 else
                 {
@@ -203,9 +117,82 @@ namespace soccer1.Controllers
                 dataBase.SaveChanges();
                 Statistics.GameDataVersion++;
             }
-           
+
             AddPawnmutex.ReleaseMutex();
-            return "done :" ;
+            return "done :";
+        }
+
+
+
+        [HttpPost]
+        public string ReturnPlayerHistory(FormCollection collection)
+        {
+            new AssetManager().LoadDataFromServerifitsFirstTime();
+            AddPawnmutex.WaitOne();
+            string AdminCode = Request.Form["AdminCode"];
+            if (AdminCode != Statistics.AdminCode)
+            {
+                AddPawnmutex.ReleaseMutex();
+                return "wrong Admin Code";
+            }
+            string playerId = Request.Form["playerId"];
+            PlayerForDatabase player = dataBase.playerInfoes.Find(playerId);
+
+            if (player != null)
+            {
+                AddPawnmutex.ReleaseMutex();
+                return player.HistoryCode;
+            }
+            else
+            {
+                AddPawnmutex.ReleaseMutex();
+                return "id not finded :";
+            }
+            
+
+        }
+
+        [HttpPost]
+        public string ReturnListOfplayersThatLeft(FormCollection collection)
+        {
+            new AssetManager().LoadDataFromServerifitsFirstTime();
+            AddPawnmutex.WaitOne();
+            string AdminCode = Request.Form["AdminCode"];
+            if (AdminCode != Statistics.AdminCode)
+            {
+                AddPawnmutex.ReleaseMutex();
+                return "wrong Admin Code";
+            }
+            int TimeFromlastConnection =int.Parse( Request.Form["TimeFromlastConnection"]);
+            if (TimeFromlastConnection < 10)
+            {
+                AddPawnmutex.ReleaseMutex();
+                return "invalidTime :";
+            }
+            List<string> leftedPlayers = new List<string>();
+            int TimePointofNow = new Utilities().TimePointofNow();
+            foreach (PlayerForDatabase p in dataBase.playerInfoes.ToList())
+            {
+                if(TimeFromlastConnection < TimePointofNow - p.LastConnectionTime)
+                {
+                    leftedPlayers.Add(p.id);
+                }
+            }
+            if(leftedPlayers.Count == 0)
+            {
+                AddPawnmutex.ReleaseMutex();
+                return "noOneleft :";
+            }
+            else
+            {
+                string res = leftedPlayers[0];
+                for (int i = 1; i < leftedPlayers.Count; i++)
+                {
+                    res += "|"+leftedPlayers[i];
+                }
+                AddPawnmutex.ReleaseMutex();
+                return res;
+            }
         }
 
 
@@ -291,227 +278,35 @@ namespace soccer1.Controllers
         }
 
 
-        [HttpPost]
-        public string AddSponser(FormCollection collection)
-        {
-            new AssetManager().LoadDataFromServerifitsFirstTime();
-            AddPawnmutex.WaitOne();
-            string AdminCode = Request.Form["AdminCode"];
-            if (AdminCode != Statistics.AdminCode)
-            {
-                AddPawnmutex.ReleaseMutex();
-                return "wrong Admin Code";
-            }
-            //AssetManager.assentsLoaded.WaitOne();
-            Sponsor newsp = new Sponsor();
-            //pawn.abilityShower= Request.Form["abilityShower"];
-            newsp.MaxTickets = Int32.Parse(Request.Form["MaxTickets"]);
-            newsp.goldPerWin = Int32.Parse(Request.Form["goldPerWin"]);
-            newsp.MaxTickets = Int32.Parse(Request.Form["MaxTickets"]);
-            newsp.minAcceptableTropy = Int32.Parse(Request.Form["minAcceptableTropy"]);
-            newsp.minAcceptableXp = Int32.Parse(Request.Form["minAcceptableXp"]);
-            newsp.name = Request.Form["name"];
-            newsp.prerequisite = Request.Form["prerequisite"];
-            newsp.prerequisiteCode = Request.Form["prerequisiteCode"];
-            newsp.TimeBetweenTickets = Int32.Parse(Request.Form["TimeBetweenTickets"]);
-            new AssetManager().AddSponserToAssets(newsp);
-            AddPawnmutex.ReleaseMutex();
-            return "Sponser saved :" + newsp.name;
-        }
-
-
         public class ShortArrayClass
         {
             public short[] ar;
         }
 
 
+
         [HttpPost]
-        public string AddMissionToDatabase(FormCollection collection)
+        public string AddClassData(FormCollection collection)
         {
-            new AssetManager().LoadDataFromServerifitsFirstTime();
-            AddPawnmutex.WaitOne();
+            AddAdminControlermutex.WaitOne();
+            new AssetManager().LoadDataFromServerifitsFirstTime();            
             string AdminCode = Request.Form["AdminCode"];
             if (AdminCode != Statistics.AdminCode)
             {
-                AddPawnmutex.ReleaseMutex();
-                return "wrong Admin Code";
-            }
-
-
-            //AssetManager.assentsLoaded.WaitOne();
-            MissionDefinition newMission = new MissionDefinition();
-            //pawn.abilityShower= Request.Form["abilityShower"];            
-            newMission.IdNum = short.Parse(Request.Form["IdNum"]);
-            string shortsss = Request.Form["preRequisite"];
-            string[] shotrss = shortsss.Split('*');
-
-            if (1 < shotrss.Length)
-            {
-                short[] inputs = new short[shotrss.Length - 1];
-                for (int i = 0; i < shotrss.Length - 1; i++)
-                {
-                    inputs[i] = short.Parse(shotrss[i]);
-                }
-                newMission.preRequisite = new JavaScriptSerializer().Serialize(inputs);
-            }
-            else
-            {
-                newMission.preRequisite = "";
-            }
-
-            //ShortArrayClass prereq =(ShortArrayClass) new JavaScriptSerializer().DeserializeObject(shortsss);            
-
-            newMission.rewardInGold = Int32.Parse(Request.Form["rewardInGold"]);
-
-            newMission.key = newMission.IdNum.ToString();
-
-            new AssetManager().AddMissionsToAssets(newMission);
-            AddPawnmutex.ReleaseMutex();
-            return "Mission Loaded" + newMission.key + " " + newMission.IdNum;
-        }
-
-
-        [HttpPost]
-        public string AddRoboBase(FormCollection collection)
-        {
-            new AssetManager().LoadDataFromServerifitsFirstTime();
-            AddPawnmutex.WaitOne();
-            string AdminCode = Request.Form["AdminCode"];
-            if (AdminCode != Statistics.AdminCode)
-            {
-                AddPawnmutex.ReleaseMutex();
-                return "wrong Admin Code";
-            }
-
-            //AssetManager.assentsLoaded.WaitOne();
-            RoboBase newRoboBase = new RoboBase();
-            //pawn.abilityShower= Request.Form["abilityShower"];
-            newRoboBase.IdNum = short.Parse(Request.Form["IdNum"]);
-            newRoboBase.level = short.Parse(Request.Form["level"]);
-            newRoboBase.requiredXpToUpgrade = Int32.Parse(Request.Form["requiredXpToUpgrade"]);
-            newRoboBase.upgradeToId1 = short.Parse(Request.Form["upgradeToId1"]);
-            newRoboBase.upgradeToId2 = short.Parse(Request.Form["upgradeToId2"]);
-            newRoboBase.key = newRoboBase.IdNum.ToString();
-            newRoboBase.upgradeToId3 = short.Parse(Request.Form["upgradeToId3"]);
-            newRoboBase.SpaceForAddOn = short.Parse(Request.Form["SpaceForAddOn"]);
-            //Log.AddLog("AddPawnStarted" + pawn.IdName);
-            PawnAbility mainability = new PawnAbility();
-            mainability.aiming = float.Parse(Request.Form["mainAbility.aiming"]);
-            mainability.boddyMass = float.Parse(Request.Form["mainAbility.boddyMass"]);
-            mainability.endorance = float.Parse(Request.Form["mainAbility.endorance"]);
-            mainability.shootPower = float.Parse(Request.Form["mainAbility.shootPower"]);
-            mainability.force = float.Parse(Request.Form["mainAbility.force"]);
-            newRoboBase.mainAbility = mainability;
-            //pawn.ShowName = Request.Form["redForSale"];            
-            new AssetManager().AddRoboBaseToAssets(newRoboBase);
-            AddPawnmutex.ReleaseMutex();
-            return "Base Loaded" + newRoboBase.IdNum;
-        }
-
-
-        [HttpPost]
-        public string AddElixir(FormCollection collection)
-        {
-            new AssetManager().LoadDataFromServerifitsFirstTime();
-            AddElixirmutex.WaitOne();
-            string AdminCode = Request.Form["AdminCode"];
-            if (AdminCode != Statistics.AdminCode)
-            {
-                AddElixirmutex.ReleaseMutex();
+                AddAdminControlermutex.ReleaseMutex();
                 return "wrong Admin Code";
             }
             //AssetManager.assentsLoaded.WaitOne();
-            Elixir elixir = new Elixir();
-            elixir.forSale = Request.Form["forSale"];
-            elixir.IdNum = Int32.Parse(Request.Form["IdNum"]);
-            elixir.key = elixir.IdNum.ToString();
-            elixir.showName = Request.Form["showName"];
-            //Log.AddLog("AddElixirStarted" + elixir.IdName);
-            SpetialPower sp = new SpetialPower();
-            sp.IdName = Request.Form["spPower.IdName"];
-            sp.image = Request.Form["spPower.image"];
-            sp.scribtion = Request.Form["spPower.scribtion"];
-            sp.ShowName = Request.Form["spPower.ShowName"];
-            elixir.spPower = sp;
-            Property price = new Property();
-            price.Alminum = Int32.Parse(Request.Form["price.coin"]);
-            price.fan = Int32.Parse(Request.Form["price.fan"]);
-            price.tropy = Int32.Parse(Request.Form["price.level"]);
-            price.gold = Int32.Parse(Request.Form["price.SoccerSpetial"]);
-            elixir.price = price;
-            new AssetManager().AddElixirToAssets(elixir);
-            AddElixirmutex.ReleaseMutex();
-            return "Elixir Loaded" + elixir.IdNum;
+            ClassData newClassData = new ClassData();
+            newClassData.nameCode = Request.Form["CodeName"];
+            newClassData.innerData = Request.Form["innerData"];
+            newClassData.type = Int32.Parse(Request.Form["type"]);
+            new AssetManager().AddClassDataToAssets(newClassData, false);
+            
+
+            AddAdminControlermutex.ReleaseMutex();
+            return "ClassData Added Loaded" + newClassData.nameCode;
         }
-
-        [HttpPost]
-        public string AddFormation(FormCollection collection)
-        {
-            new AssetManager().LoadDataFromServerifitsFirstTime();
-            AddFormationmutex.WaitOne();
-            string AdminCode = Request.Form["AdminCode"];
-            if (AdminCode != Statistics.AdminCode)
-            {
-                AddFormationmutex.ReleaseMutex();
-                return "wrong Admin Code";
-            }
-            //AssetManager.assentsLoaded.WaitOne();
-            Formation formation = new Formation();
-            formation.discription = Request.Form["discription"];
-            formation.IdNum = Int32.Parse(Request.Form["IdNum"]);
-            formation.key = formation.IdNum.ToString();
-            formation.showName = Request.Form["showName"];
-
-            Property price = new Property();
-            price.Alminum = Int32.Parse(Request.Form["price.coin"]);
-            price.fan = Int32.Parse(Request.Form["price.fan"]);
-            price.tropy = Int32.Parse(Request.Form["price.level"]);
-            price.gold = Int32.Parse(Request.Form["price.SoccerSpetial"]);
-            formation.price = price;
-            formation.positions = new PawnStartPosition[5];
-            for (int i = 0; i < formation.positions.Length; i++)
-            {
-                formation.positions[i].x = Int32.Parse(Request.Form["positions" + i.ToString() + "x"]);
-                formation.positions[i].y = Int32.Parse(Request.Form["positions" + i.ToString() + "y"]);
-            }
-
-            new AssetManager().AddFormationToAssets(formation);
-            AddFormationmutex.ReleaseMutex();
-            return "Formation Loaded" + formation.IdNum;
-        }
-
-
-        [HttpPost]
-        public string AddOffer(FormCollection collection)
-        {
-            new AssetManager().LoadDataFromServerifitsFirstTime();
-            AddOffermutex.WaitOne();
-            string AdminCode = Request.Form["AdminCode"];
-            if (AdminCode != Statistics.AdminCode)
-            {
-                AddOffermutex.ReleaseMutex();
-                return "wrong Admin Code";
-            }
-            //AssetManager.assentsLoaded.WaitOne();
-            Offer newOffer = new Offer();
-            newOffer.BuyedmoneyAmount = Int32.Parse(Request.Form["BuyedmoneyAmount"]);
-            newOffer.BuyedmoneyType = Int32.Parse(Request.Form["BuyedmoneyType"]);
-            newOffer.IdName = Request.Form["IdName"];
-            newOffer.realDollerPrice = Int32.Parse(Request.Form["realDollerPrice"]);
-            Property price = new Property();
-            price.Alminum = Int32.Parse(Request.Form["price.coin"]);
-            price.fan = Int32.Parse(Request.Form["price.fan"]);
-            price.tropy = Int32.Parse(Request.Form["price.level"]);
-            price.gold = Int32.Parse(Request.Form["price.SoccerSpetial"]);
-            newOffer.price = price;
-
-            new AssetManager().AddOfferToAssets(newOffer);
-            AddOffermutex.ReleaseMutex();
-            return "Formation Loaded" + newOffer.IdName;
-        }
-
-
 
 
 

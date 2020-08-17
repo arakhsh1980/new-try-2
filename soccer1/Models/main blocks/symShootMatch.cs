@@ -2,20 +2,26 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Web.Mvc;
+using System.Runtime.Serialization;
+using System.Xml.Serialization;
 using soccer1.Models;
+using System.IO;
+using System.Text;
+using System.Runtime.Serialization.Json;
+using System.Web.Script.Serialization;
+using soccer1.Models.utilites;
 using soccer1.Models.main_blocks;
 using System.Threading;
-using System.Web.Script.Serialization;
 using soccer1.Models.DataBase;
 using System.Data.Entity;
-using soccer1.Models.utilites;
 
 
 namespace soccer1.Models.main_blocks
 {
     public enum matchExternalResults { matchStarted, pl1}
-
     
+
     public struct DoubleString
     {
         public string st1;
@@ -44,7 +50,7 @@ namespace soccer1.Models.main_blocks
 
     public class symShootMatch
     {
-
+        
 
         public symShootMatch()
         {
@@ -109,6 +115,7 @@ namespace soccer1.Models.main_blocks
             mainMutex.WaitOne();
             if (playerIDName == playerOneIdName && playerOneShoot== "NULL" )
             {
+                CurrentGoalMemory.plOneShoot2 = shoot;
                 playerOneShoot = shoot;
                 //pl1PawnShooterAssingedIndex = PawnAssignIndex;
                 AddXpToShooter(true, NominatedXperiance.simpleShootXp);
@@ -119,6 +126,7 @@ namespace soccer1.Models.main_blocks
             }
             if (playerIDName == playerTwoIdName && playerTwoShoot == "NULL" )
             {
+                CurrentGoalMemory.plTwoShoot2 = shoot;
                 playerTwoShoot = shoot;
                 //pl2PawnShooterAssingedIndex = PawnAssignIndex;
                 AddXpToShooter(false, NominatedXperiance.simpleShootXp);                
@@ -175,6 +183,10 @@ namespace soccer1.Models.main_blocks
                     situation = MatchSituation.WFShoot;
 
                     Log.AddMatchLog(matchNumber, " GetStationeryPostion.Stationery position Accepted");
+                    CurrentGoalMemory.startPositions = CurrentGoalMemory.endPositionsAfter;
+                    CurrentGoalMemory.endPositionsAfter = playerOnePawnsPositions;
+                    CurrentGoalMemory.plOneShoot1 = CurrentGoalMemory.plOneShoot2;
+                    CurrentGoalMemory.plTwoShoot1 = CurrentGoalMemory.plTwoShoot2;
                     playerOnePawnsPositions = "";
                     playerTwoPawnsPositions = "";
                     isUnSolvedStationeryPostion = false;
@@ -225,6 +237,8 @@ namespace soccer1.Models.main_blocks
             {
                 if (playerOneGoalClaim == 1)
                 {
+                    CurrentGoalMemory.isPlayerOneScoredAtEnd = true;
+                    CurrentGoalMemory.ScorerId= playerOneIdName;
                     IsgoalHappenInTurn = true;
                     AddXpToShooter(true, NominatedXperiance.GoalXp);
                     AddXpToTeam(true, NominatedXperiance.GoalScorerTeamXp);
@@ -235,10 +249,12 @@ namespace soccer1.Models.main_blocks
                     playerOnePawnsPositions = "";
                     playerTwoPawnsPositions = "";
                     isUnSolvedGoalClaim = false;
-
+                    
                 }
                 if (playerOneGoalClaim == -1)
                 {
+                    CurrentGoalMemory.isPlayerOneScoredAtEnd = false;
+                    CurrentGoalMemory.ScorerId = playerTwoIdName;
                     IsgoalHappenInTurn = true;
                     AddXpToShooter(false, NominatedXperiance.GoalXp);
                     AddXpToTeam(false, NominatedXperiance.GoalScorerTeamXp);
@@ -270,6 +286,11 @@ namespace soccer1.Models.main_blocks
                     return "None";
                 }
                 SendMassageToPlayers(MatchMassageType.PlayerGoal, ThisTurnScorerID);
+                if(CurrentGoalMemory.startPositions !="" && CurrentGoalMemory.startPositions != null)
+                {
+                    AddPlayerEvent(CurrentGoalMemory.ScorerId, MatchMassageType.goalMemory, new JavaScriptSerializer().Serialize(CurrentGoalMemory));
+                }
+                
                 StartNextTurn();
             }
             mainMutex.ReleaseMutex();
@@ -319,6 +340,7 @@ namespace soccer1.Models.main_blocks
                     for (int i = 0; i < result.Events.Length; i++)
                     {
                         result.Events[i] = playerOneEvents[i + lastREsiverNumber+1];
+                        
                     }                                        
                 } 
             }
@@ -1009,7 +1031,6 @@ namespace soccer1.Models.main_blocks
         #region inner functions
 
 
-
         /*
         void matchTimeControler()
         {
@@ -1480,6 +1501,7 @@ namespace soccer1.Models.main_blocks
 
 
         #region private variables
+        TwoStepGoalMemory CurrentGoalMemory = new TwoStepGoalMemory();
         bool isPlayerOneInMatch;
         bool isPlayerTwoInMatch;
         string pl1Substitution = "null";

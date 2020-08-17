@@ -18,22 +18,29 @@ namespace soccer1.Models.DataBase
         }
         public DbSet<PlayerForDatabase> playerInfoes { get; set; }
         //public DbSet<Pawn> allPawns { get; set; }
-
-        public DbSet<Elixir> allElixires { get; set; }
-
-        public DbSet<Formation> allFormations { get; set; }
-
-        public DbSet<Offer> allOffers { get; set; }
-
-        public DbSet<Sponsor> allSponsor { get; set; }
         
-        public DbSet<RoboPart> allParts { get; set; }
+        //public DbSet<Elixir> allElixires { get; set; }
 
-        public DbSet<RoboBase> allBases { get; set; }
+        //public DbSet<Formation> allFormations { get; set; }
 
-        public DbSet<MissionDefinition> allMissions { get; set; }
+        //public DbSet<Offer> allOffers { get; set; }
+
+        //public DbSet<Sponsor> allSponsor { get; set; }
+        
+        //public DbSet<RoboPart> allParts { get; set; }
+
+        //public DbSet<RoboBase> allBases { get; set; }
+        
+        public DbSet<ClassData> allClassesData { get; set; }
+
+        //public DbSet<MissionDefinition> allMissions { get; set; }
 
         public DbSet<DualString> GameDataStrings { get; set; }
+
+        public DbSet<TwoStepChalenge> twoStepChalenges { get; set; }
+
+        public DbSet<OneStepChalenge> OneStepChalenges { get; set; }
+
         public DbSet<IntArrayClass> HostPlayers { get; set; }
 
 
